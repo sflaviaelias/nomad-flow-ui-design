@@ -1,8 +1,8 @@
+
 import React, { useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Users, MapPin, CircleCheck } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import ConciergeContextModal from "./ConciergeContextModal";
 import { useNavigate } from "react-router-dom";
@@ -84,7 +84,7 @@ const ConciergeChat: React.FC = () => {
 
   return (
     <section className="w-full max-w-2xl mx-auto flex flex-col pt-0 px-2 md:px-0 gap-2 font-inter">
-      {/* Cabeçalho padrão internal */}
+      {/* Header padrão: só UM header utilizando PageHeader padrão interno */}
       <PageHeader title="Concierge" showBack />
 
       {/* Message Card (Card do DS para a mensagem inicial) */}
@@ -211,3 +211,4 @@ const ConciergeChat: React.FC = () => {
 };
 
 export default ConciergeChat;
+
