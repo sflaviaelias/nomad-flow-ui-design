@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,8 +8,9 @@ body {
   font-family: 'Inter', Arial, sans-serif;
 }
 
-// Untitled UI core
+/* Untitled UI core */
 .text-terra-600 { color: #E76F51; }
 .text-terra-700 { color: #C9583C; }
 .text-terra-800 { color: #AD4F36; }
 .text-terra-900 { color: #6D4530; }
+
