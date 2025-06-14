@@ -1,9 +1,9 @@
 
 import React from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, ArrowRight, MapPin } from "lucide-react";
+import { Loader2, ArrowRight } from "lucide-react";
 import { useDestinationImageAI } from "./useDestinationImageAI";
+import DestinationCombobox from "./DestinationCombobox";
 
 interface TripDestinationStepProps {
   value: string;
@@ -23,14 +23,13 @@ const TripDestinationStep: React.FC<TripDestinationStepProps> = ({
   return (
     <div>
       <label className="block mb-2 font-medium flex items-center gap-2">
-        <MapPin className="text-terracotta" /> Destino
+        Destino
       </label>
-      <Input
+      <DestinationCombobox
         value={value}
-        onChange={e => onChange(e.target.value)}
-        placeholder="Ex: Lisboa, Portugal"
+        onChange={onChange}
+        disabled={disabled}
         autoFocus
-        aria-label="Destino"
       />
       <div className="mt-3">
         {imgLoading && (
@@ -54,4 +53,3 @@ const TripDestinationStep: React.FC<TripDestinationStepProps> = ({
 };
 
 export default TripDestinationStep;
-
