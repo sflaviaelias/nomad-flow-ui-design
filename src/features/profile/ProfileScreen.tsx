@@ -51,70 +51,18 @@ export default function ProfileScreen() {
     );
   }
 
-  // Caso não haja usuário logado, exibe opções amigáveis para login/criar conta
+  // Caso não haja usuário logado
   if (!user) {
-    return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-[#FAF3EC] px-4">
-        <Card className="w-full max-w-md bg-white rounded-2xl p-8 border-none shadow-soft flex flex-col items-center">
-          <ProfileAvatar avatarUrl={null} name={null} editable={false} />
-          <h2 className="font-bold text-2xl mt-4 mb-2 text-terra-800 text-center" style={{ fontFamily: "Inter" }}>
-            Sessão não iniciada
-          </h2>
-          <p className="text-terra-700 text-[16px] text-center mb-6" style={{ fontFamily: "Inter" }}>
-            Faça login para visualizar seu perfil e personalizar sua experiência no Go Nomad.
-          </p>
-          <Button
-            className="w-full mb-3 min-h-[44px] font-semibold bg-[#E76F51] text-white hover:bg-[#CC5A3D]"
-            onClick={() => navigate("/auth/login")}
-          >
-            Entrar
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full min-h-[44px] font-semibold border-[#E76F51] text-[#E76F51] hover:bg-[#E76F51]/10"
-            onClick={() => navigate("/auth/access")}
-          >
-            Criar conta
-          </Button>
-        </Card>
-      </div>
-    );
+    return <ProfileLoginPrompt />;
   }
 
-  // Fallback se não encontrar perfil (usuário autenticado)
+  // Caso usuário autenticado mas perfil não encontrado
   if (!profile) {
-    return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-[#FAF3EC] px-4">
-        <div className="w-full max-w-md flex flex-col items-center justify-center mt-16">
-          <h2 className="font-bold text-xl mb-4 text-terra-800 text-center" style={{ fontFamily: "Inter" }}>
-            Perfil não encontrado.
-          </h2>
-          <div className="flex flex-col gap-2 w-full max-w-[220px]">
-            <Button
-              className="w-full min-h-[44px] font-semibold bg-[#E76F51] text-white hover:bg-[#CC5A3D]"
-              onClick={() => navigate("/auth/login")}
-            >
-              Entrar
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full min-h-[44px] font-semibold border-[#E76F51] text-[#E76F51] hover:bg-[#E76F51]/10"
-              onClick={() => navigate("/auth/access")}
-            >
-              Criar conta
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
+    return <ProfileNotFoundPrompt />;
   }
 
-  // Extrai tags, nacionalidade e preferências corretamente
+  // Extrai as preferências e outros dados
   const preferences = profile.preferences || {};
-  const travel_tags = preferences.travel_tags ?? fallbackTags;
-  const isGoogleSSO = user?.app_metadata?.provider === "google";
-  const hasTags = travel_tags && travel_tags.length > 0;
-  const isIncomplete = !profile.name || !preferences?.nationality || !preferences?.country_residence;
 
   return (
     <div className="bg-[#FAF3EC] min-h-screen px-4 pt-2 pb-8 flex flex-col font-sans">
@@ -162,79 +110,8 @@ export default function ProfileScreen() {
       )}
 
       <div className="space-y-8">
-        {/* Informações Pessoais */}
-        <Card className="bg-white rounded-xl shadow-soft border-none">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-terra-900 font-semibold text-base" style={{ fontFamily: "Inter" }}>
-              Informações Pessoais
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="px-0 pb-4 pt-0">
-            <dl className="grid grid-cols-2 gap-y-2 text-[15px] text-terra-800" style={{ fontFamily: "Inter", wordBreak: "break-word" }}>
-              <dt className="font-medium leading-tight">Nome</dt>
-              <dd className="font-normal text-terra-900">{profile.name}</dd>
-              <dt className="font-medium leading-tight">E-mail</dt>
-              <dd className="font-normal text-terra-900">{profile.email}</dd>
-              <dt className="font-medium leading-tight">Nacionalidade</dt>
-              <dd className="font-normal text-terra-900">{preferences?.nationality}</dd>
-              <dt className="font-medium leading-tight">Residência</dt>
-              <dd className="font-normal text-terra-900">{profile.country_residence}</dd>
-              <dt className="font-medium leading-tight">Moeda</dt>
-              <dd className="font-normal text-terra-900">{preferences?.currency}</dd>
-            </dl>
-          </CardContent>
-        </Card>
-
-        {/* Preferências */}
-        <Card className="bg-white rounded-xl shadow-soft border-none">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-terra-900 font-semibold text-base" style={{ fontFamily: "Inter" }}>
-              Preferências
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="px-0 pb-4 pt-0">
-            <div className="mb-2">
-              <span className="font-medium text-terra-800 text-[15px]" style={{ fontFamily: "Inter" }}>Idiomas:</span>
-              <span className="ml-1 text-terra-900">{preferences?.languages?.join(", ")}</span>
-            </div>
-            <div className="mb-2 flex flex-col">
-              <span className="font-medium text-terra-800 text-[15px] mb-1" style={{ fontFamily: "Inter" }}>Estilo de viagem:</span>
-              <div className="flex flex-wrap gap-2">
-                {hasTags ? (
-                  travel_tags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="secondary"
-                      className="bg-terra-600/90 text-white rounded-full px-3 py-1 text-xs"
-                      style={{ fontFamily: "Inter", minHeight: "28px" }}
-                    >
-                      {tag}
-                    </Badge>
-                  ))
-                ) : (
-                  <span className="text-terra-700 text-[14px]" style={{ fontFamily: "Inter" }}>
-                    Nenhum estilo favorito selecionado ainda.
-                  </span>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center gap-2 mt-2">
-              <span className="font-medium text-terra-800 text-[15px]" style={{ fontFamily: "Inter" }}>
-                Assistente IA:
-              </span>
-              <Badge
-                className={`rounded-full px-2 py-0.5 text-xs font-medium border-none min-w-[44px] min-h-[28px] ${
-                  preferences?.ai_assistant
-                    ? "bg-terra-600 text-white"
-                    : "bg-[#DADADA] text-terra-900"
-                }`}
-                style={{ fontFamily: "Inter" }}
-              >
-                {preferences?.ai_assistant ? "Ativado" : "Desativado"}
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
+        <ProfileInfoCard profile={profile} />
+        <ProfilePreferencesCard preferences={preferences} />
 
         {/* Países visitados */}
         <div className="flex justify-between items-center px-1 mt-1">
@@ -249,32 +126,7 @@ export default function ProfileScreen() {
           </span>
         </div>
 
-        {/* Ações de Conta */}
-        <Card className="bg-white rounded-xl shadow-soft border-none mt-3">
-          <CardContent className="flex flex-col gap-3 p-4">
-            <Button
-              variant="secondary"
-              className="w-full text-terra-600 border-terra-600 bg-[#FAF3EC] hover:bg-terra-600/10 font-semibold text-base min-h-[44px]"
-              style={{ fontFamily: "Inter" }}
-              onClick={async () => {
-                await signOut();
-                toast({ title: "Sessão encerrada", description: "Você saiu da conta com sucesso." });
-                navigate("/auth/access");
-              }}
-            >
-              <LogOut className="mr-2" size={18} /> Sair da Conta
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full text-terra-700 bg-transparent hover:underline font-semibold text-base min-h-[44px] hover:bg-terra-600/5"
-              style={{ fontFamily: "Inter" }}
-              onClick={() => toast({ title: "Função indisponível no momento" })}
-            >
-              Excluir Conta
-            </Button>
-          </CardContent>
-        </Card>
+        <AccountActionsCard />
       </div>
     </div>
   );
