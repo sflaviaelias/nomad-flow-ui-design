@@ -1,12 +1,10 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function HomeAddTripButton() {
   const navigate = useNavigate();
-
   return (
     <div className="flex justify-center py-2">
       <Button
@@ -20,9 +18,15 @@ export default function HomeAddTripButton() {
         onClick={() => navigate("/trip/new")}
         aria-label="Adicionar nova viagem"
       >
-        <PlusCircle size={22} className="mr-1.5" />
+        {/* Ícone plus Untitled UI style */}
+        <svg width="20" height="20" fill="none" viewBox="0 0 20 20" className="mr-1.5">
+          <rect x="9" y="4" width="2" height="12" rx="1" fill="white" />
+          <rect x="4" y="9" width="12" height="2" rx="1" fill="white" />
+          <rect x="1" y="1" width="18" height="18" rx="5" stroke="white" strokeWidth="2" fill="#E76F51" />
+        </svg>
         Adicionar nova viagem
       </Button>
     </div>
   );
 }
+

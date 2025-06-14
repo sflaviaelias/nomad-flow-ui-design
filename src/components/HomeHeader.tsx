@@ -1,24 +1,64 @@
 
 import React from "react";
-import LogoMini from "./LogoMini";
+import { Menu, User } from "lucide-react"; // Lucide ícones do Untitled UI
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useNavigate } from "react-router-dom";
 
+// Novo Header conforme guidelines e DS
 type Props = {
-  user: { name: string; avatarUrl: string };
-  onAvatarClick?: () => void;
+  user: { name?: string; avatarUrl?: string };
 };
 
-export default function HomeHeader({ user, onAvatarClick }: Props) {
+export default function HomeHeader({ user }: Props) {
+  const navigate = useNavigate();
+
+  // Saudação conforme dado do user
+  const saudacao =
+    user?.name === "Flávia"
+      ? "Olá, Flávia"
+      : user?.name
+      ? `Olá, ${user.name}`
+      : "Olá, Nômade!";
+
   return (
     <header className="flex items-center justify-between px-3 pt-4 pb-2 bg-[#FAF3EC] select-none">
-      <LogoMini />
-      <img
-        src={user.avatarUrl}
-        alt={`Avatar de ${user.name}`}
-        className="w-10 h-10 rounded-full ring-2 ring-[#E76F51] object-cover cursor-pointer"
-        onClick={onAvatarClick}
-        draggable={false}
+      {/* Menu Hambúrguer */}
+      <button
+        type="button"
+        aria-label="Abrir menu"
+        className="flex items-center justify-center rounded-md p-2 hover:bg-[#E76F5112] transition"
         style={{ minWidth: 44, minHeight: 44 }}
-      />
+        onClick={() => navigate("/menu")}
+      >
+        <Menu size={28} className="text-[#E76F51]" />
+      </button>
+
+      {/* Saudação dinâmica */}
+      <span className="flex-1 text-center font-inter text-lg md:text-xl font-semibold text-[#C9583C] select-none">
+        {saudacao}
+      </span>
+
+      {/* Avatar do usuário (Untitled UI) */}
+      <button
+        type="button"
+        aria-label="Perfil"
+        className="ml-2"
+        onClick={() => navigate("/profile")}
+        style={{ minWidth: 44, minHeight: 44 }}
+      >
+        <Avatar className="w-11 h-11 ring-2 ring-[#E76F51] shadow-md">
+          {user.avatarUrl ? (
+            <AvatarImage src={user.avatarUrl} alt={`Avatar de ${user.name ?? "Nômade"}`} />
+          ) : (
+            <AvatarFallback
+              className="bg-[#E76F51] text-white font-bold"
+              aria-label="Avatar"
+            >
+              <User size={24} />
+            </AvatarFallback>
+          )}
+        </Avatar>
+      </button>
     </header>
   );
 }
