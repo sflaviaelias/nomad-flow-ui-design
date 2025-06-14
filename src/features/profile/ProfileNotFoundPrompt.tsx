@@ -14,7 +14,7 @@ export function ProfileNotFoundPrompt() {
         <div className="flex flex-col gap-2 w-full max-w-[220px]">
           <Button
             className="w-full min-h-[44px] font-semibold bg-[#E76F51] text-white hover:bg-[#CC5A3D]"
-            onClick={() => navigate("/auth/login")}
+            onClick={() => navigate("/auth")}
           >
             Entrar
           </Button>

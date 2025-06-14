@@ -19,7 +19,7 @@ export function ProfileLoginPrompt() {
         </p>
         <Button
           className="w-full mb-3 min-h-[44px] font-semibold bg-[#E76F51] text-white hover:bg-[#CC5A3D]"
-          onClick={() => navigate("/auth/login")}
+          onClick={() => navigate("/auth")}
         >
           Entrar
         </Button>
