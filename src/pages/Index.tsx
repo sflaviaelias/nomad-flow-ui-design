@@ -8,6 +8,11 @@ import DiscoverySection from "../components/DiscoverySection";
 import UpcomingTripsPreview from "../components/UpcomingTripsPreview";
 import { Avatar } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
+import { HomeHeader } from "../components/HomeHeader";
+import { ActiveTripSection } from "../components/ActiveTripSection";
+import { ConciergeSection } from "../components/ConciergeSection";
+import { DiscoverySectionWrapper } from "../components/DiscoverySectionWrapper";
+import { UpcomingTripsSection } from "../components/UpcomingTripsSection";
 
 // Dummy data: in real app, replace with actual data and hooks.
 const user = {
@@ -110,37 +115,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-[#FAF3EC]">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 pt-5 pb-2 bg-[#FAF3EC] rounded-b-xl shadow-none">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          aria-label="Abrir menu"
-          onClick={() => navigate("/profile")}
-        >
-          <Menu className="text-[#E76F51]" size={28} />
-        </Button>
-        <div className="flex-1 flex flex-col items-center justify-center">
-          <h1 className="font-bold text-xl leading-tight text-[#E76F51] font-inter">
-            Olá, {userName}!
-          </h1>
-          <span className="text-sm text-[#6D4530] leading-tight font-inter">Seu painel de viagens</span>
-        </div>
-        <div onClick={() => navigate("/profile")} className="cursor-pointer">
-          <Avatar className="w-10 h-10 border-2 border-[#E76F51] ring-2 ring-[#E76F51] shadow">
-            <img
-              src={avatarUrl}
-              alt={`Avatar de ${userName}`}
-              className="object-cover w-full h-full rounded-full"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src =
-                  "https://ui-avatars.com/api/?background=E76F51&color=fff&size=128&name=" +
-                  encodeURIComponent(userName);
-              }}
-            />
-          </Avatar>
-        </div>
-      </header>
+      <HomeHeader userName={userName} avatarUrl={avatarUrl} />
 
       <main className="max-w-md mx-auto w-full px-0 pb-10">
         {/* Loading indicator */}
@@ -149,118 +124,19 @@ const Index = () => {
             Carregando informações...
           </div>
         ) : (
-        <>
-        {/* Vertical spacing */}
-        <div className="h-8 md:h-12" />
-        {/* Trip Section */}
-        <section>
-          <h2 className="heading-sm font-semibold text-[#AD4F36] px-5 mb-3 text-base md:text-lg tracking-tight font-inter">
-            Viagem ativa
-          </h2>
-          <div className="px-4">
-            {hasActiveTrip ? (
-              <div className="rounded-2xl bg-white overflow-hidden shadow-card mb-6 w-full">
-                <img
-                  src={activeTrip.imageUrl}
-                  alt={activeTrip.destination}
-                  className="object-cover w-full h-40 md:h-48"
-                  style={{ borderTopLeftRadius: 14, borderTopRightRadius: 14 }}
-                />
-                <div className="p-4 flex flex-col gap-2">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-[#E76F51] font-inter font-semibold text-lg">
-                      {activeTrip.destination}
-                    </span>
-                  </div>
-                  <div className="text-xs text-[#AD4F36] mb-1 font-medium">{activeTrip.startDate} — {activeTrip.endDate}</div>
-                  <div className="flex gap-4 mb-1">
-                    <div>
-                      <div className="text-xs text-neutral-500">Orçamento</div>
-                      <div className="font-bold text-base text-[#C9583C]">{activeTrip.budget}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-neutral-400">No destino</div>
-                      <div className="font-medium text-[#6D4530]">{activeTrip.localBudget}</div>
-                    </div>
-                  </div>
-                  <div className="flex gap-2 mt-3">
-                    <Button
-                      className="flex-1"
-                      variant="default"
-                      size="sm"
-                      onClick={() => navigate("/trip/add-expense")}
-                    >
-                      Adicionar despesa
-                    </Button>
-                    <Button
-                      className="flex-1"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate("/discovery/markets")}
-                    >
-                      Descoberta local
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-2xl bg-white shadow-card p-7 text-center mb-6 flex flex-col items-center">
-                <span className="text-lg font-semibold text-[#E76F51] mb-1">
-                  Nenhuma viagem ativa encontrada.
-                </span>
-                <span className="text-sm text-[#AD4F36] mb-4">
-                  Programe uma nova viagem para começar!
-                </span>
-                <Button
-                  onClick={() => navigate("/trip/new")}
-                  className="w-full max-w-xs mx-auto"
-                >
-                  Adicionar nova viagem
-                </Button>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Vertical spacing */}
-        <div className="h-12" />
-        
-        {/* Concierge IA */}
-        <section>
-          <h2 className="heading-sm font-semibold text-[#AD4F36] px-5 mb-3 text-base md:text-lg tracking-tight font-inter">
-            Concierge IA
-          </h2>
-          <div className="px-4 mb-3">
-            <ConciergeCard />
-          </div>
-        </section>
-
-        {/* Vertical spacing */}
-        <div className="h-12" />
-
-        {/* Discovery */}
-        <section>
-          <h2 className="heading-sm font-semibold text-[#AD4F36] px-5 mb-3 text-base md:text-lg tracking-tight font-inter">
-            Descoberta
-          </h2>
-          <div className="px-4">
-            <DiscoverySection />
-          </div>
-        </section>
-
-        {/* Vertical spacing */}
-        <div className="h-12" />
-
-        {/* Upcoming Trips */}
-        <section>
-          <h2 className="heading-sm font-semibold text-[#AD4F36] px-5 mb-3 text-base md:text-lg tracking-tight font-inter">
-            Próximas viagens
-          </h2>
-          <div className="px-4">
-            <UpcomingTripsPreview />
-          </div>
-        </section>
-        </>
+          <>
+            <div className="h-8 md:h-12" />
+            <ActiveTripSection
+              hasActiveTrip={hasActiveTrip}
+              activeTrip={activeTrip}
+            />
+            <div className="h-12" />
+            <ConciergeSection />
+            <div className="h-12" />
+            <DiscoverySectionWrapper />
+            <div className="h-12" />
+            <UpcomingTripsSection />
+          </>
         )}
       </main>
     </div>
