@@ -7,6 +7,15 @@ import { useNavigate } from "react-router-dom";
 import { ChartContainer, ChartLegendContent } from "@/components/ui/chart";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+// Importando os componentes do Recharts
+import {
+  ResponsiveContainer,
+  BarChart,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Bar,
+} from "recharts";
 
 type Expense = {
   id: string;
@@ -46,11 +55,9 @@ export default function ExpensesDashboard() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Busca viagem ativa e despesas (primeira viagem do usuário logado)
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-      // Pega o usuário atual pelo perfil
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({ title: "Faça login para ver despesas." });
@@ -121,14 +128,11 @@ export default function ExpensesDashboard() {
       fill: CATEGORY_COLORS[cat as keyof typeof CATEGORY_COLORS] || "#DADADA",
     })),
     ...(otherSum > 0
-      ? [
-          {
-            categoria: "Outros",
-            valor: otherSum,
-            fill: CATEGORY_COLORS.Outros,
-          },
-        ]
-      : []),
+      ? [{
+        categoria: "Outros",
+        valor: otherSum,
+        fill: CATEGORY_COLORS.Outros,
+      }] : []),
   ];
 
   return (
@@ -167,16 +171,14 @@ export default function ExpensesDashboard() {
                     }}
                     className="w-full max-w-sm"
                   >
-                    {({ ResponsiveContainer, BarChart, XAxis, YAxis, Tooltip, Bar }) => (
-                      <ResponsiveContainer width="100%" height={180}>
-                        <BarChart data={chartData}>
-                          <XAxis dataKey="categoria" axisLine={false} tickLine={false} />
-                          <YAxis hide />
-                          <Tooltip />
-                          <Bar dataKey="valor" radius={[8, 8, 0, 0]} />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    )}
+                    <ResponsiveContainer width="100%" height={180}>
+                      <BarChart data={chartData}>
+                        <XAxis dataKey="categoria" axisLine={false} tickLine={false} />
+                        <YAxis hide />
+                        <Tooltip />
+                        <Bar dataKey="valor" radius={[8, 8, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
                   </ChartContainer>
                 ) : (
                   <div className="text-neutral-400 text-sm py-12 text-center">Sem despesas ainda</div>
