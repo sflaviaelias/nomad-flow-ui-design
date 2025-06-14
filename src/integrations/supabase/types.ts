@@ -9,7 +9,201 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      community_posts: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: string
+          media_url: string | null
+          title: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          media_url?: string | null
+          title: string
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          media_url?: string | null
+          title?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expenses: {
+        Row: {
+          amount: number
+          category: string | null
+          created_at: string | null
+          date: string | null
+          id: string
+          title: string
+          trip_id: string | null
+        }
+        Insert: {
+          amount: number
+          category?: string | null
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          title: string
+          trip_id?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: string | null
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          title?: string
+          trip_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      places: {
+        Row: {
+          address: string | null
+          category: string
+          city: string | null
+          country: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+        }
+        Insert: {
+          address?: string | null
+          category: string
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+        }
+        Update: {
+          address?: string | null
+          category?: string
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          country: string | null
+          created_at: string | null
+          email: string
+          id: string
+          name: string
+          preferences: Json | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          country?: string | null
+          created_at?: string | null
+          email: string
+          id: string
+          name: string
+          preferences?: Json | null
+        }
+        Update: {
+          avatar_url?: string | null
+          country?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          name?: string
+          preferences?: Json | null
+        }
+        Relationships: []
+      }
+      trips: {
+        Row: {
+          budget: number | null
+          checklist: Json | null
+          created_at: string | null
+          currency: string | null
+          destination: string
+          end_date: string
+          id: string
+          itinerary: Json | null
+          notes: string | null
+          start_date: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          budget?: number | null
+          checklist?: Json | null
+          created_at?: string | null
+          currency?: string | null
+          destination: string
+          end_date: string
+          id?: string
+          itinerary?: Json | null
+          notes?: string | null
+          start_date: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          budget?: number | null
+          checklist?: Json | null
+          created_at?: string | null
+          currency?: string | null
+          destination?: string
+          end_date?: string
+          id?: string
+          itinerary?: Json | null
+          notes?: string | null
+          start_date?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trips_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
