@@ -9,7 +9,7 @@ export function useSupabaseAuth() {
 
   useEffect(() => {
     // Listener de autenticação
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -28,7 +28,7 @@ export function useSupabaseAuth() {
       }
     });
 
-    return () => authListener?.unsubscribe?.();
+    return () => subscription.unsubscribe();
   }, []);
 
   // Cria um perfil na tabela `profiles` ao registrar
