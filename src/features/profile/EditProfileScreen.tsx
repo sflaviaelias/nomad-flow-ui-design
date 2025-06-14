@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +8,7 @@ import { ProfileAvatar } from "./ProfileAvatar";
 import { TravelTagsPicker } from "./TravelTagsPicker";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const currencyOptions = ["BRL", "USD", "EUR"];
 const languageOptions = ["Português", "Inglês", "Espanhol", "Francês"];
@@ -20,6 +20,7 @@ const countryList = [
 export default function EditProfileScreen() {
   const { user } = useSupabaseAuth();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   // Placeholder: Replace with data from user profile fetch
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -36,9 +37,35 @@ export default function EditProfileScreen() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Upload avatar, update profile in supabase
-    toast({ title: "Perfil atualizado com sucesso!" });
-    navigate("/profile");
+    setLoading(true);
+
+    try {
+      // Atualize o perfil no Supabase (tabela: profiles)
+      const updates = {
+        id: user?.id,
+        name,
+        email: user?.email,
+        avatar_url: avatarUrl,
+        country: countryResidence,
+        preferences: {
+          nationality,
+          currency,
+          languages,
+          travel_tags: travelTags,
+          ai_assistant: aiAssistant
+        }
+      };
+
+      const { error } = await supabase.from("profiles").upsert(updates, { onConflict: "id" });
+      if (error) throw error;
+
+      toast({ title: "Perfil atualizado com sucesso!" });
+      navigate("/profile", { state: { refresh: true } }); // força refetch na tela de perfil
+    } catch (err: any) {
+      toast({ title: "Erro ao atualizar perfil", description: err.message ?? "Tente novamente." });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -227,4 +254,3 @@ export default function EditProfileScreen() {
     </div>
   );
 }
-

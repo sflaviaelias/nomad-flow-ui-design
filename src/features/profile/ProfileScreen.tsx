@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { Button } from "@/components/ui/button";
 import { LogOut, User, ArrowLeft } from "lucide-react";
@@ -8,6 +7,7 @@ import { ProfileAvatar } from "./ProfileAvatar";
 import { toast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
 
 const fallbackTags = [
   "Viajante Econômico",
@@ -16,28 +16,52 @@ const fallbackTags = [
 ];
 
 export default function ProfileScreen() {
-  const { user, signOut } = useSupabaseAuth();
+  const { user } = useSupabaseAuth();
   const navigate = useNavigate();
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Placeholder user info
-  const profile = {
-    name: user?.user_metadata?.name || "Nome não informado",
-    email: user?.email || "",
-    avatar_url: user?.user_metadata?.avatar_url ?? null,
-    nationality: "Brasil",
-    country_residence: "Brasil",
-    currency: "BRL",
-    languages: ["Português", "Inglês"],
-    travel_tags: fallbackTags, // Simular vazio para fallback
-    ai_assistant: true,
-    provider: user?.app_metadata?.provider,
-    countries_visited: 6,
-    complete: true,
-  };
+  // Buscar perfil atualizado do banco
+  async function fetchProfile() {
+    if (!user?.id) return;
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .maybeSingle();
+    setProfile(data);
+    setLoading(false);
+  }
 
-  const isGoogleSSO = profile.provider === "google";
-  const hasTags = profile.travel_tags && profile.travel_tags.length > 0;
-  const isIncomplete = !profile.name || !profile.nationality || !profile.country_residence;
+  useEffect(() => {
+    fetchProfile();
+    // Refetch ao voltar do editar, se necessário
+    if (window.history.state && "refresh" in window.history.state) {
+      fetchProfile();
+      window.history.replaceState({}, document.title); // limpa o refresh
+    }
+  }, [user?.id]);
+
+  if (loading) {
+    return (
+      <div className="w-full flex justify-center items-center min-h-screen text-lg">
+        Carregando...
+      </div>
+    );
+  }
+
+  // Fallback se não encontrar perfil
+  if (!profile) {
+    return <div className="text-center mt-12 text-terra-800">Perfil não encontrado.</div>;
+  }
+
+  // Extrai tags, nacionalidade e preferências corretamente
+  const preferences = profile.preferences || {};
+  const travel_tags = preferences.travel_tags ?? fallbackTags;
+  const isGoogleSSO = user?.app_metadata?.provider === "google";
+  const hasTags = travel_tags && travel_tags.length > 0;
+  const isIncomplete = !profile.name || !preferences?.nationality || !preferences?.country_residence;
 
   return (
     <div className="bg-[#FAF3EC] min-h-screen px-4 pt-2 pb-8 flex flex-col font-sans">
@@ -99,11 +123,11 @@ export default function ProfileScreen() {
               <dt className="font-medium leading-tight">E-mail</dt>
               <dd className="font-normal text-terra-900">{profile.email}</dd>
               <dt className="font-medium leading-tight">Nacionalidade</dt>
-              <dd className="font-normal text-terra-900">{profile.nationality}</dd>
+              <dd className="font-normal text-terra-900">{preferences?.nationality}</dd>
               <dt className="font-medium leading-tight">Residência</dt>
               <dd className="font-normal text-terra-900">{profile.country_residence}</dd>
               <dt className="font-medium leading-tight">Moeda</dt>
-              <dd className="font-normal text-terra-900">{profile.currency}</dd>
+              <dd className="font-normal text-terra-900">{preferences?.currency}</dd>
             </dl>
           </CardContent>
         </Card>
@@ -118,13 +142,13 @@ export default function ProfileScreen() {
           <CardContent className="px-0 pb-4 pt-0">
             <div className="mb-2">
               <span className="font-medium text-terra-800 text-[15px]" style={{ fontFamily: "Inter" }}>Idiomas:</span>
-              <span className="ml-1 text-terra-900">{profile.languages.join(", ")}</span>
+              <span className="ml-1 text-terra-900">{preferences?.languages?.join(", ")}</span>
             </div>
             <div className="mb-2 flex flex-col">
               <span className="font-medium text-terra-800 text-[15px] mb-1" style={{ fontFamily: "Inter" }}>Estilo de viagem:</span>
               <div className="flex flex-wrap gap-2">
                 {hasTags ? (
-                  profile.travel_tags.map((tag) => (
+                  travel_tags.map((tag) => (
                     <Badge
                       key={tag}
                       variant="secondary"
@@ -147,13 +171,13 @@ export default function ProfileScreen() {
               </span>
               <Badge
                 className={`rounded-full px-2 py-0.5 text-xs font-medium border-none min-w-[44px] min-h-[28px] ${
-                  profile.ai_assistant
+                  preferences?.ai_assistant
                     ? "bg-terra-600 text-white"
                     : "bg-[#DADADA] text-terra-900"
                 }`}
                 style={{ fontFamily: "Inter" }}
               >
-                {profile.ai_assistant ? "Ativado" : "Desativado"}
+                {preferences?.ai_assistant ? "Ativado" : "Desativado"}
               </Badge>
             </div>
           </CardContent>

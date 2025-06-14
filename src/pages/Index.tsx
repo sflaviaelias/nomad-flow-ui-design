@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import ConciergeCard from "../components/ConciergeCard";
 import DiscoverySection from "../components/DiscoverySection";
 import UpcomingTripsPreview from "../components/UpcomingTripsPreview";
 import { Avatar } from "@/components/ui/avatar";
+import { supabase } from "@/integrations/supabase/client";
 
 // Dummy data: in real app, replace with actual data and hooks.
 const user = {
@@ -65,6 +65,33 @@ const hasUpcomingTrips = upcomingTrips.length > 0;
 const Index = () => {
   const navigate = useNavigate();
 
+  // Novo: state para perfil do usuário para reflexão imediata das edições
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      // Buscar perfil do usuário autenticado no Supabase
+      // Assumimos que um hook global fornece o id do user logado
+      const user = supabase.auth.getUser
+        ? (await supabase.auth.getUser()).data.user // V2 Supabase SDK
+        : null;
+      if (!user?.id) return;
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      setProfile(data);
+    }
+    fetchProfile();
+  }, []);
+
+  // Substitui os dados estáticos abaixo, se o perfil está carregado:
+  const userName = profile?.name || "—";
+  const avatarUrl = profile?.avatar_url || "https://randomuser.me/api/portraits/men/12.jpg";
+
   return (
     <div className="min-h-screen bg-[#FAF3EC]">
       {/* Header */}
@@ -79,14 +106,16 @@ const Index = () => {
           <Menu className="text-[#E76F51]" size={28} />
         </Button>
         <div className="flex-1 flex flex-col items-center justify-center">
-          <h1 className="font-bold text-xl leading-tight text-[#E76F51] font-inter">Olá, {user.name}!</h1>
+          <h1 className="font-bold text-xl leading-tight text-[#E76F51] font-inter">
+            Olá, {userName}!
+          </h1>
           <span className="text-sm text-[#6D4530] leading-tight font-inter">Seu painel de viagens</span>
         </div>
         <div onClick={() => navigate("/profile")} className="cursor-pointer">
           <Avatar className="w-10 h-10 border-2 border-[#E76F51] ring-2 ring-[#E76F51] shadow">
             <img
-              src={user.avatarUrl}
-              alt={`Avatar de ${user.name}`}
+              src={avatarUrl}
+              alt={`Avatar de ${userName}`}
               className="object-cover w-full h-full rounded-full"
             />
           </Avatar>
@@ -266,4 +295,3 @@ const Index = () => {
 };
 
 export default Index;
-
