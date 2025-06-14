@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -45,24 +44,21 @@ serve(async (req) => {
     {
       role: "system",
       content:
-        "Você é um assistente especializado em viagens para nômades digitais. Quando receber um destino (cidade, país), responda única e exclusivamente com uma URL de imagem adequada e inspiradora desse local, preferencialmente do Unsplash, e que seja paisagem ou ícone visual reconhecível do destino (ex: ponto turístico famoso, paisagem urbana, praia famosa etc). Forneça apenas a URL, sem comentários ou texto adicional.",
+        "Você é um assistente especializado em viagens para nômades digitais. Receba um destino (cidade, país) e responda única e exclusivamente com uma URL de imagem adequada e inspiradora desse local, preferencialmente do Unsplash, mostrando um ponto turístico ou paisagem facilmente reconhecível. Responda APENAS com a URL!",
     },
     { role: "user", content: `Destino: ${destination}` },
   ];
 
   const groqPayload = {
-    model: "llama-3-70b-8192", // modelo Groq LLM estável
+    model: "llama-3-70b-8192", // modelo LLM texto - ajuste conforme documentação Groq (consultar docs!)
     messages: prompt,
     max_tokens: 128,
     temperature: 0.5,
   };
 
-  // Log do payload
   console.log("[GROQ Request Payload]", JSON.stringify(groqPayload));
-
   let rawGroq;
   let groqErrorDetail = "";
-  let statusCode = 500;
 
   try {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -73,8 +69,6 @@ serve(async (req) => {
       },
       body: JSON.stringify(groqPayload),
     });
-
-    // Log status
     console.log("[GROQ Response Status]", response.status);
 
     if (!response.ok) {
@@ -82,55 +76,36 @@ serve(async (req) => {
       groqErrorDetail = rawGroq;
       console.error("[Groq API ERROR]", rawGroq);
 
-      // Verificação direta por problemas clássicos
       if (groqErrorDetail.includes("model not found")) {
-        statusCode = 422;
         return new Response(
           JSON.stringify({
             error: "Erro na Groq: modelo não encontrado",
             details: groqErrorDetail
           }),
           {
-            status: statusCode,
+            status: 422,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           }
         );
       }
-
-      if (groqErrorDetail.toLowerCase().includes("timeout")) {
-        statusCode = 504;
-        return new Response(
-          JSON.stringify({
-            error: "Timeout ao consultar a Groq",
-            details: groqErrorDetail,
-          }),
-          {
-            status: statusCode,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
-      }
-
-      // Genérico
+      // Outros erros
       return new Response(
         JSON.stringify({
           error: "Erro ao buscar imagem na Groq",
           details: groqErrorDetail,
         }),
         {
-          status: statusCode,
+          status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
     }
 
-    // Tenta parsear a resposta JSON
     let ai;
     try {
       ai = await response.json();
       console.log("[GROQ JSON Response]", JSON.stringify(ai));
     } catch (err) {
-      console.error("[Groq JSON parse error]", err);
       return new Response(
         JSON.stringify({ error: "Groq API retornou resposta inválida", details: err && (err.message || err.toString()) }),
         {
@@ -143,10 +118,10 @@ serve(async (req) => {
     let url = ai.choices?.[0]?.message?.content?.trim() ?? "";
     url = url.replace(/^["']|["']$/g, "");
 
-    // Fallback para Unsplash se necessário (resposta não é URL)
+    // Se a resposta não for uma URL válida de imagem, retorna vazio
     if (!/^https?:\/\/.+\.(jpg|jpeg|png|webp)/i.test(url)) {
-      url = `https://source.unsplash.com/900x600/?${encodeURIComponent(destination)},landscape`;
-      console.warn("[Fallback] Resposta da IA não era URL, usando Unsplash:", url);
+      console.warn("[Groq] Nenhuma URL válida retornada, resposta foi:", url);
+      url = "";
     }
 
     return new Response(JSON.stringify({ image_url: url }), {

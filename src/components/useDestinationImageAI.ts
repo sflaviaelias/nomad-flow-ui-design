@@ -21,9 +21,9 @@ export function useDestinationImageAI(destination: string) {
         });
         const data = await res.json();
         if (data.image_url) setImageUrl(data.image_url);
-        else setImageUrl(`https://source.unsplash.com/600x350/?${encodeURIComponent(destination)},travel,city`);
+        else setImageUrl(null); // Nunca faz fallback para outra fonte
       } catch {
-        setImageUrl(`https://source.unsplash.com/600x350/?${encodeURIComponent(destination)},travel,city`);
+        setImageUrl(null); // Em erro, também retorna null
       } finally {
         setImgLoading(false);
       }
