@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useNavigate } from "react-router-dom";
@@ -13,14 +12,18 @@ import { ProfileTripCountCard } from "./ProfileTripCountCard";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function ProfileScreen() {
-  const { user, signOut } = useSupabaseAuth();
+  const { user } = useSupabaseAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // Buscar perfil atualizado do banco
+  // Buscar perfil atualizado do banco, somente se user
   async function fetchProfile() {
-    if (!user?.id) return setLoading(false);
+    if (!user?.id) {
+      setProfile(null);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const { data, error } = await supabase
       .from("profiles")
@@ -32,7 +35,7 @@ export default function ProfileScreen() {
   }
 
   useEffect(() => {
-    fetchProfile();
+    if (user?.id) fetchProfile();
     if (window.history.state && "refresh" in window.history.state) {
       fetchProfile();
       window.history.replaceState({}, document.title);
@@ -46,6 +49,7 @@ export default function ProfileScreen() {
       </div>
     );
   }
+  // Se não há user autenticado, mostra o prompt para login/criar conta - UX correta!
   if (!user) return <ProfileLoginPrompt />;
   if (!profile) return <ProfileNotFoundPrompt />;
 

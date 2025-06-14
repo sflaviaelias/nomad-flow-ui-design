@@ -29,6 +29,10 @@ export default function EditProfileScreen() {
   // Controle de erros para validação obrigatória
   const [errors, setErrors] = useState<{ [k: string]: string | null }>({});
 
+  // Nova lógica: não permite "escapar" da tela se campos obrigatórios não preenchidos
+  // A menos que já venha de perfil existente e completo.
+  // (isso depende do backend: é bom obrigar no backend, mas aqui é prevention UX)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: { [k: string]: string | null } = {};
@@ -58,14 +62,16 @@ export default function EditProfileScreen() {
           languages,
           travel_profiles: travelProfiles,
           ai_assistant: aiAssistant
-        }
+        },
+        complete: true // Marque como "completo" após edição inicial
       };
 
       const { error } = await supabase.from("profiles").upsert(updates, { onConflict: "id" });
       if (error) throw error;
 
       toast({ title: "Perfil atualizado com sucesso!" });
-      navigate("/profile", { state: { refresh: true } });
+      // Após perfil salvo, redirecione para Home para garantir experiência fluída
+      navigate("/", { state: { refresh: true } });
     } catch (err: any) {
       toast({ title: "Erro ao atualizar perfil", description: err.message ?? "Tente novamente." });
     } finally {

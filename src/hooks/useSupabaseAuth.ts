@@ -8,19 +8,22 @@ export function useSupabaseAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // 1. Configura listener ANTES de buscar session
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
+    // 2. Busca session atual (garante redirect ao voltar)
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setUser(data.session?.user ?? null);
       setLoading(false);
     });
-    // TODO: Não chame nada do supabase aqui, nem fetch extra
 
+    // IMPORTANTE: Não faça chamadas async extras ou profile fetch AQUI
+    // 3. Limpa assinatura no unmount
     return () => subscription.unsubscribe();
   }, []);
 
