@@ -23,7 +23,7 @@ export default function ProfileScreen() {
 
   // Buscar perfil atualizado do banco
   async function fetchProfile() {
-    if (!user?.id) return;
+    if (!user?.id) return setLoading(false); // Evita loading infinito se usuário não logado
     setLoading(true);
     const { data, error } = await supabase
       .from("profiles")
@@ -51,9 +51,49 @@ export default function ProfileScreen() {
     );
   }
 
-  // Fallback se não encontrar perfil
+  // Caso não haja usuário logado, exibe opções amigáveis para login/criar conta
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-[#FAF3EC] px-4">
+        <Card className="w-full max-w-md bg-white rounded-2xl p-8 border-none shadow-soft flex flex-col items-center">
+          <ProfileAvatar avatarUrl={null} name={null} editable={false} />
+          <h2 className="font-bold text-2xl mt-4 mb-2 text-terra-800 text-center" style={{ fontFamily: "Inter" }}>
+            Sessão não iniciada
+          </h2>
+          <p className="text-terra-700 text-[16px] text-center mb-6" style={{ fontFamily: "Inter" }}>
+            Faça login para visualizar seu perfil e personalizar sua experiência no Go Nomad.
+          </p>
+          <Button
+            className="w-full mb-3 min-h-[44px] font-semibold bg-[#E76F51] text-white hover:bg-[#CC5A3D]"
+            onClick={() => navigate("/auth/login")}
+          >
+            Entrar
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full min-h-[44px] font-semibold border-[#E76F51] text-[#E76F51] hover:bg-[#E76F51]/10"
+            onClick={() => navigate("/auth/access")}
+          >
+            Criar conta
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
+  // Fallback se não encontrar perfil (usuário autenticado)
   if (!profile) {
-    return <div className="text-center mt-12 text-terra-800">Perfil não encontrado.</div>;
+    return (
+      <div className="text-center mt-12 text-terra-800" style={{ fontFamily: "Inter" }}>
+        Perfil não encontrado.<br />
+        <Button
+          className="mt-4 min-h-[44px] font-semibold bg-[#E76F51] text-white hover:bg-[#CC5A3D]"
+          onClick={() => navigate("/auth/access")}
+        >
+          Criar conta
+        </Button>
+      </div>
+    );
   }
 
   // Extrai tags, nacionalidade e preferências corretamente
