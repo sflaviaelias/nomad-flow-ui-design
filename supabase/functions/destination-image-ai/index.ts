@@ -44,8 +44,8 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        // Modelo atualizado conforme Groq atual:
-        model: "llama3-70b-8192",
+        // Modelo atualizado para compatibilidade Groq atual:
+        model: "llama-3.3-70b-versatile",
         messages: prompt,
         max_tokens: 128,
         temperature: 0.5,
