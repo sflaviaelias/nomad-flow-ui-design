@@ -9,7 +9,8 @@ import { ProfileNotFoundPrompt } from "./ProfileNotFoundPrompt";
 import { ProfileInfoCard } from "./ProfileInfoCard";
 import { ProfilePreferencesCard } from "./ProfilePreferencesCard";
 import { AccountActionsCard } from "./AccountActionsCard";
-import { ProfileTripCountCard } from "./ProfileTripCountCard"; // novo contador visual
+import { ProfileTripCountCard } from "./ProfileTripCountCard";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function ProfileScreen() {
   const { user, signOut } = useSupabaseAuth();

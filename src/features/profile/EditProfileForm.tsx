@@ -2,9 +2,16 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { DatePicker } from "@/components/ui/calendar"; // usaremos o DatePicker shadcn
-import TravelProfileCheckboxes from "./TravelProfileCheckboxes";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
 import { format } from "date-fns";
+import TravelProfileCheckboxes from "./TravelProfileCheckboxes";
+import { cn } from "@/lib/utils";
 
 interface EditProfileFormProps {
   name: string;
@@ -83,8 +90,34 @@ export function EditProfileForm({
       {/* Data Nascimento */}
       <div className="flex flex-col gap-1">
         <label className="text-terra-900 font-medium text-sm font-inter">Data de Nascimento<span className="ml-0.5 text-red-500">*</span></label>
-        <DatePicker selected={birthDate} onSelect={setBirthDate}
-          maxDate={new Date()} required />
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              className={cn(
+                "w-full rounded-md bg-[#FAF3EC] border-terra-900/10 px-3 py-2 text-base flex items-center justify-between",
+                !birthDate && "text-muted-foreground",
+                errors.birthDate ? "border-red-500" : ""
+              )}
+              style={{ minHeight: 44 }}
+            >
+              {birthDate ? format(birthDate, "dd/MM/yyyy") : <span>Selecione uma data</span>}
+              <CalendarIcon size={18} className="ml-2 text-terra-600" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={birthDate || undefined}
+              onSelect={setBirthDate}
+              disabled={(date) =>
+                date > new Date() || date < new Date("1900-01-01")
+              }
+              initialFocus
+              className="pointer-events-auto"
+            />
+          </PopoverContent>
+        </Popover>
         {errors.birthDate && <span className="text-red-500 text-xs">{errors.birthDate}</span>}
       </div>
       {/* Perfil de viagem (obrigatório, mínimo 1) */}
