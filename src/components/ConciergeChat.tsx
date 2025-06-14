@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,6 +28,9 @@ const userSampleContext = {
   weather: "22°C, ensolarado",
 };
 
+const SUPABASE_CONCIERGE_FN_URL =
+  "https://hxjjdutzpzrchfkrbxcd.functions.supabase.co/concierge-chat";
+
 const ConciergeChat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [value, setValue] = useState("");
@@ -45,7 +47,7 @@ const ConciergeChat: React.FC = () => {
     setLoading(true);
     try {
       const res = await fetch(
-        "/functions/v1/concierge-chat",
+        SUPABASE_CONCIERGE_FN_URL,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -211,4 +213,3 @@ const ConciergeChat: React.FC = () => {
 };
 
 export default ConciergeChat;
-

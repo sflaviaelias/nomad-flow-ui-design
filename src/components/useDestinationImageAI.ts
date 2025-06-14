@@ -1,6 +1,10 @@
 
 import * as React from "react";
 
+// URL da função edge do Supabase
+const SUPABASE_DEST_IMAGE_FN_URL =
+  "https://hxjjdutzpzrchfkrbxcd.functions.supabase.co/destination-image-ai";
+
 export function useDestinationImageAI(destination: string) {
   const [imageUrl, setImageUrl] = React.useState<string | null>(null);
   const [imgLoading, setImgLoading] = React.useState(false);
@@ -14,7 +18,7 @@ export function useDestinationImageAI(destination: string) {
     setImageUrl(null);
     const fetchDestinationImageWithAI = async () => {
       try {
-        const res = await fetch("/functions/v1/destination-image-ai", {
+        const res = await fetch(SUPABASE_DEST_IMAGE_FN_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ destination }),
