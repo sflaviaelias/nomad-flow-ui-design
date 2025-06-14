@@ -34,7 +34,6 @@ export function TravelTagsPicker({ value, onChange, disabled, max = 3 }: Props) 
           key={tag}
           value={tag}
           aria-pressed={value.includes(tag)}
-          pressed={value.includes(tag)}
           onClick={() => handleChange(tag)}
           disabled={disabled && !value.includes(tag)}
           className={`rounded-full px-3 py-1 font-medium text-sm border ${
