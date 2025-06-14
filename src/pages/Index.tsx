@@ -1,10 +1,10 @@
-
 import Navbar from "../components/Navbar";
 import ActiveTripCard from "../components/ActiveTripCard";
 import DiscoverySection from "../components/DiscoverySection";
 import ConciergeCard from "../components/ConciergeCard";
 import BudgetOverview from "../components/BudgetOverview";
 import UpcomingTripsPreview from "../components/UpcomingTripsPreview";
+import ExpensesDashboard from "../components/ExpensesDashboard";
 
 const Index = () => {
   return (
@@ -26,8 +26,10 @@ const Index = () => {
             localBudget="US$ 1,300"
           />
         </div>
+        {/* Dashboard de despesas */}
+        <ExpensesDashboard />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-7 mb-8">
-          <BudgetOverview />
+          {/* <BudgetOverview /> --- Retirado, pois ExpensesDashboard já mostra visão de orçamento */}
           <ConciergeCard />
         </div>
         <DiscoverySection />
