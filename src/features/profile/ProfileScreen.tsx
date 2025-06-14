@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,13 @@ import { toast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+
+// Import the refactored components
+import { ProfileLoginPrompt } from "./ProfileLoginPrompt";
+import { ProfileNotFoundPrompt } from "./ProfileNotFoundPrompt";
+import { ProfileInfoCard } from "./ProfileInfoCard";
+import { ProfilePreferencesCard } from "./ProfilePreferencesCard";
+import { AccountActionsCard } from "./AccountActionsCard";
 
 const fallbackTags = [
   "Viajante Econômico",
