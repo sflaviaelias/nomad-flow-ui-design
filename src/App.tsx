@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +16,9 @@ import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/AuthPage";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import React from "react";
+import OnboardingFlow from "./features/onboarding/OnboardingFlow";
+import AuthAccessScreen from "./features/auth/AuthAccessScreen";
+import LoginScreen from "./features/auth/LoginScreen";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Onboarding and auth */}
+          <Route path="/onboarding" element={<OnboardingFlow />} />
+          <Route path="/auth/access" element={<AuthAccessScreen />} />
+          <Route path="/auth/login" element={<LoginScreen />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route
             path="/"
