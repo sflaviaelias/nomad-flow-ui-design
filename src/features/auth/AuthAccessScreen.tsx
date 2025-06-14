@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Google } from "lucide-react";
+import { Globe } from "lucide-react";
 
 export default function AuthAccessScreen() {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ export default function AuthAccessScreen() {
             window.location.href = "/auth/social/google";
           }}
         >
-          <Google className="mr-2" /> Entrar com Google
+          <Globe className="mr-2" /> Entrar com Google
         </Button>
         <Button
           className="w-full py-3 mb-3 bg-white text-[#E76F51] border border-[#E76F51] font-semibold text-base shadow"
@@ -45,3 +45,4 @@ export default function AuthAccessScreen() {
     </div>
   );
 }
+
