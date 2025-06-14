@@ -105,13 +105,7 @@ const Index = () => {
 
             <HomeCommunityCard />
             <HomeTripSummaryCard />
-            <div className="px-5 mt-4">
-              <div className="bg-[#e76f5112] border border-[#E76F51]/10 rounded-lg px-4 py-2 text-[#C9583C] text-xs font-inter shadow-sm">
-                ⚡ Para ativar todos os recursos inteligentes:<br/>
-                <b>Cadastre sua OpenAI API Key</b> nas configurações (Settings &gt; Secrets) do Lovable.  
-                <br/>Já conectou? As sugestões com IA funcionarão automaticamente!
-              </div>
-            </div>
+            {/* REMOVIDO O FOOTER DE SECRETS */}
           </>
         )}
       </main>
@@ -120,4 +114,3 @@ const Index = () => {
 };
 
 export default Index;
-
