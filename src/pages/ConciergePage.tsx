@@ -1,17 +1,14 @@
 
 import React from "react";
 import Navbar from "../components/Navbar";
-import PageHeader from "../components/PageHeader";
+import ConciergeChat from "../components/ConciergeChat";
 
 const ConciergePage = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main>
-        <PageHeader title="Concierge IA" showBack />
-        <div className="p-4 text-neutral-700">
-          <div className="text-center text-lg font-medium">Em breve: área de interação com o Concierge IA.</div>
-        </div>
+      <main className="max-w-3xl mx-auto">
+        <ConciergeChat />
       </main>
     </div>
   );
