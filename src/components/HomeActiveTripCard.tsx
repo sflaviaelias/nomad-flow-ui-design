@@ -1,4 +1,3 @@
-
 import React from "react";
 import { CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,12 +20,13 @@ type Props = {
 export default function HomeActiveTripCard({ trip }: Props) {
   // Convert budget string (e.g., '€1200') to number (remove currency and format)
   const spent = 0; // For now, pass 0. Would get from real expenses in full integration.
-  const budgetNum = Number((trip.budget || "").replace(/[^\d]/g, ""));
+  // Fix: budgetNum should be a string, already done by trip.budget cleanup:
+  const budgetNum = (trip.budget || "").replace(/[^\d]/g, "");
   const { data: ai, loading } = useActiveTripAI({
     destination: trip.destination,
     tripStart: trip.startDate,
     tripEnd: trip.endDate,
-    budget: budgetNum,
+    budget: budgetNum, // Budget should be a string!
     currency: (trip.budget || "BRL").replace(/[\d\s.,]/g, "") || "BRL",
     spent,
   });
