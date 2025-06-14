@@ -67,16 +67,18 @@ const Index = () => {
 
   // Novo: state para perfil do usuário para reflexão imediata das edições
   const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     async function fetchProfile() {
-      // Buscar perfil do usuário autenticado no Supabase
-      // Assumimos que um hook global fornece o id do user logado
-      const user = supabase.auth.getUser
-        ? (await supabase.auth.getUser()).data.user // V2 Supabase SDK
-        : null;
-      if (!user?.id) return;
-
+      setLoading(true);
+      // Buscar usuário autenticado do Supabase (v2)
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) {
+        setProfile(null);
+        setLoading(false);
+        return;
+      }
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -84,13 +86,26 @@ const Index = () => {
         .maybeSingle();
 
       setProfile(data);
+      setLoading(false);
     }
     fetchProfile();
+
+    // Recarregar perfil após login ou atualização
+    const { data: authListener } = supabase.auth.onAuthStateChange(() => {
+      fetchProfile();
+    });
+    return () => {
+      authListener?.subscription?.unsubscribe?.();
+    };
   }, []);
 
-  // Substitui os dados estáticos abaixo, se o perfil está carregado:
-  const userName = profile?.name || "—";
-  const avatarUrl = profile?.avatar_url || "https://randomuser.me/api/portraits/men/12.jpg";
+  // Fallbacks
+  const userName = profile?.name || "Viajante";
+  const avatarUrl =
+    profile?.avatar_url && profile.avatar_url !== ""
+      ? profile.avatar_url
+      : "https://ui-avatars.com/api/?background=E76F51&color=fff&size=128&name=" +
+        encodeURIComponent(userName);
 
   return (
     <div className="min-h-screen bg-[#FAF3EC]">
@@ -117,12 +132,24 @@ const Index = () => {
               src={avatarUrl}
               alt={`Avatar de ${userName}`}
               className="object-cover w-full h-full rounded-full"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src =
+                  "https://ui-avatars.com/api/?background=E76F51&color=fff&size=128&name=" +
+                  encodeURIComponent(userName);
+              }}
             />
           </Avatar>
         </div>
       </header>
 
       <main className="max-w-md mx-auto w-full px-0 pb-10">
+        {/* Loading indicator */}
+        {loading ? (
+          <div className="h-32 flex items-center justify-center text-[#E76F51] text-lg font-medium">
+            Carregando informações...
+          </div>
+        ) : (
+        <>
         {/* Vertical spacing */}
         <div className="h-8 md:h-12" />
         {/* Trip Section */}
@@ -230,65 +257,11 @@ const Index = () => {
             Próximas viagens
           </h2>
           <div className="px-4">
-            {hasUpcomingTrips ? (
-              <div
-                className="flex gap-4 overflow-x-auto pb-2 scroll-snap-x"
-                style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
-              >
-                {upcomingTrips.map((trip) => (
-                  <div
-                    key={trip.id}
-                    className="bg-white rounded-2xl shadow-card min-w-[240px] flex flex-col flex-shrink-0"
-                    style={{ scrollSnapAlign: "center" }}
-                  >
-                    <img
-                      src={trip.imageUrl}
-                      alt={trip.destination}
-                      className="w-full h-28 object-cover rounded-t-2xl"
-                    />
-                    <div className="px-4 pt-3 pb-3 flex flex-col gap-1">
-                      <div className="font-bold text-[#E76F51] leading-tight">{trip.destination}</div>
-                      <div className="text-xs text-[#AD4F36]">{trip.dates}</div>
-                      <div className="text-xs text-neutral-500 mt-1">
-                        Orçamento: <span className="font-medium text-[#C9583C]">{trip.budget}</span>
-                      </div>
-                      <div className="text-xs text-neutral-400">
-                        Local: <span className="font-medium text-[#6D4530]">{trip.localBudget}</span>
-                      </div>
-                      {trip.visa || trip.vaccines ? (
-                        <div className="flex gap-1 flex-wrap mt-1">
-                          {trip.visa && (
-                            <span className="bg-[#E76F51] text-white text-xs px-2 py-0.5 rounded font-medium">
-                              Visto
-                            </span>
-                          )}
-                          {trip.vaccines && (
-                            <span className="bg-accent-light text-accent text-xs px-2 py-0.5 rounded font-medium">
-                              Vacinas
-                            </span>
-                          )}
-                        </div>
-                      ) : null}
-                      <Button
-                        onClick={() => navigate(`/trip/upcoming/${trip.id}`)}
-                        size="sm"
-                        className="mt-3 w-full"
-                      >
-                        Ver detalhes
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-2xl bg-white shadow-card p-7 text-center mb-6 flex flex-col items-center">
-                <span className="text-lg font-semibold text-[#E76F51] mb-1">
-                  Nenhuma próxima viagem cadastrada.
-                </span>
-              </div>
-            )}
+            <UpcomingTripsPreview />
           </div>
         </section>
+        </>
+        )}
       </main>
     </div>
   );
