@@ -1,5 +1,4 @@
 
-// Refactored file, now orchestrates the child components!
 import React, { useState } from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { toast } from "@/hooks/use-toast";
@@ -10,17 +9,12 @@ import { EditProfileAvatarBlock } from "./EditProfileAvatarBlock";
 import { EditProfileForm } from "./EditProfileForm";
 import { EditProfileActions } from "./EditProfileActions";
 
-const currencyOptions = ["BRL", "USD", "EUR"];
-const languageOptions = ["Português", "Inglês", "Espanhol", "Francês"];
-const countryList = [
-  "Brasil", "Argentina", "Espanha", "Portugal", "Colômbia", "Estados Unidos", "México",
-];
-
 export default function EditProfileScreen() {
   const { user } = useSupabaseAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  // State hooks for fields
+
+  // State fields obrigatórios
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarUrl, setAvatarUrl] = useState(user?.user_metadata?.avatar_url || null);
   const [name, setName] = useState(user?.user_metadata?.name || "");
@@ -28,11 +22,26 @@ export default function EditProfileScreen() {
   const [countryResidence, setCountryResidence] = useState("Brasil");
   const [currency, setCurrency] = useState("BRL");
   const [languages, setLanguages] = useState<string[]>(["Português", "Inglês"]);
-  const [travelTags, setTravelTags] = useState<string[]>([]);
+  const [travelProfiles, setTravelProfiles] = useState<string[]>([]);
+  const [birthDate, setBirthDate] = useState<Date | null>(null);
   const [aiAssistant, setAIAssistant] = useState(true);
+
+  // Controle de erros para validação obrigatória
+  const [errors, setErrors] = useState<{ [k: string]: string | null }>({});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const newErrors: { [k: string]: string | null } = {};
+
+    if (!name.trim()) newErrors.name = "Nome é obrigatório";
+    if (!nationality) newErrors.nationality = "Selecione sua nacionalidade";
+    if (!birthDate) newErrors.birthDate = "Data de nascimento obrigatória";
+    if (!Array.isArray(travelProfiles) || travelProfiles.length === 0)
+      newErrors.travelProfiles = "Selecione ao menos um perfil";
+
+    setErrors(newErrors);
+    if (Object.values(newErrors).some(Boolean)) return;
+
     setLoading(true);
 
     try {
@@ -42,11 +51,12 @@ export default function EditProfileScreen() {
         email: user?.email,
         avatar_url: avatarUrl,
         country: countryResidence,
+        birth_date: birthDate ? birthDate.toISOString().split("T")[0] : null,
         preferences: {
           nationality,
           currency,
           languages,
-          travel_tags: travelTags,
+          travel_profiles: travelProfiles,
           ai_assistant: aiAssistant
         }
       };
@@ -80,10 +90,13 @@ export default function EditProfileScreen() {
           setCurrency={setCurrency}
           languages={languages}
           setLanguages={setLanguages}
-          travelTags={travelTags}
-          setTravelTags={setTravelTags}
+          travelProfiles={travelProfiles}
+          setTravelProfiles={setTravelProfiles}
+          birthDate={birthDate}
+          setBirthDate={setBirthDate}
           aiAssistant={aiAssistant}
           setAIAssistant={setAIAssistant}
+          errors={errors}
         />
         <EditProfileActions loading={loading} onSave={handleSubmit} />
       </form>

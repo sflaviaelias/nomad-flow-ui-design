@@ -8,33 +8,24 @@ export function useSupabaseAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Listener de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-      if (event === "SIGNED_IN" && session?.user) {
-        createProfileIfNotExists(session.user);
-      }
     });
 
-    // Verifica sessão inicial
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setUser(data.session?.user ?? null);
       setLoading(false);
-      if (data.session?.user) {
-        createProfileIfNotExists(data.session.user);
-      }
     });
+    // TODO: Não chame nada do supabase aqui, nem fetch extra
 
     return () => subscription.unsubscribe();
   }, []);
 
-  // Cria um perfil na tabela `profiles` ao registrar
   const createProfileIfNotExists = useCallback(async (user) => {
     if (!user) return;
-    // Tenta inserir apenas se não existe
     await supabase
       .from("profiles")
       .upsert(
@@ -50,7 +41,6 @@ export function useSupabaseAuth() {
       );
   }, []);
 
-  // Sign Out
   const signOut = async () => {
     await supabase.auth.signOut();
     setSession(null);
