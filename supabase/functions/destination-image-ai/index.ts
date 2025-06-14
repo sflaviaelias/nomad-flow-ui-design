@@ -44,8 +44,8 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        // Modelo atualizado conforme Groq API:
-        model: "llama3-8b-8192",
+        // Troca para modelo garantido disponível na Groq
+        model: "mixtral-8x7b-32768",
         messages: prompt,
         max_tokens: 128,
         temperature: 0.5,
