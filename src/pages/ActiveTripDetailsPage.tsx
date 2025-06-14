@@ -1,12 +1,10 @@
 
 import React from "react";
-import Navbar from "../components/Navbar";
 import PageHeader from "../components/PageHeader";
 
 const ActiveTripDetailsPage = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
       <main>
         <PageHeader title="Detalhes da Viagem Ativa" showBack />
         <div className="p-4 text-neutral-700">
