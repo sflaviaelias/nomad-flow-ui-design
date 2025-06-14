@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu } from "lucide-react";
@@ -8,7 +9,7 @@ import DiscoverySection from "../components/DiscoverySection";
 import UpcomingTripsPreview from "../components/UpcomingTripsPreview";
 import { Avatar } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
-import { HomeHeader } from "../components/HomeHeader";
+import HomeHeader from "../components/HomeHeader";
 import { ActiveTripSection } from "../components/ActiveTripSection";
 import { ConciergeSection } from "../components/ConciergeSection";
 import { DiscoverySectionWrapper } from "../components/DiscoverySectionWrapper";
