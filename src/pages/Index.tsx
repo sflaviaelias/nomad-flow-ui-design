@@ -84,22 +84,34 @@ const Index = () => {
               activeTrip={activeTrip}
             />
             <div className="h-4" />
-            {/* Botão “Adicionar nova viagem” abaixo das próximas viagens */}
             <HomeAddTripButton />
             <div className="h-6" />
-
-            {/* Concierge IA Proativo */}
+            {/* Concierge IA Proativo: agora exibe dica de IA */}
             <ConciergeSection />
+            <div className="px-5 mb-2">
+              <div className="bg-[#e76f5115] border border-[#E76F51]/20 rounded-lg px-4 py-2 mt-2 text-[#AD4F36] text-xs font-inter shadow-sm">
+                🎯 DICA: O Concierge utiliza IA para sugerir ações inteligentes, baseadas no contexto da sua viagem.
+              </div>
+            </div>
             <div className="h-6" />
 
-            {/* Descoberta Local personalizada */}
             <DiscoverySectionWrapper />
+            <div className="px-5 mb-2">
+              <div className="bg-[#dadada20] border border-[#E76F51]/5 rounded-lg px-4 py-2 mt-2 text-[#6D4530] text-xs font-inter shadow-sm">
+                ✨ Em breve: locais recomendados pela IA conforme seu perfil e localização.
+              </div>
+            </div>
             <div className="h-6" />
 
-            {/* Card Comunidade Inteligente */}
             <HomeCommunityCard />
-            {/* Card Resumo Inteligente da Viagem */}
             <HomeTripSummaryCard />
+            <div className="px-5 mt-4">
+              <div className="bg-[#e76f5112] border border-[#E76F51]/10 rounded-lg px-4 py-2 text-[#C9583C] text-xs font-inter shadow-sm">
+                ⚡ Para ativar todos os recursos inteligentes:<br/>
+                <b>Cadastre sua OpenAI API Key</b> nas configurações (Settings &gt; Secrets) do Lovable.  
+                <br/>Já conectou? As sugestões com IA funcionarão automaticamente!
+              </div>
+            </div>
           </>
         )}
       </main>
@@ -108,3 +120,4 @@ const Index = () => {
 };
 
 export default Index;
+
