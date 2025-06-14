@@ -16,7 +16,7 @@ const fallbackTags = [
 ];
 
 export default function ProfileScreen() {
-  const { user } = useSupabaseAuth();
+  const { user, signOut } = useSupabaseAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
