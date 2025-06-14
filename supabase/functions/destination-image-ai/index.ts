@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -45,7 +44,8 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama-3-8b-8192",
+        // Modelo atualizado conforme Groq API:
+        model: "llama3-8b-8192",
         messages: prompt,
         max_tokens: 128,
         temperature: 0.5,
