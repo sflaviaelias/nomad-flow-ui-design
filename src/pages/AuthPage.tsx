@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -78,13 +78,30 @@ export default function AuthPage() {
   const handleSocial = async (provider: "google" | "github" | "twitter") => {
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: { redirectTo: window.location.origin },
-    });
-    if (error) setError("Falha ao autenticar com provedor social.");
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: window.location.origin + "/auth", // Após login retorna seguro ao Auth (o onAuthStateChange cuidará do restante)
+        },
+      });
+      if (error) setError("Falha ao autenticar com provedor social.");
+    } catch (e: any) {
+      setError("Erro inesperado: " + (e?.message || "Tente novamente."));
+    }
     setLoading(false);
   };
+
+  // Adicionar log do estado atual ao montar/detectar session
+  React.useEffect(() => {
+    // Detecta se já está logado (ex: após social login)
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        console.log("[AuthPage] session encontrada, redirecionando para Home");
+        navigate("/", { replace: true });
+      }
+    });
+  }, [navigate]);
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-background">

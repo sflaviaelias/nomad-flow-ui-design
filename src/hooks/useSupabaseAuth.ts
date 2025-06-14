@@ -8,22 +8,32 @@ export function useSupabaseAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 1. Configura listener ANTES de buscar session
+    // 1. Listener ANTES de buscar session
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+
+      // LOG: print eventos de autenticação para debug detalhado
+      console.log("[useSupabaseAuth] Evento de Autenticação:", event, session);
+      if (session?.user) {
+        // log ok para acompanhamento
+        console.log("[useSupabaseAuth] Usuário autenticado:", session.user.email);
+      }
+      if (!session) {
+        console.log("[useSupabaseAuth] Usuário fez logout ou não existe sessão");
+      }
     });
 
-    // 2. Busca session atual (garante redirect ao voltar)
+    // 2. Busca session atual
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setUser(data.session?.user ?? null);
       setLoading(false);
+      // LOG
+      console.log("[useSupabaseAuth] getSession inicial:", data.session);
     });
 
-    // IMPORTANTE: Não faça chamadas async extras ou profile fetch AQUI
-    // 3. Limpa assinatura no unmount
     return () => subscription.unsubscribe();
   }, []);
 
