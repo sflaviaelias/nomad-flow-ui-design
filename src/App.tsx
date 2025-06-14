@@ -19,6 +19,8 @@ import React from "react";
 import OnboardingFlow from "./features/onboarding/OnboardingFlow";
 import AuthAccessScreen from "./features/auth/AuthAccessScreen";
 import LoginScreen from "./features/auth/LoginScreen";
+import ProfileScreen from "./features/profile/ProfileScreen";
+import EditProfileScreen from "./features/profile/EditProfileScreen";
 
 const queryClient = new QueryClient();
 
@@ -117,6 +119,22 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <CommunityPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfileScreen />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/edit"
+            element={
+              <ProtectedRoute>
+                <EditProfileScreen />
               </ProtectedRoute>
             }
           />

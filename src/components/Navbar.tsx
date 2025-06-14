@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Compass, Menu } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -34,7 +33,7 @@ const Navbar = () => {
           type="button"
           aria-label="Menu"
           className="md:hidden p-2 rounded-md hover:bg-terracotta-light transition"
-          onClick={() => {/* future: open sidebar menu */}}
+          onClick={() => navigate("/profile")}
         >
           <Menu className="text-terracotta" size={28} />
         </button>
@@ -60,7 +59,8 @@ const Navbar = () => {
         <img
           src="https://randomuser.me/api/portraits/women/22.jpg"
           alt="Avatar"
-          className="w-9 h-9 rounded-full border-2 border-terracotta"
+          className="w-9 h-9 rounded-full border-2 border-terracotta cursor-pointer"
+          onClick={() => navigate("/profile")}
         />
       </div>
     </header>
