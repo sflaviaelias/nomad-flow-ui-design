@@ -19,6 +19,7 @@ import React from "react";
 import OnboardingFlow from "./features/onboarding/OnboardingFlow";
 import AuthAccessScreen from "./features/auth/AuthAccessScreen";
 import LoginScreen from "./features/auth/LoginScreen";
+import SignupScreen from "./features/auth/SignupScreen";
 import ProfileScreen from "./features/profile/ProfileScreen";
 import EditProfileScreen from "./features/profile/EditProfileScreen";
 
@@ -48,6 +49,7 @@ const App = () => (
           {/* Onboarding and auth */}
           <Route path="/onboarding" element={<OnboardingFlow />} />
           <Route path="/auth/access" element={<AuthAccessScreen />} />
+          <Route path="/auth/signup" element={<SignupScreen />} />
           <Route path="/auth/login" element={<LoginScreen />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route

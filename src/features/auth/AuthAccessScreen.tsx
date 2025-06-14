@@ -9,13 +9,12 @@ export default function AuthAccessScreen() {
 
   const handleSocial = async () => {
     try {
-      // Usa o mesmo handler que AuthPage para padronizar (e evitar rota inexistente!)
       await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo: window.location.origin + "/auth" },
       });
     } catch (e) {
-      // erro será tratado pelo provider em outro lugar
+      // erro tratado pelo provider
     }
   };
 
@@ -33,7 +32,7 @@ export default function AuthAccessScreen() {
         </Button>
         <Button
           className="w-full py-3 mb-3 bg-white text-[#E76F51] border border-[#E76F51] font-semibold text-base shadow"
-          onClick={() => navigate("/auth")}
+          onClick={() => navigate("/auth/signup")}
         >
           Cadastrar com e-mail
         </Button>
