@@ -116,7 +116,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-[#FAF3EC]">
       {/* Header */}
-      <HomeHeader userName={userName} avatarUrl={avatarUrl} />
+      <HomeHeader user={{ name: userName, avatarUrl }} />
 
       <main className="max-w-md mx-auto w-full px-0 pb-10">
         {/* Loading indicator */}
