@@ -44,8 +44,8 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        // Modelo ajustado para o solicitado pelo usuário:
-        model: "meta-llama/llama-guard-4-12b",
+        // Modelo alterado para maior estabilidade Groq:
+        model: "llama-3.3-70b-versatile",
         messages: prompt,
         max_tokens: 128,
         temperature: 0.5,
