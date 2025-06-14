@@ -37,6 +37,7 @@ export default function EditProfileScreen() {
     e.preventDefault();
     const newErrors: { [k: string]: string | null } = {};
 
+    // DUPLA validação frontend
     if (!name.trim()) newErrors.name = "Nome é obrigatório";
     if (!nationality) newErrors.nationality = "Selecione sua nacionalidade";
     if (!birthDate) newErrors.birthDate = "Data de nascimento obrigatória";
@@ -67,10 +68,22 @@ export default function EditProfileScreen() {
       };
 
       const { error } = await supabase.from("profiles").upsert(updates, { onConflict: "id" });
-      if (error) throw error;
+      if (error) {
+        // Check mensagem trigger SQL/email duplicado
+        if (
+          error.message?.toLowerCase().includes("duplic") ||
+          error.message?.toLowerCase().includes("já existe um perfil cadastrado com este e-mail")
+        ) {
+          toast({ title: "Já existe um perfil com este e-mail", description: "Tente acessar sua conta existente ou recupere sua senha!" });
+          setErrors({ ...newErrors, email: "E-mail já cadastrado" });
+        } else {
+          toast({ title: "Erro ao atualizar perfil", description: error.message ?? "Tente novamente." });
+        }
+        setLoading(false);
+        return;
+      }
 
       toast({ title: "Perfil atualizado com sucesso!" });
-      // Após perfil salvo, redirecione para Home para garantir experiência fluída
       navigate("/", { state: { refresh: true } });
     } catch (err: any) {
       toast({ title: "Erro ao atualizar perfil", description: err.message ?? "Tente novamente." });

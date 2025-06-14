@@ -33,7 +33,7 @@ export default function AuthPage() {
     }
 
     if (variant === "register") {
-      const { error, data } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -41,8 +41,18 @@ export default function AuthPage() {
           data: { name: email.split("@")[0] },
         },
       });
+
+      // Checa duplicidade pelo trigger/banco
       if (error) {
-        setError("Erro ao registrar: " + error.message);
+        // Mostra mensagem clara para duplicidade de email
+        if (
+          error.message?.toLowerCase().includes("duplic") ||
+          error.message?.toLowerCase().includes("já existe um perfil cadastrado com este e-mail")
+        ) {
+          setError("Já existe uma conta cadastrada com este e-mail.");
+        } else {
+          setError("Erro ao registrar: " + error.message);
+        }
       } else {
         toast({ title: "Cheque seu e-mail para confirmar o cadastro." });
         setVariant("login");
