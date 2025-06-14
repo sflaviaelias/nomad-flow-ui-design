@@ -2,7 +2,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const openAIApiKey = Deno.env.get("OPENAI_API_KEY");
+const groqApiKey = Deno.env.get("GO-NOMAD-GROQ");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,17 +17,24 @@ serve(async (req) => {
     const { messages, userContext } = await req.json();
     // Exemplos de contexto: { name, destination, budget, currency, weather }
     const systemPrompt = `Você é um concierge inteligente do app Go Nomad para nômades digitais. Sempre responda em português, com tom acolhedor, objetivo e contextual ao usuário brasileiro. Utilize o contexto fornecido: ${JSON.stringify(userContext || {})}. Dê respostas práticas, com sugestões acionáveis.`;
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    if (!groqApiKey) {
+      return new Response(
+        JSON.stringify({ error: "Groq API Key não configurada" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    // Altere aqui para o modelo suportado pela Groq, como llama3-70b-8192
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${openAIApiKey}`,
+        "Authorization": `Bearer ${groqApiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model: "llama3-70b-8192", // Confirme na doc Groq se prefere outro modelo!
         messages: [
           { role: "system", content: systemPrompt },
-          ...messages
+          ...(messages || [])
         ],
         max_tokens: 500,
         temperature: 0.77,
