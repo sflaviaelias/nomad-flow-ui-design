@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { ArrowLeft, Users, MapPin, CircleCheck } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import ConciergeContextModal from "./ConciergeContextModal";
 import { useNavigate } from "react-router-dom";
+import PageHeader from "@/components/PageHeader";
 
 // Tipos
 interface Message {
@@ -83,29 +83,9 @@ const ConciergeChat: React.FC = () => {
     "flex items-center gap-2 h-10 px-3 py-2 rounded-md bg-transparent border-none text-[#E76F51] hover:bg-[#E76F51]/10 font-inter text-base font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E76F51] min-w-[44px] min-h-[44px]";
 
   return (
-    <section className="w-full max-w-2xl mx-auto flex flex-col pt-2 px-2 md:px-0 gap-2 font-inter">
-
-      {/* Cabeçalho */}
-      <div className="flex items-center justify-between mb-2 px-0">
-        {/* Botão Voltar (esquerda) */}
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Voltar"
-          onClick={() => navigate(-1)}
-          className={BUTTON_BACK}
-          style={{ minWidth: 44, minHeight: 44 }}
-        >
-          <ArrowLeft size={22} className="mr-1" />
-          <span className="hidden sm:inline">Voltar</span>
-        </Button>
-        {/* Título centralizado */}
-        <span className={HEADER_TITLE}>
-          Concierge
-        </span>
-        {/* Espaço à direita para manter centralização */}
-        <div style={{ width: 52 }}></div>
-      </div>
+    <section className="w-full max-w-2xl mx-auto flex flex-col pt-0 px-2 md:px-0 gap-2 font-inter">
+      {/* Cabeçalho padrão internal */}
+      <PageHeader title="Concierge" showBack />
 
       {/* Message Card (Card do DS para a mensagem inicial) */}
       <div className="w-full">

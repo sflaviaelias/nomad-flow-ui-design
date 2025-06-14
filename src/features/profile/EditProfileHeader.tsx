@@ -5,26 +5,36 @@ import { ArrowLeft } from "lucide-react";
 
 interface EditProfileHeaderProps {
   title?: string;
+  rightAction?: React.ReactNode;
 }
 
 export const EditProfileHeader: React.FC<EditProfileHeaderProps> = ({
   title = "Editar Perfil",
+  rightAction
 }) => {
   const navigate = useNavigate();
   return (
-    <div className="flex items-center gap-2 py-4 px-4 md:px-8 bg-white shadow-soft rounded-b-lg mb-4">
+    <header className="w-full flex items-center justify-between px-4 pt-4 pb-2 bg-[#FAF3EC] shadow-soft rounded-b-lg select-none">
       <button
-        className="flex items-center justify-center p-0.5 sm:p-2 rounded-md transition hover:bg-terra-600/10 text-terra-700"
-        style={{ minWidth: 44, minHeight: 44 }}
+        className="flex items-center justify-center rounded-full hover:bg-[#E76F5115] transition"
         aria-label="Voltar"
         onClick={() => navigate(-1)}
+        style={{ width: 44, height: 44, minWidth: 44, minHeight: 44 }}
       >
-        <ArrowLeft size={24} />
+        <ArrowLeft size={24} className="text-[#E76F51]" />
       </button>
-      <h1 className="flex-1 text-center font-bold text-xl text-terra-800" style={{ fontFamily: "Inter" }}>
+      <h1
+        className="flex-1 text-center font-inter font-semibold text-lg md:text-xl"
+        style={{
+          color: "#E76F51",
+          letterSpacing: "-0.01em"
+        }}
+      >
         {title}
       </h1>
-      <span style={{ width: 32 }} />
-    </div>
+      <div style={{ minWidth: 44, minHeight: 44 }} className="flex items-center justify-end">
+        {rightAction ? rightAction : null}
+      </div>
+    </header>
   );
 };

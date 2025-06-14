@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import PageHeader from "@/components/PageHeader";
 
 // Import the refactored components
 import { ProfileLoginPrompt } from "./ProfileLoginPrompt";
@@ -74,33 +74,8 @@ export default function ProfileScreen() {
 
   return (
     <div className="bg-[#FAF3EC] min-h-screen px-4 pt-2 pb-8 flex flex-col font-sans">
-      {/* Navegação superior com botão voltar */}
-      <div className="flex items-center justify-between gap-2 mb-7 mt-2">
-        <button
-          aria-label="Voltar"
-          className="flex-shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-transparent hover:bg-terra-600/10 transition"
-          onClick={() => navigate(-1)}
-        >
-          <ArrowLeft size={22} className="text-terra-700" />
-        </button>
-        <h1
-          className="flex-1 text-center text-[1.45rem] font-bold text-terra-800"
-          style={{ fontFamily: "Inter", letterSpacing: "-0.02em", marginLeft: -22 }}
-        >
-          Perfil
-        </h1>
-        {/* Editar perfil */}
-        <Button
-          variant="outline"
-          className="flex items-center gap-1.5 text-terra-600 border-terra-600 bg-white px-4 h-11 min-w-[44px] min-h-[44px] font-medium transition hover:bg-terra-600/10"
-          style={{ fontFamily: "Inter" }}
-          onClick={() => navigate("/profile/edit")}
-          aria-label="Editar perfil"
-        >
-          <User className="mr-1" size={18} />
-          Editar
-        </Button>
-      </div>
+      {/* Cabeçalho padrão interno */}
+      <PageHeader title="Perfil" showBack />
 
       {/* Avatar */}
       <div className="mb-5 flex flex-col items-center">
