@@ -1,7 +1,9 @@
 
 import React from "react";
-import { CalendarDays, MapPin, BadgeCheck } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useActiveTripAI } from "@/hooks/useActiveTripAI";
+import ActiveTripAiBanner from "./ActiveTripAiBanner";
 
 type Props = {
   trip: {
@@ -17,6 +19,18 @@ type Props = {
 };
 
 export default function HomeActiveTripCard({ trip }: Props) {
+  // Convert budget string (e.g., '€1200') to number (remove currency and format)
+  const spent = 0; // For now, pass 0. Would get from real expenses in full integration.
+  const budgetNum = Number((trip.budget || "").replace(/[^\d]/g, ""));
+  const { data: ai, loading } = useActiveTripAI({
+    destination: trip.destination,
+    tripStart: trip.startDate,
+    tripEnd: trip.endDate,
+    budget: budgetNum,
+    currency: (trip.budget || "BRL").replace(/[\d\s.,]/g, "") || "BRL",
+    spent,
+  });
+
   return (
     <section className="bg-white rounded-2xl shadow-card overflow-hidden mb-2 border border-[#E76F51]/10">
       <div className="relative w-full h-40">
@@ -35,6 +49,9 @@ export default function HomeActiveTripCard({ trip }: Props) {
           <CalendarDays className="w-4 h-4" />
           {trip.startDate} — {trip.endDate}
         </div>
+
+        <ActiveTripAiBanner ai={ai || {}} loading={loading} />
+
         <div className="flex gap-4 mt-1 mb-1">
           <div>
             <div className="text-xs text-neutral-400">Orçamento</div>
@@ -45,20 +62,6 @@ export default function HomeActiveTripCard({ trip }: Props) {
             <div className="font-medium text-[#6D4530]">{trip.localBudget}</div>
           </div>
         </div>
-        {(trip.visa || trip.vaccines) && (
-          <div className="flex gap-2 flex-wrap mb-1">
-            {trip.visa && (
-              <span className="bg-[#E76F51] text-white text-xs px-2 py-0.5 rounded font-medium flex items-center gap-1">
-                <BadgeCheck size={14} /> Visto necessário
-              </span>
-            )}
-            {trip.vaccines && (
-              <span className="bg-[#AD4F36] text-white text-xs px-2 py-0.5 rounded font-medium flex items-center gap-1">
-                <BadgeCheck size={14} /> Vacinas obrigatórias
-              </span>
-            )}
-          </div>
-        )}
         <Button
           size="sm"
           className="w-full mt-2 bg-[#E76F51] hover:bg-[#C9583C] text-white font-bold rounded-md"
