@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -23,6 +22,7 @@ const TripCreationWizard: React.FC = () => {
   const [loadingAI, setLoadingAI] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [weather, setWeather] = useState<string | null>(null);
+  const [imgLoading, setImgLoading] = useState(false);
 
   // Simulação do preenchimento automático via AI
   async function fetchAIAdvice() {
@@ -57,6 +57,36 @@ const TripCreationWizard: React.FC = () => {
     setWeather("22°C, ensolarado");
   }
 
+  // IA: busca imagem do destino via edge function
+  async function fetchDestinationImageWithAI(dest: string) {
+    setImgLoading(true);
+    setImageUrl(null);
+    try {
+      const res = await fetch("/functions/v1/destination-image-ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ destination: dest }),
+      });
+      const data = await res.json();
+      if (data.image_url) setImageUrl(data.image_url);
+      else setImageUrl(`https://source.unsplash.com/600x350/?${encodeURIComponent(dest)},travel,city`);
+    } catch {
+      setImageUrl(`https://source.unsplash.com/600x350/?${encodeURIComponent(dest)},travel,city`);
+    } finally {
+      setImgLoading(false);
+    }
+  }
+
+  // Busca imagem sempre que o destino mudar (com debounce de digitação)
+  React.useEffect(() => {
+    if (!destination) return;
+    const handler = setTimeout(() => {
+      fetchDestinationImageWithAI(destination);
+    }, 750);
+    return () => clearTimeout(handler);
+    // eslint-disable-next-line
+  }, [destination]);
+
   function nextPhase() {
     setPhase((p) => (p < 3 ? ((p + 1) as Phase) : p));
   }
@@ -73,6 +103,13 @@ const TripCreationWizard: React.FC = () => {
     }
     // eslint-disable-next-line
   }, [phase]);
+
+  // Prepara os dados para salvar (incluindo imagem)
+  function handleSaveTrip() {
+    // ... inserir chamada real à API salvar viagem aqui ...
+    // Certifique-se de salvar também o campo imageUrl como image_url
+    toast({ title: "Viagem criada com sucesso! (fake)", description: "Integração de backend futura." });
+  }
 
   return (
     <Card className="mt-6">
@@ -93,9 +130,24 @@ const TripCreationWizard: React.FC = () => {
                 onChange={e => setDestination(e.target.value)}
                 placeholder="Ex: Lisboa, Portugal"
                 autoFocus
+                aria-label="Destino"
               />
+              <div className="mt-3">
+                {imgLoading && (
+                  <div className="text-xs text-neutral-500 flex items-center gap-2">
+                    <Loader2 className="animate-spin" size={16} /> Buscando imagem do destino...
+                  </div>
+                )}
+                {imageUrl && !imgLoading && (
+                  <div className="rounded-md overflow-hidden mt-2 max-h-40 border border-[#DADADA]">
+                    <img src={imageUrl} alt={`Paisagem de ${destination}`} className="w-full object-cover" style={{ height: 160 }} />
+                  </div>
+                )}
+              </div>
               <div className="mt-4 flex gap-2">
-                <Button className="bg-terracotta" disabled={!destination} onClick={nextPhase}>Próxima <ArrowRight className="ml-1" /></Button>
+                <Button className="bg-terracotta" disabled={!destination} onClick={nextPhase}>
+                  Próxima <ArrowRight className="ml-1" />
+                </Button>
               </div>
             </div>
           )}
@@ -189,7 +241,7 @@ const TripCreationWizard: React.FC = () => {
               )}
               <div className="mt-4 flex gap-2">
                 <Button variant="outline" onClick={prevPhase}>Voltar</Button>
-                <Button className="bg-terracotta" onClick={() => toast({ title: "Viagem criada com sucesso! (fake)", description: "Integração de backend futura." })}>Salvar viagem & finalizar</Button>
+                <Button className="bg-terracotta" onClick={handleSaveTrip}>Salvar viagem & finalizar</Button>
               </div>
             </div>
           )}
