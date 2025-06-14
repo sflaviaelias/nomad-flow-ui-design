@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import HomeHeader from "../components/HomeHeader";
@@ -53,7 +52,7 @@ export default function Home() {
 
   return (
     <div className="bg-[#FAF3EC] min-h-screen font-sans">
-      <HomeHeader user={user} onAvatarClick={() => navigate("/profile")} />
+      <HomeHeader user={user} />
       <main className="max-w-md mx-auto w-full pt-4 pb-14 px-3">
         <HomeQuickActions />
         <div className="my-5" />
