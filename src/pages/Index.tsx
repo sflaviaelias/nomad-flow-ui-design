@@ -111,16 +111,8 @@ const Index = () => {
             <div className="px-4">
               <HomeTripSummaryCard activeTrip={activeTrip} />
             </div>
-            <UpcomingTripsSlider />
-            <div className="h-6" />
-            <ConciergeSection />
-            <div className="px-5 mb-2">
-              <div className="bg-[#e76f5115] border border-[#E76F51]/20 rounded-lg px-4 py-2 mt-2 text-[#AD4F36] text-xs font-inter shadow-sm">
-                🎯 DICA: O Concierge utiliza IA para sugerir ações inteligentes, baseadas no contexto da sua viagem.
-              </div>
-            </div>
-            <div className="h-6" />
 
+            {/* --- Move Community and Discovery sections above UpcomingTripsSlider for better flow --- */}
             <DiscoverySectionWrapper />
             <div className="px-5 mb-2">
               <div className="bg-[#dadada20] border border-[#E76F51]/5 rounded-lg px-4 py-2 mt-2 text-[#6D4530] text-xs font-inter shadow-sm">
@@ -132,11 +124,23 @@ const Index = () => {
             <div className="px-4">
               <HomeCommunityCard />
             </div>
+            <div className="h-3" />
+
+            {/* Upcoming Trips should render at the bottom, below community/news */}
+            <UpcomingTripsSlider />
+
+            <div className="h-3" />
+            <ConciergeSection />
+            <div className="px-5 mb-2">
+              <div className="bg-[#e76f5115] border border-[#E76F51]/20 rounded-lg px-4 py-2 mt-2 text-[#AD4F36] text-xs font-inter shadow-sm">
+                🎯 DICA: O Concierge utiliza IA para sugerir ações inteligentes, baseadas no contexto da sua viagem.
+              </div>
+            </div>
+            <div className="h-4" />
           </>
         )}
       </main>
     </div>
   );
 };
-
 export default Index;
