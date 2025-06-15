@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HomeHeader from "../components/HomeHeader";
@@ -93,8 +94,11 @@ const Index = () => {
               activeTrip={activeTrip}
             />
             <div className="h-4" />
-            {/* -- Your Travel Summary AI section likely sits here -- */}
-            <HomeTripSummaryCard />
+
+            {/* Alinhar card com os outros blocos usando px-4 */}
+            <div className="px-4">
+              <HomeTripSummaryCard />
+            </div>
             {/* Slider of upcoming trips goes here */}
             <UpcomingTripsSlider />
             <div className="h-6" />
@@ -114,7 +118,10 @@ const Index = () => {
             </div>
             <div className="h-6" />
 
-            <HomeCommunityCard />
+            {/* Alinhar card com os outros blocos usando px-4 */}
+            <div className="px-4">
+              <HomeCommunityCard />
+            </div>
           </>
         )}
       </main>
@@ -123,3 +130,4 @@ const Index = () => {
 };
 
 export default Index;
+

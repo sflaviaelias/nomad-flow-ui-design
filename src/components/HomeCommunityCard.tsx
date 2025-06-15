@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 
 export default function HomeCommunityCard() {
   return (
-    <section className="rounded-2xl bg-white shadow-card px-5 py-5 mb-5 flex items-center gap-4 border border-[#E76F51]/10">
+    // Remove px-5, deixar padding horizontal para o wrapper externo
+    <section className="rounded-2xl bg-white shadow-card px-0 py-5 mb-5 flex items-center gap-4 border border-[#E76F51]/10">
       <div className="bg-[#FAF3EC] rounded-xl p-3">
         <Users size={30} className="text-[#E76F51]" />
       </div>
