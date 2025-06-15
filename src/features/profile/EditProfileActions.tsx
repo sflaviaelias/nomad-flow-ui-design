@@ -6,9 +6,10 @@ import { useNavigate } from "react-router-dom";
 interface EditProfileActionsProps {
   loading: boolean;
   onSave: (e: React.FormEvent) => void;
+  canSave?: boolean; // NOVO: controle de habilitação
 }
 
-export function EditProfileActions({ loading, onSave }: EditProfileActionsProps) {
+export function EditProfileActions({ loading, onSave, canSave = true }: EditProfileActionsProps) {
   const navigate = useNavigate();
   return (
     <div className="flex gap-3">
@@ -16,7 +17,7 @@ export function EditProfileActions({ loading, onSave }: EditProfileActionsProps)
         type="submit"
         className="flex-1 bg-terra-600 text-white font-semibold text-lg rounded-lg py-2 mt-1 min-h-[44px]"
         style={{ fontFamily: "Inter" }}
-        disabled={loading}
+        disabled={loading || !canSave}
         onClick={onSave}
       >
         Salvar

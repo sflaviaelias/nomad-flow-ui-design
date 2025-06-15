@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { toast } from "@/hooks/use-toast";
@@ -27,12 +26,17 @@ export default function EditProfileScreen() {
   const [aiAssistant, setAIAssistant] = useState(true);
 
   const [errors, setErrors] = useState<{ [k: string]: string | null }>({});
+  // NOVO: controle habilitação do botão salvar
+  const requiredFilled =
+    !!name?.trim() &&
+    !!nationality &&
+    !!birthDate &&
+    Array.isArray(travelProfiles) && travelProfiles.length > 0;
 
   // Buscar dados completos do perfil ao montar
   useEffect(() => {
     if (!user?.id) return;
     setLoading(true);
-
     supabase
       .from("profiles")
       .select("name,avatar_url,email,country,birth_date,preferences")
@@ -49,8 +53,7 @@ export default function EditProfileScreen() {
           setAvatarUrl(data.avatar_url || null);
           setCountryResidence(data.country || "Brasil");
           setBirthDate(data.birth_date ? new Date(data.birth_date) : null);
-
-          // --- CORREÇÃO DE PARSING AQUI ---
+          // --- CORREÇÃO robusta preferences ---
           let prefs: any = {};
           if (data.preferences && typeof data.preferences === "object") {
             prefs = data.preferences as { [k: string]: any };
@@ -61,7 +64,6 @@ export default function EditProfileScreen() {
               prefs = {};
             }
           }
-
           setNationality(
             typeof prefs.nationality === "string" ? prefs.nationality : "Brasil"
           );
@@ -82,25 +84,22 @@ export default function EditProfileScreen() {
         }
         setLoading(false);
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
+  // Salvar perfil
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: { [k: string]: string | null } = {};
-
     if (!name.trim()) newErrors.name = "Nome é obrigatório";
     if (!nationality) newErrors.nationality = "Selecione sua nacionalidade";
     if (!birthDate) newErrors.birthDate = "Data de nascimento obrigatória";
     if (!Array.isArray(travelProfiles) || travelProfiles.length === 0)
       newErrors.travelProfiles = "Selecione ao menos um perfil";
-
     setErrors(newErrors);
     if (Object.values(newErrors).some(Boolean)) return;
-
     setLoading(true);
-
     try {
+      // Avatar: upload futuramente
       const updates = {
         id: user?.id,
         name,
@@ -116,7 +115,6 @@ export default function EditProfileScreen() {
           ai_assistant: aiAssistant,
         },
       };
-
       const { error } = await supabase
         .from("profiles")
         .upsert(updates, { onConflict: "id" });
@@ -142,9 +140,8 @@ export default function EditProfileScreen() {
         setLoading(false);
         return;
       }
-
       toast({ title: "Perfil atualizado com sucesso!" });
-      navigate("/", { state: { refresh: true } });
+      navigate("/profile", { state: { refresh: true } });
     } catch (err: any) {
       toast({
         title: "Erro ao atualizar perfil",
@@ -160,7 +157,7 @@ export default function EditProfileScreen() {
       <EditProfileHeader />
       <form
         onSubmit={handleSubmit}
-        className="flex-1 px-4 pb-8 md:pb-12 space-y-7 w-full max-w-md mx-auto"
+        className="flex-1 px-2 pb-8 md:pb-12 space-y-6 w-full max-w-md mx-auto"
       >
         <EditProfileAvatarBlock
           avatarUrl={avatarUrl}
@@ -187,7 +184,7 @@ export default function EditProfileScreen() {
           setAIAssistant={setAIAssistant}
           errors={errors}
         />
-        <EditProfileActions loading={loading} onSave={handleSubmit} />
+        <EditProfileActions loading={loading} onSave={handleSubmit} canSave={requiredFilled && !loading} />
       </form>
     </div>
   );
