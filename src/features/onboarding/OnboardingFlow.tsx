@@ -5,22 +5,29 @@ import OnboardingScreen2 from "./OnboardingScreen2";
 import OnboardingScreen3 from "./OnboardingScreen3";
 import { useNavigate } from "react-router-dom";
 
-export default function OnboardingFlow() {
+// Adiciona prop opcional para finalizar o onboarding e informar ao App
+type Props = {
+  onFinish?: () => void;
+};
+
+export default function OnboardingFlow({ onFinish }: Props) {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
+
+  function handleFinish() {
+    if (onFinish) onFinish();
+    // Após onboarding, encaminha para acesso/criação da conta
+    navigate("/auth/access", { replace: true });
+  }
 
   return (
     <div className="min-h-screen w-full bg-[#FAF3EC] flex flex-col items-center font-sans">
       <div className="w-full flex-1 flex flex-col justify-between items-stretch max-w-md mx-auto">
-        {/* Screens */}
         {step === 1 && <OnboardingScreen1 onNext={() => setStep(2)} />}
         {step === 2 && <OnboardingScreen2 onNext={() => setStep(3)} />}
         {step === 3 && (
           <OnboardingScreen3
-            onNext={() => {
-              // Route to auth access (choose create/login) using real page
-              navigate("/auth/access", { replace: true });
-            }}
+            onNext={handleFinish}
           />
         )}
         {/* Progress indicator */}
