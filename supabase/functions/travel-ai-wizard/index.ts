@@ -87,7 +87,6 @@ serve(async (req) => {
     }
 
     if (aiResponse.status !== 200) {
-      // Se Groq retornou erro, propagar descrição
       return new Response(JSON.stringify({ error: resData.error || "Erro na Groq API", debug: resData }), { status: 502, headers: corsHeaders });
     }
 

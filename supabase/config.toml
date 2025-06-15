@@ -3,3 +3,7 @@ project_id = "hxjjdutzpzrchfkrbxcd"
 
 [functions.destination-image-ai]
 verify_jwt = false
+
+[functions.travel-ai-wizard]
+verify_jwt = false
+
