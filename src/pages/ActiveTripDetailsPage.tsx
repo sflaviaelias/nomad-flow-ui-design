@@ -1,6 +1,7 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import PageHeader from "@/components/PageHeader";
 
 const tripData = {
   destination: "Paris, França",
@@ -67,28 +68,11 @@ export default function ActiveTripDetailsPage() {
 
   return (
     <div className="min-h-screen bg-[#FAF3EC] text-[#6D4530] flex flex-col items-center px-2 pb-10">
-      {/* Cabeçalho */}
-      <div className="w-full max-w-lg mx-auto flex flex-col pt-5 pb-2">
-        <div className="flex items-center gap-3">
-          <button
-            className="text-[#E76F51] text-2xl px-2 py-1 rounded hover:bg-[#e76f5115] transition cursor-pointer"
-            aria-label="Voltar"
-            style={{ minWidth: 44, minHeight: 44 }}
-            onClick={() => {
-              console.log("Voltar para a lista de viagens");
-              navigate(-1);
-            }}
-          >
-            &#8592;
-          </button>
-          <span className="text-xl md:text-2xl font-bold font-inter select-none" style={{ color: "#E76F51" }}>
-            Detalhes da Viagem Ativa
-          </span>
-        </div>
-        <div className="mt-1 ml-14 text-[#AD4F36] text-sm md:text-base font-inter">
-          Painel de detalhes da viagem (itinerário, checklist, clima, orçamento...)
-        </div>
-      </div>
+      {/* Novo cabeçalho padronizado */}
+      <PageHeader
+        title="Detalhes da Viagem Ativa"
+        showBack
+      />
 
       {/* Cartões de Detalhes */}
       <div className="w-full max-w-lg flex flex-col gap-5 mt-4">
