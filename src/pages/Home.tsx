@@ -27,22 +27,22 @@ const discoveryData = [
   {
     title: "Mercados e Padarias",
     nearby: [
-      { name: "Mercado Central", desc: "A 300m • 08h-19h", link: "#" },
-      { name: "Padaria Monalisa", desc: "A 450m • 24h", link: "#" },
+      { name: "Mercado Central", desc: "A 300m • 08h-19h", link: "mercado-central" },
+      { name: "Padaria Monalisa", desc: "A 450m • 24h", link: "padaria-monalisa" },
     ],
   },
   {
     title: "Cafés e Restaurantes",
     nearby: [
-      { name: "Café Nómade", desc: "Wi-fi • 350m", link: "#" },
-      { name: "Bistro do Porto", desc: "Cozinha local • 580m", link: "#" },
+      { name: "Café Nômade", desc: "Wi-fi • 350m", link: "cafe-nomade" },
+      { name: "Bistro do Porto", desc: "Cozinha local • 580m", link: "bistro-do-porto" },
     ],
   },
   {
     title: "Co-workings por perto",
     nearby: [
-      { name: "Work BCN", desc: "Sala priv. • 800m", link: "#" },
-      { name: "SmartLab", desc: "Cowork 24h • 1.2km", link: "#" },
+      { name: "Work BCN", desc: "Sala priv. • 800m", link: "work-bcn" },
+      { name: "SmartLab", desc: "Cowork 24h • 1.2km", link: "smartlab" },
     ],
   },
 ];
