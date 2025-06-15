@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
@@ -6,6 +7,7 @@ import TripDatesStep from "./TripDatesStep";
 import TripCurrencyStep from "./TripCurrencyStep";
 import TripSummaryStep from "./TripSummaryStep";
 import { useDestinationImageAI } from "./useDestinationImageAI";
+import { supabase } from "@/integrations/supabase/client";
 
 type Phase = 0 | 1 | 2 | 3;
 
@@ -25,6 +27,9 @@ const TripCreationWizard: React.FC = () => {
 
   // Usa hook para buscar imagem do destino via IA
   const { imageUrl, imgLoading } = useDestinationImageAI(destination);
+
+  // Loading e feedback
+  const [saving, setSaving] = React.useState(false);
 
   function nextPhase() {
     setPhase((p) => (p < 3 ? ((p + 1) as Phase) : p));
@@ -64,10 +69,57 @@ const TripCreationWizard: React.FC = () => {
     // eslint-disable-next-line
   }, [phase]);
 
-  function handleSaveTrip() {
-    // ... inserir chamada real à API salvar viagem aqui ...
-    // Certifique-se de salvar também o campo imageUrl como image_url
-    toast({ title: "Viagem criada com sucesso! (fake)", description: "Integração de backend futura." });
+  // Salva viagem na tabela trips
+  async function handleSaveTrip() {
+    setSaving(true);
+    try {
+      // Obter usuário logado
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) {
+        toast({
+          title: "Erro",
+          description: "É preciso estar logado para salvar a viagem.",
+          variant: "destructive"
+        });
+        setSaving(false);
+        return;
+      }
+
+      // Gravar viagem
+      const { error } = await supabase
+        .from("trips")
+        .insert({
+          user_id: user.id,
+          destination,
+          start_date: dates.start,
+          end_date: dates.end,
+          currency,
+          budget: null, // Ajustar se orçamento for numérico
+          notes: "",
+          // Use imageUrl if available (additional column if your schema permits)
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Viagem salva!",
+        description: "Em breve: sugestões inteligentes da IA para otimizar seu planejamento ✨",
+      });
+
+      // Resetar wizard (opcional: pode redirecionar ou só limpar)
+      setPhase(0);
+      setDestination("");
+      setDates({ start: "", end: "" });
+      setCurrency("BRL");
+      setAiAdvice(null);
+    } catch (e: any) {
+      toast({
+        title: "Erro ao salvar",
+        description: "Não foi possível salvar a viagem. Tente novamente.",
+        variant: "destructive"
+      });
+    }
+    setSaving(false);
   }
 
   return (
@@ -84,7 +136,7 @@ const TripCreationWizard: React.FC = () => {
               value={destination}
               onChange={setDestination}
               onNext={nextPhase}
-              disabled={imgLoading}
+              disabled={imgLoading || saving}
             />
           )}
 
@@ -119,8 +171,14 @@ const TripCreationWizard: React.FC = () => {
               imageUrl={imageUrl}
               onPrev={prevPhase}
               onSave={handleSaveTrip}
+              saving={saving}
             />
           )}
+
+          {saving && (
+            <div className="text-center text-[#E76F51] text-sm">Salvando...</div>
+          )}
+          {/* Mensagem extra de "em breve" após salvar está no toast */}
         </div>
       </CardContent>
     </Card>
@@ -128,3 +186,4 @@ const TripCreationWizard: React.FC = () => {
 };
 
 export default TripCreationWizard;
+
