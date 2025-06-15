@@ -4,14 +4,11 @@ import {
   Drawer,
   DrawerContent,
   DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
   DrawerClose,
   DrawerOverlay,
   DrawerFooter,
 } from "@/components/ui/drawer";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Switch } from "@/components/ui/switch";
 import { User, Settings, LogOut, Moon, Sun, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -29,7 +26,8 @@ const MENU_ITEMS = [
     action: "settings",
   },
   {
-    label: "Tema: Claro / Escuro",
+    // Este item será tratado separadamente, só mantido para o mapeamento
+    label: "Tema",
     icon: null,
     action: "theme",
   },
@@ -52,8 +50,8 @@ export default function AppMenuDrawer({ open, onOpenChange }: AppMenuDrawerProps
     (localStorage.getItem("theme") as "light" | "dark") || "light"
   );
 
-  function handleThemeToggle(checked: boolean) {
-    const newTheme = checked ? "dark" : "light";
+  function handleThemeToggle() {
+    const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
     document.documentElement.classList.toggle("dark", newTheme === "dark");
     localStorage.setItem("theme", newTheme);
@@ -125,16 +123,19 @@ export default function AppMenuDrawer({ open, onOpenChange }: AppMenuDrawerProps
           <ul className="flex flex-col gap-2 px-3">
             {MENU_ITEMS.map((item) =>
               item.action === "theme" ? (
-                <li key={item.action} className="rounded-lg bg-white px-4 py-3 shadow-card flex items-center justify-between mb-2">
+                <li
+                  key={item.action}
+                  className="rounded-lg bg-white px-4 py-3 shadow-card flex items-center justify-between cursor-pointer mb-2 hover:bg-[#E76F5112] transition"
+                  onClick={handleThemeToggle}
+                  aria-label={`Alternar tema: ${theme === "dark" ? "Escuro ⭢ Claro" : "Claro ⭢ Escuro"}`}
+                >
                   <div className="flex items-center gap-2">
                     {theme === "dark" ? <Moon className="text-[#E76F51]" /> : <Sun className="text-[#E76F51]" />}
-                    <span className="text-sm font-medium">Tema: {theme === "dark" ? "Escuro" : "Claro"}</span>
+                    <span className="text-sm font-medium">
+                      Tema:{" "}
+                      {theme === "dark" ? "Escuro ⭢ Claro" : "Claro ⭢ Escuro"}
+                    </span>
                   </div>
-                  <Switch
-                    checked={theme === "dark"}
-                    onCheckedChange={handleThemeToggle}
-                    aria-label="Alternar tema claro/escuro"
-                  />
                 </li>
               ) : (
                 <li
@@ -167,3 +168,4 @@ export default function AppMenuDrawer({ open, onOpenChange }: AppMenuDrawerProps
     </Drawer>
   );
 }
+
