@@ -119,9 +119,12 @@ export default function ExpensesDashboard() {
   const topCategories = Object.entries(expensesByCategory)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 4);
+  // CORRIGIDO: soma corretamente os valores das demais categorias em 'Outros'
   const otherSum = Object.entries(expensesByCategory)
+    .sort((a, b) => b[1] - a[1])  // garantir o mesmo order da slice acima
     .slice(4)
     .reduce((sum, [, value]) => sum + value, 0);
+
   const chartData = [
     ...topCategories.map(([cat, value]) => ({
       categoria: cat,
