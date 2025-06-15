@@ -1,5 +1,4 @@
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PageHeader from "@/components/PageHeader";
 import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
@@ -45,7 +44,10 @@ const DiscoveryPage = () => {
   // Simula idioma do usuário - usar do perfil real se possível
   const userLanguage = user?.user_metadata?.language || "pt";
 
-  const { title, places } = getCategoryData(category || "");
+  const { title, places: rawPlaces } = getCategoryData(category || "");
+
+  // ⭐ Memoize dos dados dos lugares para prevenir re-renderizações desnecessárias
+  const places = useMemo(() => rawPlaces, [category]);
 
   // IA rankeando
   const { rankedPlaces, loading } = useDiscoveryRanking(category || "", places, user, userLanguage);
