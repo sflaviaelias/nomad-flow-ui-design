@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,7 +14,7 @@ export default function EditProfileScreen() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  // State fields obrigatórios
+  // Campos do formulário
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarUrl, setAvatarUrl] = useState(user?.user_metadata?.avatar_url || null);
   const [name, setName] = useState(user?.user_metadata?.name || "");
@@ -25,18 +26,56 @@ export default function EditProfileScreen() {
   const [birthDate, setBirthDate] = useState<Date | null>(null);
   const [aiAssistant, setAIAssistant] = useState(true);
 
-  // Controle de erros para validação obrigatória
   const [errors, setErrors] = useState<{ [k: string]: string | null }>({});
 
-  // Nova lógica: não permite "escapar" da tela se campos obrigatórios não preenchidos
-  // A menos que já venha de perfil existente e completo.
-  // (isso depende do backend: é bom obrigar no backend, mas aqui é prevention UX)
+  // Buscar dados completos do perfil ao montar
+  useEffect(() => {
+    // Só busca se tiver user.id
+    if (!user?.id) return;
+    setLoading(true);
+
+    supabase
+      .from("profiles")
+      .select("name,avatar_url,email,country,birth_date,preferences")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (error) {
+          setLoading(false);
+          toast({ title: "Erro ao carregar perfil", description: error.message });
+          return;
+        }
+        if (data) {
+          setName(data.name || "");
+          setAvatarUrl(data.avatar_url || null);
+          setCountryResidence(data.country || "Brasil");
+          setBirthDate(data.birth_date ? new Date(data.birth_date) : null);
+
+          // preferences é um JSON com nationality, currency, languages, travel_profiles, ai_assistant
+          const prefs = data.preferences || {};
+          setNationality(prefs.nationality || "Brasil");
+          setCurrency(prefs.currency || "BRL");
+          setLanguages(
+            Array.isArray(prefs.languages) && prefs.languages.length > 0
+              ? prefs.languages
+              : ["Português", "Inglês"]
+          );
+          setTravelProfiles(
+            Array.isArray(prefs.travel_profiles) ? prefs.travel_profiles : []
+          );
+          setAIAssistant(
+            typeof prefs.ai_assistant === "boolean" ? prefs.ai_assistant : true
+          );
+        }
+        setLoading(false);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: { [k: string]: string | null } = {};
 
-    // DUPLA validação frontend
     if (!name.trim()) newErrors.name = "Nome é obrigatório";
     if (!nationality) newErrors.nationality = "Selecione sua nacionalidade";
     if (!birthDate) newErrors.birthDate = "Data de nascimento obrigatória";
@@ -61,21 +100,31 @@ export default function EditProfileScreen() {
           currency,
           languages,
           travel_profiles: travelProfiles,
-          ai_assistant: aiAssistant
-        }
+          ai_assistant: aiAssistant,
+        },
       };
 
-      const { error } = await supabase.from("profiles").upsert(updates, { onConflict: "id" });
+      const { error } = await supabase
+        .from("profiles")
+        .upsert(updates, { onConflict: "id" });
       if (error) {
-        // Check mensagem trigger SQL/email duplicado
         if (
           error.message?.toLowerCase().includes("duplic") ||
-          error.message?.toLowerCase().includes("já existe um perfil cadastrado com este e-mail")
+          error.message
+            ?.toLowerCase()
+            .includes("já existe um perfil cadastrado com este e-mail")
         ) {
-          toast({ title: "Já existe um perfil com este e-mail", description: "Tente acessar sua conta existente ou recupere sua senha!" });
+          toast({
+            title: "Já existe um perfil com este e-mail",
+            description:
+              "Tente acessar sua conta existente ou recupere sua senha!",
+          });
           setErrors({ ...newErrors, email: "E-mail já cadastrado" });
         } else {
-          toast({ title: "Erro ao atualizar perfil", description: error.message ?? "Tente novamente." });
+          toast({
+            title: "Erro ao atualizar perfil",
+            description: error.message ?? "Tente novamente.",
+          });
         }
         setLoading(false);
         return;
@@ -84,7 +133,10 @@ export default function EditProfileScreen() {
       toast({ title: "Perfil atualizado com sucesso!" });
       navigate("/", { state: { refresh: true } });
     } catch (err: any) {
-      toast({ title: "Erro ao atualizar perfil", description: err.message ?? "Tente novamente." });
+      toast({
+        title: "Erro ao atualizar perfil",
+        description: err.message ?? "Tente novamente.",
+      });
     } finally {
       setLoading(false);
     }
@@ -93,8 +145,15 @@ export default function EditProfileScreen() {
   return (
     <div className="bg-[#FAF3EC] min-h-screen flex flex-col font-sans">
       <EditProfileHeader />
-      <form onSubmit={handleSubmit} className="flex-1 px-4 pb-8 md:pb-12 space-y-7 w-full max-w-md mx-auto">
-        <EditProfileAvatarBlock avatarUrl={avatarUrl} onChange={setAvatarFile} name={name} />
+      <form
+        onSubmit={handleSubmit}
+        className="flex-1 px-4 pb-8 md:pb-12 space-y-7 w-full max-w-md mx-auto"
+      >
+        <EditProfileAvatarBlock
+          avatarUrl={avatarUrl}
+          onChange={setAvatarFile}
+          name={name}
+        />
         <EditProfileForm
           name={name}
           setName={setName}
