@@ -2,10 +2,10 @@
 import React from "react";
 import { BarChart3 } from "lucide-react";
 
+// Ajusta paddings para consistência visual com outros cards (px-6 py-5 igual ConciergeCard)
 export default function HomeTripSummaryCard() {
   return (
-    // Remove px-5, deixar padding horizontal para o wrapper externo
-    <section className="rounded-2xl bg-white shadow-card px-0 py-5 mb-5 flex items-center gap-4 border border-[#E76F51]/10">
+    <section className="rounded-2xl bg-white shadow-card px-6 py-5 mb-6 flex items-center gap-4 border border-[#E76F51]/10">
       <div className="bg-[#FAF3EC] rounded-xl p-3">
         <BarChart3 size={30} className="text-[#E76F51]" />
       </div>
