@@ -34,12 +34,17 @@ serve(async (req) => {
   try {
     const { type, value, context } = await req.json();
 
+    // 🚩 Log entrada recebida
+    console.log("[TravelAIWizard][REQ] type:", type, "value:", value, "context:", context);
+
     if (!groqApiKey) {
       console.error("[Travel-AI-Wizard][ERROR] Falta chave GO-NOMAD-GROQ");
       return new Response(JSON.stringify({ error: "Groq API Key não configurada" }), { status: 500, headers: corsHeaders });
     }
 
     const prompt = buildPrompt(type, value, context);
+    // 🚩 Log do prompt construído
+    console.log("[TravelAIWizard][PROMPT]", prompt);
 
     const systemPrompt = "Responda SEMPRE em português (Brasil), de forma simpática, sucinta e bem contextual para nômades digitais brasileiros.";
     const model = "llama3-70b-8192";
@@ -67,14 +72,23 @@ serve(async (req) => {
       }),
     });
 
+    // 🚩 log status da resposta da Groq
+    console.log("[TravelAIWizard][Groq-Status]", aiResponse.status);
+
     const resText = await aiResponse.text();
     console.log("[TravelAIWizard] Resposta do Groq:", resText);
 
     let resData: any;
     try {
       resData = JSON.parse(resText);
-    } catch {
+    } catch (err) {
+      console.error("[TravelAIWizard][JSON-Parse-Error]", err, resText);
       return new Response(JSON.stringify({ error: "Erro ao parsear resposta Groq", debug: resText }), { status: 502, headers: corsHeaders });
+    }
+
+    if (aiResponse.status !== 200) {
+      // Se Groq retornou erro, propagar descrição
+      return new Response(JSON.stringify({ error: resData.error || "Erro na Groq API", debug: resData }), { status: 502, headers: corsHeaders });
     }
 
     if (type === "suggestions") {
@@ -82,7 +96,8 @@ serve(async (req) => {
       let output;
       try {
         output = JSON.parse(resData.choices?.[0]?.message?.content ?? "");
-      } catch {
+      } catch (err) {
+        console.error("[TravelAIWizard][Sugestões][Parse Error]", err, resData.choices?.[0]?.message?.content);
         output = { sugestoes: [] };
       }
       return new Response(JSON.stringify(output.sugestoes || []), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -94,6 +109,6 @@ serve(async (req) => {
 
   } catch (err) {
     console.error("[TravelAIWizard][ERROR] Erro:", err);
-    return new Response(JSON.stringify({ error: "Falha ao obter resposta da IA" }), { status: 500, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: "Falha ao obter resposta da IA", debug: String(err) }), { status: 500, headers: corsHeaders });
   }
 });
