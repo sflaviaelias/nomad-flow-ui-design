@@ -10,6 +10,7 @@ import HomeCommunityCard from "../components/HomeCommunityCard";
 import HomeTripSummaryCard from "../components/HomeTripSummaryCard";
 import TripDetailsModal from "@/components/TripDetailsModal";
 import { supabase } from "@/integrations/supabase/client";
+import UpcomingTripsSlider from "@/components/UpcomingTripsSlider";
 
 // Dummy data: in real app, replace with actual data and hooks.
 const userFallback = {
@@ -92,7 +93,10 @@ const Index = () => {
               activeTrip={activeTrip}
             />
             <div className="h-4" />
-            {/* Removed HomeAddTripButton from here (was previously under the card) */}
+            {/* -- Your Travel Summary AI section likely sits here -- */}
+            <HomeTripSummaryCard />
+            {/* Slider of upcoming trips goes here */}
+            <UpcomingTripsSlider />
             <div className="h-6" />
             <ConciergeSection />
             <div className="px-5 mb-2">
@@ -111,7 +115,6 @@ const Index = () => {
             <div className="h-6" />
 
             <HomeCommunityCard />
-            <HomeTripSummaryCard />
           </>
         )}
       </main>
