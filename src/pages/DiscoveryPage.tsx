@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PageHeader from "@/components/PageHeader";
 import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
@@ -6,6 +7,7 @@ import { PLACES_MOCK, PlaceMock } from "@/components/placesMockData";
 import { MapPin } from "lucide-react";
 import { useDiscoveryRanking } from "@/hooks/useDiscoveryRanking";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import DiscoveryPlaceCardSkeleton from "@/components/DiscoveryPlaceCardSkeleton";
 
 const getCategoryData = (category: string): { title: string, places: PlaceMock[] } => {
   if (category === "markets") {
@@ -66,7 +68,11 @@ const DiscoveryPage = () => {
       <main>
         <div className="p-4 max-w-lg mx-auto">
           {loading ? (
-            <div className="py-10 text-center text-neutral-400">Carregando recomendações…</div>
+            <div className="flex flex-col gap-4 py-4">
+              {[...Array(4)].map((_, i) => (
+                <DiscoveryPlaceCardSkeleton key={i} />
+              ))}
+            </div>
           ) : rankedPlaces.length > 0 ? (
             <div className="flex flex-col gap-4">
               {rankedPlaces.map((place) => (
