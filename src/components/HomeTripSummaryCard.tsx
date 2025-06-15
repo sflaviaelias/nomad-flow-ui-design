@@ -1,13 +1,17 @@
 
 import React from "react";
 import { BarChart3 } from "lucide-react";
-import { useActiveTripSmartSummary } from "@/hooks/useActiveTripSmartSummary";
 import { useNavigate } from "react-router-dom";
 
-// Card do resumo inteligente: visual clean, card todo clicável
-export default function HomeTripSummaryCard() {
-  const { summary } = useActiveTripSmartSummary();
+// Accept prop for activeTrip
+type HomeTripSummaryCardProps = {
+  activeTrip: any;
+};
+
+export default function HomeTripSummaryCard({ activeTrip }: HomeTripSummaryCardProps) {
   const navigate = useNavigate();
+
+  // Optionally, you can use activeTrip here for advanced summaries
 
   return (
     <section
@@ -40,4 +44,3 @@ export default function HomeTripSummaryCard() {
     </section>
   );
 }
-

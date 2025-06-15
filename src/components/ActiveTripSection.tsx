@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -34,7 +35,7 @@ interface TripData {
 }
 interface ActiveTripSectionProps {
   hasActiveTrip: boolean;
-  activeTrip: TripData;
+  activeTrip: TripData | null;
   onShowDetails?: () => void;
 }
 
@@ -44,7 +45,7 @@ export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const [cityPhoto, setCityPhoto] = useState<string>(activeTrip.imageUrl);
+  const [cityPhoto, setCityPhoto] = useState<string>(activeTrip?.imageUrl ?? "");
   const [weather, setWeather] = useState<string>("");
   const [timezone, setTimezone] = useState<string>("");
   const [utcOffset, setUtcOffset] = useState<string>("");
@@ -54,6 +55,17 @@ export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
   const nationality = localStorage.getItem("profile-country") || "BR";
 
   useEffect(() => {
+    // Early exit if no active trip
+    if (!activeTrip) {
+      setCityPhoto("");
+      setWeather("");
+      setTimezone("");
+      setUtcOffset("");
+      setBrlBudget("");
+      setLoading(false);
+      return;
+    }
+
     async function fetchInfo() {
       setLoading(true);
       const image = await getCityImage(activeTrip.destination);
@@ -66,14 +78,20 @@ export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
       setTimezone(tz.timezone);
       setUtcOffset(tz.offset);
 
-      const eur = Number(activeTrip.budget.replace(/[^\d.,]/g, "").replace(",", "."));
+      const eur = Number(
+        (activeTrip.budget || "")
+          .replace(/[^\d.,]/g, "")
+          .replace(",", ".")
+      );
       const brl = convertCurrency(eur, nationality);
-      setBrlBudget(brl.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }));
+      setBrlBudget(
+        brl.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+      );
       setLoading(false);
     }
     if (hasActiveTrip) fetchInfo();
     // eslint-disable-next-line
-  }, [activeTrip.destination, hasActiveTrip]);
+  }, [activeTrip?.destination, hasActiveTrip]);
 
   // Classes e estilos centralizados
   const cardClass =
@@ -97,7 +115,7 @@ export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
         Viagem ativa
       </h2>
       <div className="px-4">
-        {hasActiveTrip ? (
+        {hasActiveTrip && activeTrip ? (
           <div className={cardClass + " mb-6 w-full"}>
             {/* Edit Trip icon button (top-right) */}
             <div className="absolute top-3 right-3 z-10">

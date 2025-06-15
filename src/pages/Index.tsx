@@ -12,6 +12,7 @@ import HomeTripSummaryCard from "../components/HomeTripSummaryCard";
 import TripDetailsModal from "@/components/TripDetailsModal";
 import { supabase } from "@/integrations/supabase/client";
 import UpcomingTripsSlider from "@/components/UpcomingTripsSlider";
+import { useActiveTrip } from "@/hooks/useActiveTrip";
 
 // Dummy data: in real app, replace with actual data and hooks.
 const userFallback = {
@@ -20,23 +21,15 @@ const userFallback = {
     "https://ui-avatars.com/api/?background=E76F51&color=fff&size=128&name=Viajante"
 };
 
-const activeTrip = {
-  destination: "Barcelona, Espanha",
-  imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=945&q=80",
-  startDate: "01/07/2024",
-  endDate: "15/07/2024",
-  budget: "€1200",
-  localBudget: "US$ 1,300",
-  // Adicione outros campos relevantes se necessário
-};
-
-const hasActiveTrip = true; // Simulate trip presence
-
 const Index = () => {
   const navigate = useNavigate();
 
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Hook: fetch dynamic active trip
+  const { data: activeTrip, isLoading: tripLoading } = useActiveTrip();
+  const hasActiveTrip = !!activeTrip;
 
   useEffect(() => {
     async function fetchProfile() {
@@ -70,36 +63,30 @@ const Index = () => {
       ? profile.avatar_url
       : userFallback.avatarUrl;
 
-  // Infos de orçamento/currency mock:
-  const mockBudgetBRL = 6500; // valor simulado já convertido
-  const mockBudgetEUR = 1200;
-  const mockVisaRequired = false; // Simule como quiser
-  const mockVaccineRequired = true; // Simule como quiser
+  // Infos de orçamento/currency mock removidos (tudo dinâmico agora!)
 
   return (
     <div className="min-h-screen bg-[#FAF3EC]">
       {/* Header */}
       <HomeHeader user={{ name: userName, avatarUrl }} />
       <main className="max-w-md mx-auto w-full px-0 pb-8">
-        {loading ? (
+        {loading || tripLoading ? (
           <div className="h-32 flex items-center justify-center text-[#E76F51] text-lg font-medium">
             Carregando informações...
           </div>
         ) : (
           <>
             <div className="h-8 md:h-12" />
-            {/* Removido HomeAddTripButton externo – agora aparece dentro do card */}
             <ActiveTripSection
               hasActiveTrip={hasActiveTrip}
               activeTrip={activeTrip}
             />
             <div className="h-4" />
 
-            {/* Alinhar card com os outros blocos usando px-4 */}
             <div className="px-4">
-              <HomeTripSummaryCard />
+              {/* Pass activeTrip here if the summary needs it, or fetch inside HomeTripSummaryCard */}
+              <HomeTripSummaryCard activeTrip={activeTrip} />
             </div>
-            {/* Slider of upcoming trips goes here */}
             <UpcomingTripsSlider />
             <div className="h-6" />
             <ConciergeSection />
@@ -118,7 +105,6 @@ const Index = () => {
             </div>
             <div className="h-6" />
 
-            {/* Alinhar card com os outros blocos usando px-4 */}
             <div className="px-4">
               <HomeCommunityCard />
             </div>
@@ -130,4 +116,3 @@ const Index = () => {
 };
 
 export default Index;
-
