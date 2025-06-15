@@ -65,18 +65,43 @@ export default function TravelPlanWizard() {
 
   // Handler: fetch and display suggestions in Step 3
   useEffect(() => {
-    if (step === 3 && destination && dates.start && dates.end && budget) {
+    let didCancel = false;
+
+    async function getSuggestions() {
       setSuggestionsLoading(true);
-      fetchIASuggestions({ destination, dates, budget }).then(list => {
-        // Normalize suggestions to add "adicionado" flag for selection
-        setIASuggestions(
-          (list ?? []).map((s: any) => ({
+      try {
+        const list = await fetchIASuggestions({ destination, dates, budget });
+        if (!didCancel) {
+          // Normalize suggestions to add "adicionado" flag for selection
+          const norm = (list ?? []).map((s: any) => ({
             ...s,
             adicionado: false,
-          }))
-        );
-        setSuggestionsLoading(false);
-      });
+          }));
+          setIASuggestions(norm);
+        }
+      } catch (err) {
+        if (!didCancel) {
+          setIASuggestions([]);
+          // Opcional: log do erro
+          console.error("Erro ao buscar sugestões IA:", err);
+        }
+      } finally {
+        if (!didCancel) setSuggestionsLoading(false);
+      }
+    }
+
+    if (step === 3 && destination && dates.start && dates.end && budget) {
+      getSuggestions();
+
+      // Timeout de segurança: se demorar mais de 12s, encerra loading
+      const timeoutId = setTimeout(() => {
+        if (!didCancel) setSuggestionsLoading(false);
+      }, 12000);
+
+      return () => {
+        didCancel = true;
+        clearTimeout(timeoutId);
+      };
     } else if (step !== 3) {
       setIASuggestions([]);
     }
