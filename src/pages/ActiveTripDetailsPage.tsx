@@ -1,18 +1,152 @@
 
 import React from "react";
-import PageHeader from "../components/PageHeader";
+import { useNavigate } from "react-router-dom";
 
-const ActiveTripDetailsPage = () => {
-  return (
-    <div className="min-h-screen bg-background">
-      <main>
-        <PageHeader title="Detalhes da Viagem Ativa" showBack />
-        <div className="p-4 text-neutral-700">
-          <div className="text-center text-lg font-medium">Painel de detalhes da viagem (itinerário, checklist, clima, orçamento...)</div>
-        </div>
-      </main>
-    </div>
-  );
+const tripData = {
+  destination: "Paris, França",
+  startDate: "15 de Julho",
+  endDate: "22 de Julho de 2025",
+  imageUrl:
+    "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?auto=format&fit=crop&w=800&q=80",
+  travelers: 2,
+  itinerary: [
+    "Dia 1: Chegada e Torre Eiffel",
+    "Dia 2: Museu do Louvre e Passeio de Barco no Sena",
+    "Dia 3: Palácio de Versalhes",
+  ],
+  checklist: [
+    "Passaporte e Visto",
+    "Passagens aéreas",
+    "Reservas de hotel",
+    "Câmera fotográfica",
+    "Adaptador de tomada",
+  ],
+  weather: "Média de 24°C, ensolarado com pancadas de chuva à tarde.",
+  budget: {
+    totalBRL: 7500,
+    totalEUR: 1350,
+    breakdown: [
+      { label: "Hospedagem", value: 600 },
+      { label: "Transporte", value: 150 },
+      { label: "Alimentação", value: 300 },
+    ],
+  },
 };
 
-export default ActiveTripDetailsPage;
+export default function ActiveTripDetailsPage() {
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen bg-[#FAF3EC] text-[#6D4530] flex flex-col items-center px-2 pb-10">
+      {/* Cabeçalho */}
+      <div className="w-full max-w-lg mx-auto flex flex-col pt-5 pb-2">
+        <div className="flex items-center gap-3">
+          <button
+            className="text-[#E76F51] text-2xl px-2 py-1 rounded hover:bg-[#e76f5115] transition cursor-pointer"
+            aria-label="Voltar"
+            style={{ minWidth: 44, minHeight: 44 }}
+            onClick={() => {
+              console.log("Voltar para a lista de viagens");
+              navigate(-1);
+            }}
+          >
+            &#8592;
+          </button>
+          <span className="text-xl md:text-2xl font-bold font-inter select-none" style={{ color: "#E76F51" }}>
+            Detalhes da Viagem Ativa
+          </span>
+        </div>
+        <div className="mt-1 ml-14 text-[#AD4F36] text-sm md:text-base font-inter">
+          Painel de detalhes da viagem (itinerário, checklist, clima, orçamento...)
+        </div>
+      </div>
+      {/* Cartões de Detalhes */}
+      <div className="w-full max-w-lg flex flex-col gap-5 mt-4">
+        {/* Visão Geral */}
+        <div className="bg-white rounded-2xl shadow-card border border-[#E76F51]/10 px-0 md:px-0 pt-0 pb-5 overflow-hidden">
+          <img
+            src={tripData.imageUrl}
+            alt="Imagem da viagem"
+            className="w-full h-40 md:h-56 object-cover rounded-t-2xl"
+            style={{ minHeight: "160px", maxHeight: "250px" }}
+          />
+          <div className="px-5 pt-4">
+            <div className="text-lg md:text-xl font-bold text-[#E76F51] font-inter">{`Viagem a ${tripData.destination}`}</div>
+            <div className="text-sm font-medium text-[#AD4F36] mb-1 font-inter">{`${tripData.startDate} a ${tripData.endDate}`}</div>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="bg-[#FAF3EC] text-[#C9583C] px-3 py-1 rounded-full text-xs font-semibold">
+                {`${tripData.travelers} Viajantes`}
+              </span>
+            </div>
+          </div>
+        </div>
+        {/* Itinerário */}
+        <div className="bg-white rounded-xl shadow-card border border-[#E76F51]/10 p-5">
+          <div className="text-base font-bold text-[#C9583C] mb-2 font-inter">Itinerário</div>
+          <ul className="list-disc pl-5 text-sm font-inter space-y-1">
+            {tripData.itinerary.map((item, idx) => (
+              <li key={idx}>{item}</li>
+            ))}
+          </ul>
+        </div>
+        {/* Checklist */}
+        <div className="bg-white rounded-xl shadow-card border border-[#E76F51]/10 p-5">
+          <div className="text-base font-bold text-[#C9583C] mb-2 font-inter">Checklist</div>
+          <ul className="space-y-1">
+            {tripData.checklist.map((item, idx) => (
+              <li key={item} className="flex items-center gap-2 font-inter text-sm">
+                <span className="inline-block w-5 h-5 rounded border border-[#DADADA] bg-[#faf3ec50]" aria-hidden>
+                  {/* Não funcional */}
+                </span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+        {/* Clima */}
+        <div className="bg-white rounded-xl shadow-card border border-[#E76F51]/10 p-5 flex items-start gap-3">
+          <span className="flex-shrink-0 text-2xl" title="Sol e nuvem">
+            <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden fill="none">
+              <circle cx="15.5" cy="15" r="7" fill="#F9D974"/>
+              <ellipse cx="20" cy="20" rx="5" ry="3" fill="#DADADA"/>
+            </svg>
+          </span>
+          <div className="flex flex-col">
+            <div className="font-bold text-[#C9583C] mb-1 font-inter">Clima em Paris</div>
+            <span className="text-sm font-inter">{tripData.weather}</span>
+          </div>
+        </div>
+        {/* Orçamento */}
+        <div className="bg-white rounded-xl shadow-card border border-[#E76F51]/10 p-5">
+          <div className="font-bold text-[#C9583C] mb-2 font-inter">Orçamento</div>
+          <div className="flex flex-col gap-1 mb-2">
+            <span className="text-base font-bold text-[#AD4F36] font-inter">
+              Orçamento Total:{" "}
+              <span className="text-[#E76F51] font-extrabold">
+                R$ {tripData.budget.totalBRL.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              </span>
+            </span>
+            <span className="text-sm text-[#AD4F36]">
+              Na moeda local:{" "}
+              <span className="font-semibold text-[#C9583C]">€ {tripData.budget.totalEUR.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+            </span>
+          </div>
+          <div>
+            <span className="text-xs text-[#AD4F36] font-medium">Divisão de custos:</span>
+            <ul className="list-disc pl-5 mt-1 text-sm font-inter">
+              {tripData.budget.breakdown.map(({ label, value }) => (
+                <li key={label} className="flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-[#E76F51]" />
+                  {label}:{" "}
+                  <span className="text-[#C9583C] font-semibold">€ {value}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+      {/* Mobile padding */}
+      <div className="h-10" />
+    </div>
+  );
+}
