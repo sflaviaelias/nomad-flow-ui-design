@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import WizardStepDestination from "./WizardStepDestination";
 import WizardStepDates from "./WizardStepDates";
 import WizardStepBudget from "./WizardStepBudget";
@@ -23,7 +23,7 @@ export default function TravelPlanWizard() {
   const [destination, setDestination] = useState("");
   const [dates, setDates] = useState({ start: "", end: "" });
   const [budget, setBudget] = useState("");
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [suggestions, setSuggestions] = useState([]);
   const [saving, setSaving] = useState(false);
 
   const {
@@ -33,21 +33,46 @@ export default function TravelPlanWizard() {
     fetchIASuggestions,
   } = useTravelIAWizard();
 
+  // Debounce helpers para evitar chamadas excessivas
+  const debounceTimeout = useRef<NodeJS.Timeout|null>(null);
+
+  // Busca IA automaticamente para cada etapa relevante (Destino/Datas/Orçamento)
+  useEffect(() => {
+    if (step !== 0) return;
+    if (!destination) return;
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    debounceTimeout.current = setTimeout(() => {
+      fetchIATip({ type: "destination", value: destination, context: {} });
+    }, 400);
+    // eslint-disable-next-line
+  }, [destination, step]);
+
+  useEffect(() => {
+    if (step !== 1) return;
+    if (!dates.start || !dates.end || !destination) return;
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    debounceTimeout.current = setTimeout(() => {
+      fetchIATip({ type: "dates", value: dates, context: { destination } });
+    }, 400);
+    // eslint-disable-next-line
+  }, [dates.start, dates.end, destination, step]);
+
+  useEffect(() => {
+    if (step !== 2) return;
+    if (!budget || !destination || !dates.start || !dates.end) return;
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    debounceTimeout.current = setTimeout(() => {
+      fetchIATip({ type: "budget", value: budget, context: { destination, dates } });
+    }, 400);
+    // eslint-disable-next-line
+  }, [budget, destination, dates.start, dates.end, step]);
+
   // Lida com submissão de etapa/dados
   const nextStep = async () => {
-    if (step === 0 && destination) {
-      await fetchIATip({ type: "destination", value: destination, context: {} });
-    }
-    if (step === 1 && dates.start && dates.end) {
-      await fetchIATip({ type: "dates", value: dates, context: { destination } });
-    }
-    if (step === 2 && budget) {
-      await fetchIATip({ type: "budget", value: budget, context: { destination, dates } });
-    }
     if (step === 3) {
       // Sugestões reais da IA
       const iaList = await fetchIASuggestions({ destination, dates, budget });
-      setSuggestions(iaList.map((t: string, idx: number) => ({ id: idx, text: t })));
+      setSuggestions(iaList.map((t, idx) => ({ id: idx, text: t })));
     }
     setStep((s) => Math.min(s + 1, steps.length - 1));
   };
