@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -49,7 +50,7 @@ export default function LoginScreen() {
     <div className="h-screen flex flex-col justify-center items-center bg-[#FAF3EC] px-4">
       <div className="w-full max-w-md">
         <h2 className="font-bold text-2xl mb-6 text-terra-800 text-center" style={{fontFamily: "Inter"}}>
-          Entrar no FlyNomad
+          Entrar no GoNomad
         </h2>
         <form className="space-y-4" onSubmit={handleLogin}>
           <Input
@@ -73,7 +74,7 @@ export default function LoginScreen() {
             type="submit"
             disabled={loading}
           >
-            {loading ? "Entrando..." : "Entrar no FlyNomad"}
+            {loading ? "Entrando..." : "Entrar no GoNomad"}
           </Button>
           {error && <div className="text-red-500 text-sm">{error}</div>}
         </form>
