@@ -32,11 +32,22 @@ import "./i18n/config";
 import { useEffect } from "react";
 import i18n from "@/i18n/config";
 import { useOnboardingFlow } from "@/hooks/useOnboardingFlow";
+import { supabase } from "@/integrations/supabase/client";
 
 // Utilitário para controle do onboarding por dispositivo
 // Função centralizada foi movida para hooks/useOnboardingFlow.ts
 
 const queryClient = new QueryClient();
+
+function getInitialLanguage() {
+  // Retorna a ordem correta de preferências
+  const saved = localStorage.getItem("language");
+  if (saved) return saved;
+  // Usa idioma navegador como fallback
+  const userLang = navigator.language;
+  if (["pt-BR", "en-US", "es-ES"].includes(userLang)) return userLang;
+  return "pt-BR";
+}
 
 function AppWrapper() {
   const onboarding = useOnboardingFlow();
@@ -200,11 +211,36 @@ function AppWrapper() {
 
 const App = () => {
   useEffect(() => {
-    // detect browser language if no saved user preference
-    const userLang = localStorage.getItem("language") || navigator.language;
-    if (["pt-BR", "en-US", "es-ES"].includes(userLang)) {
-      i18n.changeLanguage(userLang);
-    }
+    // Aguardar autenticação do usuário
+    supabase.auth.getUser().then(async ({ data }) => {
+      const user = data?.user;
+      let set = false;
+      if (user?.id) {
+        // Busca preferências do perfil Supabase
+        const { data } = await supabase
+          .from("profiles")
+          .select("preferences")
+          .eq("id", user.id)
+          .maybeSingle();
+        let prefs: any = {};
+        if (data?.preferences) {
+          if (typeof data.preferences === "object") prefs = data.preferences;
+          else if (typeof data.preferences === "string") {
+            try { prefs = JSON.parse(data.preferences); } catch { prefs = {}; }
+          }
+        }
+        if (prefs.language) {
+          i18n.changeLanguage(prefs.language);
+          localStorage.setItem("language", prefs.language);
+          set = true;
+        }
+      }
+      // Caso não esteja autenticado ou não tenha uma preferência no Supabase:
+      if (!set) {
+        const lang = getInitialLanguage();
+        i18n.changeLanguage(lang);
+      }
+    });
   }, []);
 
   return (

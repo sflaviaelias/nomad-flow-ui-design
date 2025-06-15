@@ -5,15 +5,19 @@ import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { LanguageCode } from "@/features/profile/LanguageSelect";
 
+// Mantém a linguagem globalmente consistente para usuário logado e visitor
 export function useAppLanguage(current: LanguageCode) {
   const { user } = useSupabaseAuth();
 
-  // Atualiza i18n ao alterar o idioma escolhido
+  // Sempre atualiza i18n e localStorage ao alterar linguagem escolhida
   useEffect(() => {
-    i18n.changeLanguage(current);
+    if (current) {
+      i18n.changeLanguage(current);
+      localStorage.setItem("language", current); // <- garante persistência global
+    }
   }, [current]);
 
-  // Carregar idioma salvo se logado
+  // Ao logar, tenta carregar idioma salvo no Supabase (preferência do usuário)
   useEffect(() => {
     if (user?.id && !current) {
       supabase
@@ -30,6 +34,7 @@ export function useAppLanguage(current: LanguageCode) {
           }
           if (prefs.language) {
             i18n.changeLanguage(prefs.language);
+            localStorage.setItem("language", prefs.language); // <- sincroniza localStorage
           }
         });
     }
