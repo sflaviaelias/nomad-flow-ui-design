@@ -21,6 +21,7 @@ import SignupScreen from "./features/auth/SignupScreen";
 import ProfileScreen from "./features/profile/ProfileScreen";
 import EditProfileScreen from "./features/profile/EditProfileScreen";
 import TripSummaryPage from "./pages/TripSummaryPage";
+import TripSmartSummaryPage from "./pages/TripSmartSummaryPage";
 import { NavigationHistoryProvider } from "@/contexts/NavigationHistoryContext";
 import PlaceDetailsPage from "./pages/PlaceDetailsPage";
 import RequireAuth from "./features/auth/RequireAuth";
@@ -144,6 +145,14 @@ const App = () => (
               element={
                 <RequireAuth>
                   <TripSummaryPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/trip/smart-summary"
+              element={
+                <RequireAuth>
+                  <TripSmartSummaryPage />
                 </RequireAuth>
               }
             />
