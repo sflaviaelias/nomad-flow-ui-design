@@ -1,15 +1,82 @@
-
 import React from "react";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { LanguageSelect, LanguageCode } from "@/features/profile/LanguageSelect";
+
+// Idioma padrão pelo browser
+function getDefaultLanguage(): LanguageCode {
+  const nav = typeof navigator !== "undefined" ? navigator.language : "";
+  if (nav.startsWith("pt")) return "pt-BR";
+  if (nav.startsWith("es")) return "es-ES";
+  if (nav.startsWith("en")) return "en-US";
+  return "pt-BR";
+}
 
 export default function SettingsPage() {
+  const { user } = useSupabaseAuth();
   const [notifications, setNotifications] = React.useState<boolean>(true);
   const [location, setLocation] = React.useState<boolean>(false);
   const [loadingLocation, setLoadingLocation] = React.useState<boolean>(false);
+  const [saving, setSaving] = React.useState<boolean>(false);
+
+  // Novo: idioma do app
+  const [appLanguage, setAppLanguage] = React.useState<LanguageCode>(getDefaultLanguage());
+
+  React.useEffect(() => {
+    // Carregar configuração de idioma ao abrir se logado
+    if (user?.id) {
+      supabase
+        .from("profiles")
+        .select("preferences")
+        .eq("id", user.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (!data?.preferences) return;
+          let prefs: any = {};
+          if (typeof data.preferences === "object" && data.preferences !== null) prefs = data.preferences;
+          else if (typeof data.preferences === "string") {
+            try { prefs = JSON.parse(data.preferences); } catch { prefs = {}; }
+          }
+          if (prefs.language) setAppLanguage(prefs.language);
+        });
+    }
+  }, [user?.id]);
+
+  const handleLanguageChange = async (newLang: LanguageCode) => {
+    setAppLanguage(newLang);
+    if (!user?.id) return;
+    setSaving(true);
+    // Atualiza no Supabase (preferences.language)
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("preferences")
+      .eq("id", user.id)
+      .maybeSingle();
+    let prefs: any = {};
+    if (data?.preferences) {
+      if (typeof data.preferences === "object") { prefs = data.preferences; }
+      else if (typeof data.preferences === "string") {
+        try { prefs = JSON.parse(data.preferences); } catch { prefs = {}; }
+      }
+    }
+    const updatedPrefs = { ...prefs, language: newLang };
+    await supabase
+      .from("profiles")
+      .update({ preferences: updatedPrefs })
+      .eq("id", user.id);
+    setSaving(false);
+    toast({
+      title: "Idioma atualizado com sucesso",
+      description: "A interface será ajustada conforme o idioma escolhido.",
+      variant: "default"
+    });
+    // TODO: disparar troca real do idioma na aplicação (i18n).
+  };
 
   const handleLocationToggle = async (checked: boolean) => {
     if (checked) {
@@ -74,10 +141,19 @@ export default function SettingsPage() {
       {/* Conteúdo Scrollable */}
       <form
         onSubmit={handleSave}
-        className="flex-1 w-full max-w-xl mx-auto px-5 py-7 flex flex-col gap-0"
+        className="flex-1 w-full max-w-xl mx-auto px-5 py-7 flex flex-col gap-6"
         style={{ minHeight: 0 }}
         id="form-settings"
       >
+        {/* Seletor de idioma */}
+        <div className="bg-white rounded-xl px-4 py-5 shadow-card flex items-center">
+          <div className="flex-1 flex flex-col">
+            <LanguageSelect value={appLanguage} onChange={handleLanguageChange} disabled={saving} />
+          </div>
+        </div>
+
+        <Separator className="my-1 bg-[#dadada]" />
+
         {/* Notificações */}
         <div className="bg-white rounded-xl px-4 py-5 shadow-card flex items-center">
           <div className="flex-1 flex flex-col">
@@ -95,7 +171,7 @@ export default function SettingsPage() {
           />
         </div>
 
-        <Separator className="my-6 bg-[#dadada]" />
+        <Separator className="my-1 bg-[#dadada]" />
 
         {/* Localização */}
         <div className="bg-white rounded-xl px-4 py-5 shadow-card flex items-center">
@@ -129,6 +205,7 @@ export default function SettingsPage() {
           form="form-settings"
           className="w-full max-w-xl text-white bg-terra-600 hover:bg-terra-700 font-semibold py-3 rounded-lg shadow-xl"
           size="lg"
+          disabled={saving}
         >
           Salvar alterações
         </Button>
