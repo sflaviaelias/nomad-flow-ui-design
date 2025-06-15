@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HomeHeader from "../components/HomeHeader";
@@ -13,6 +12,9 @@ import TripDetailsModal from "@/components/TripDetailsModal";
 import { supabase } from "@/integrations/supabase/client";
 import UpcomingTripsSlider from "@/components/UpcomingTripsSlider";
 import { useActiveTrip } from "@/hooks/useActiveTrip";
+import { useGuestMode } from "@/hooks/useGuestMode";
+import GuestLoginButton from "@/components/GuestLoginButton";
+import { showGuestBlockedToast } from "@/components/GuestLoginToast";
 
 // Dummy data: in real app, replace with actual data and hooks.
 const userFallback = {
@@ -33,6 +35,8 @@ const Index = () => {
   // Hook: fetch dynamic active trip
   const { data: activeTripRaw, isLoading: tripLoading } = useActiveTrip();
   const hasActiveTrip = !!activeTripRaw;
+
+  const { isGuest, isLoading } = useGuestMode();
 
   useEffect(() => {
     async function fetchProfile() {
@@ -60,15 +64,26 @@ const Index = () => {
     };
   }, []);
 
-  const userName = profile?.name || userFallback.name;
-  const avatarUrl =
-    profile?.avatar_url && profile.avatar_url !== ""
-      ? profile.avatar_url
-      : userFallback.avatarUrl;
+  // Se convidado, gera dados de exemplo:
+  const userName = isGuest ? "Nômade" : (profile?.name || userFallback.name);
+  const avatarUrl = isGuest
+    ? userFallback.avatarUrl
+    : (profile?.avatar_url && profile.avatar_url !== ""
+        ? profile.avatar_url
+        : userFallback.avatarUrl);
 
   // Adapt activeTripRaw to TripData type for ActiveTripSection and HomeTripSummaryCard
   let activeTrip = null;
-  if (activeTripRaw) {
+  if (isGuest) {
+    activeTrip = {
+      destination: "Barcelona, Espanha",
+      imageUrl: fallbackImage,
+      startDate: "01/07/2024",
+      endDate: "15/07/2024",
+      budget: "€1200",
+      localBudget: "R$ 6.850",
+    };
+  } else if (activeTripRaw) {
     activeTrip = {
       destination: activeTripRaw.destination,
       imageUrl: fallbackImage, // TODO: replace with real from backend/AI hook if exists
@@ -92,6 +107,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-[#FAF3EC]">
+      {isGuest && <GuestLoginButton />}
       {/* Header */}
       <HomeHeader user={{ name: userName, avatarUrl }} />
       <main className="max-w-md mx-auto w-full px-0 pb-8">
@@ -103,8 +119,10 @@ const Index = () => {
           <>
             <div className="h-8 md:h-12" />
             <ActiveTripSection
-              hasActiveTrip={hasActiveTrip}
+              hasActiveTrip={!!activeTrip}
               activeTrip={activeTrip}
+              // Se convidado, desativa ações e mostra toast
+              onShowDetails={isGuest ? () => showGuestBlockedToast() : undefined}
             />
             <div className="h-4" />
 

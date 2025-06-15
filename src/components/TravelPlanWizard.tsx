@@ -7,6 +7,8 @@ import WizardStepConfirmation from "./WizardStepConfirmation";
 import { useTravelIAWizard } from "@/hooks/useTravelIAWizard";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useGuestMode } from "@/hooks/useGuestMode";
+import { showGuestBlockedToast } from "./GuestLoginToast";
 
 const steps = [
   "Destino",
@@ -86,7 +88,13 @@ export default function TravelPlanWizard() {
     setSuggestions(suggestions.map(s => s.id === id ? { ...s, text } : s));
   };
 
+  const { isGuest } = useGuestMode();
+
   const handleSaveTrip = async () => {
+    if (isGuest) {
+      showGuestBlockedToast();
+      return;
+    }
     setSaving(true);
 
     // Busca usuário logado

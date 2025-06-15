@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { ChartContainer, ChartLegendContent } from "@/components/ui/chart";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-// Importando os componentes do Recharts
+import { useGuestMode } from "@/hooks/useGuestMode";
+import { showGuestBlockedToast } from "./GuestLoginToast";
 import {
   ResponsiveContainer,
   BarChart,
@@ -54,6 +54,7 @@ export default function ExpensesDashboard() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { isGuest } = useGuestMode();
 
   useEffect(() => {
     async function fetchData() {
@@ -120,7 +121,7 @@ export default function ExpensesDashboard() {
     .slice(0, 4);
   const otherSum = Object.entries(expensesByCategory)
     .slice(4)
-    .reduce((sum, [_, v]) => sum + v, 0);
+    .reduce((sum, [ v]) => sum + v, 0);
   const chartData = [
     ...topCategories.map(([cat, value]) => ({
       categoria: cat,
@@ -152,7 +153,11 @@ export default function ExpensesDashboard() {
                   {trip.destination}
                 </span>
               </div>
-              <Button className="bg-terracotta" onClick={() => navigate("/add-expense")}>
+              <Button
+                className="bg-terracotta"
+                onClick={isGuest ? showGuestBlockedToast : () => navigate("/add-expense")}
+                disabled={isGuest}
+              >
                 <Plus size={16} /> Adicionar despesa
               </Button>
             </div>
