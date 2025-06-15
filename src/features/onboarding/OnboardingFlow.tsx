@@ -8,14 +8,22 @@ import { useNavigate } from "react-router-dom";
 export default function OnboardingFlow() {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
+
   return (
     <div className="min-h-screen w-full bg-[#FAF3EC] flex flex-col items-center font-sans">
       <div className="w-full flex-1 flex flex-col justify-between items-stretch max-w-md mx-auto">
-        {/* Telas */}
+        {/* Screens */}
         {step === 1 && <OnboardingScreen1 onNext={() => setStep(2)} />}
         {step === 2 && <OnboardingScreen2 onNext={() => setStep(3)} />}
-        {step === 3 && <OnboardingScreen3 onNext={() => navigate('/auth/access')} />}
-        {/* Indicador de progresso */}
+        {step === 3 && (
+          <OnboardingScreen3
+            onNext={() => {
+              // Route to auth access (choose create/login) using real page
+              navigate("/auth/access", { replace: true });
+            }}
+          />
+        )}
+        {/* Progress indicator */}
         <nav
           className="flex flex-row space-x-2 items-center justify-center mt-0 mb-8"
           aria-label="Progresso do onboarding"

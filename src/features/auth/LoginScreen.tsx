@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -11,22 +11,31 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Check session and redirect if logged in
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        navigate("/", { replace: true });
+      }
+    });
+  }, [navigate]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    // Usa SÓ autenticação real da Supabase!
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    // Real authentication with Supabase
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       setError("Credenciais inválidas. Tente novamente.");
       setLoading(false);
       return;
     }
-    // Sucesso: session será salva, hook auth atualizará tudo (redirect automático!)
+    // Success: session will be set and hook will update everything
     setLoading(false);
-    navigate("/");
+    navigate("/", { replace: true });
   };
 
   return (
@@ -64,7 +73,7 @@ export default function LoginScreen() {
         <div className="flex justify-end mt-2">
           <button
             type="button"
-            onClick={() => {/* TODO: Forgot password */}}
+            onClick={() => { navigate("/auth"); }}
             className="text-xs text-terra-700 underline"
             style={{fontFamily: "Inter"}}
           >

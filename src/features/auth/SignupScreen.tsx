@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -32,6 +32,15 @@ export default function SignupScreen() {
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
+  // Check session and redirect if logged in
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        navigate("/", { replace: true });
+      }
+    });
+  }, [navigate]);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErro(null);
@@ -47,8 +56,8 @@ export default function SignupScreen() {
 
     setLoading(true);
 
-    // Usa SÓ signUp da Supabase, remove mocks!
-    const { data, error } = await supabase.auth.signUp({
+    // REAL Supabase SignUp
+    const { error } = await supabase.auth.signUp({
       email,
       password: senha,
       options: {

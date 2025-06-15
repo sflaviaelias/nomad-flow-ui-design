@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -7,25 +6,21 @@ export function useSupabaseAuth() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Sempre inicializa ouvindo eventos, ANTES de buscar sessão atual.
   useEffect(() => {
-    // Ouve eventos de autenticação
+    // Listen to changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
 
-      // Debug detalhado
-      console.log("[useSupabaseAuth] Evento:", event, session);
+      console.log("[useSupabaseAuth] Auth event:", event, session);
     });
 
-    // Busca sessão atual salva/localStorage (persistente)
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setUser(data.session?.user ?? null);
       setLoading(false);
-      // Debug inicial
-      console.log("[useSupabaseAuth] getSession inicial:", data.session);
+      console.log("[useSupabaseAuth] Initial getSession:", data.session);
     });
 
     return () => subscription.unsubscribe();
@@ -56,4 +51,3 @@ export function useSupabaseAuth() {
 
   return { session, user, loading, signOut };
 }
-
