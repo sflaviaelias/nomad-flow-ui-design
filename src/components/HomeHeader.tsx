@@ -1,8 +1,9 @@
-
 import React from "react";
 import { Menu, User } from "lucide-react"; // Lucide ícones do Untitled UI
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
+import AppMenuDrawer from "./AppMenuDrawer";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 // Novo Header conforme guidelines e DS
 type Props = {
@@ -11,6 +12,7 @@ type Props = {
 
 export default function HomeHeader({ user }: Props) {
   const navigate = useNavigate();
+  const { user: authUser } = useSupabaseAuth();
 
   // Saudação conforme dado do user
   const saudacao =
@@ -20,6 +22,8 @@ export default function HomeHeader({ user }: Props) {
       ? `Olá, ${user.name}`
       : "Olá, Nômade!";
 
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+
   return (
     <header className="flex items-center justify-between px-3 pt-4 pb-2 bg-[#FAF3EC] select-none">
       {/* Menu Hambúrguer */}
@@ -28,10 +32,12 @@ export default function HomeHeader({ user }: Props) {
         aria-label="Abrir menu"
         className="flex items-center justify-center rounded-md p-2 hover:bg-[#E76F5112] transition"
         style={{ minWidth: 44, minHeight: 44 }}
-        onClick={() => navigate("/menu")}
+        onClick={() => setDrawerOpen(true)}
       >
         <Menu size={28} className="text-[#E76F51]" />
       </button>
+
+      <AppMenuDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />
 
       {/* Saudação dinâmica */}
       <span className="flex-1 text-center font-inter text-lg md:text-xl font-semibold text-[#C9583C] select-none">
