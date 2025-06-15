@@ -47,8 +47,7 @@ interface ActiveTripSectionProps {
 
 export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
   hasActiveTrip,
-  activeTrip,
-  onShowDetails,
+  activeTrip
 }) => {
   const navigate = useNavigate();
 
@@ -166,7 +165,7 @@ export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
                   variant="outline"
                   style={{ minHeight: 44, minWidth: 44, letterSpacing: 0 }}
                   size="lg"
-                  onClick={onShowDetails}
+                  onClick={() => navigate("/trip/active")}
                 >
                   Acessar detalhes da viagem
                 </Button>

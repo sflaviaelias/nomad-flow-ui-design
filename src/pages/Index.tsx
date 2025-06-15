@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HomeHeader from "../components/HomeHeader";
@@ -36,7 +35,6 @@ const Index = () => {
 
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -70,16 +68,6 @@ const Index = () => {
       ? profile.avatar_url
       : userFallback.avatarUrl;
 
-  // Handler disparado pelo botão "Acessar detalhes da viagem"
-  const handleShowActiveTripDetails = () => {
-    setShowDetails(true);
-  };
-
-  // Handler de fechar o modal
-  const handleCloseDetails = () => {
-    setShowDetails(false);
-  };
-
   // Infos de orçamento/currency mock:
   const mockBudgetBRL = 6500; // valor simulado já convertido
   const mockBudgetEUR = 1200;
@@ -101,22 +89,6 @@ const Index = () => {
             <ActiveTripSection
               hasActiveTrip={hasActiveTrip}
               activeTrip={activeTrip}
-              onShowDetails={handleShowActiveTripDetails}
-            />
-            {/* Renderiza o modal, visível quando showDetails=true */}
-            <TripDetailsModal
-              open={showDetails}
-              onClose={handleCloseDetails}
-              destination={activeTrip.destination}
-              startDate={"2024-07-01"}
-              endDate={"2024-07-15"}
-              imageUrl={activeTrip.imageUrl}
-              budget={mockBudgetBRL}
-              convertedBudget={mockBudgetEUR}
-              currency="BRL"
-              destCurrency="EUR"
-              visaRequired={mockVisaRequired}
-              vaccineRequired={mockVaccineRequired}
             />
             <div className="h-4" />
             <HomeAddTripButton />
