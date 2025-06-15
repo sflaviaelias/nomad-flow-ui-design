@@ -42,11 +42,13 @@ interface TripData {
 interface ActiveTripSectionProps {
   hasActiveTrip: boolean;
   activeTrip: TripData;
+  onShowDetails?: () => void; // Nova prop opcional para mostrar modal de detalhes
 }
 
 export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
   hasActiveTrip,
   activeTrip,
+  onShowDetails,
 }) => {
   const navigate = useNavigate();
 
@@ -164,7 +166,7 @@ export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
                   variant="outline"
                   style={{ minHeight: 44, minWidth: 44, letterSpacing: 0 }}
                   size="lg"
-                  onClick={() => navigate("/trip/details")}
+                  onClick={onShowDetails}
                 >
                   Acessar detalhes da viagem
                 </Button>

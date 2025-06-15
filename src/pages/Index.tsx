@@ -9,6 +9,7 @@ import { UpcomingTripsSection } from "../components/UpcomingTripsSection";
 import HomeAddTripButton from "../components/HomeAddTripButton";
 import HomeCommunityCard from "../components/HomeCommunityCard";
 import HomeTripSummaryCard from "../components/HomeTripSummaryCard";
+import TripDetailsModal from "@/components/TripDetailsModal";
 import { supabase } from "@/integrations/supabase/client";
 
 // Dummy data: in real app, replace with actual data and hooks.
@@ -25,6 +26,7 @@ const activeTrip = {
   endDate: "15/07/2024",
   budget: "€1200",
   localBudget: "US$ 1,300",
+  // Adicione outros campos relevantes se necessário
 };
 
 const hasActiveTrip = true; // Simulate trip presence
@@ -34,6 +36,7 @@ const Index = () => {
 
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -67,6 +70,22 @@ const Index = () => {
       ? profile.avatar_url
       : userFallback.avatarUrl;
 
+  // Handler disparado pelo botão "Acessar detalhes da viagem"
+  const handleShowActiveTripDetails = () => {
+    setShowDetails(true);
+  };
+
+  // Handler de fechar o modal
+  const handleCloseDetails = () => {
+    setShowDetails(false);
+  };
+
+  // Infos de orçamento/currency mock:
+  const mockBudgetBRL = 6500; // valor simulado já convertido
+  const mockBudgetEUR = 1200;
+  const mockVisaRequired = false; // Simule como quiser
+  const mockVaccineRequired = true; // Simule como quiser
+
   return (
     <div className="min-h-screen bg-[#FAF3EC]">
       {/* Header */}
@@ -82,6 +101,22 @@ const Index = () => {
             <ActiveTripSection
               hasActiveTrip={hasActiveTrip}
               activeTrip={activeTrip}
+              onShowDetails={handleShowActiveTripDetails}
+            />
+            {/* Renderiza o modal, visível quando showDetails=true */}
+            <TripDetailsModal
+              open={showDetails}
+              onClose={handleCloseDetails}
+              destination={activeTrip.destination}
+              startDate={"2024-07-01"}
+              endDate={"2024-07-15"}
+              imageUrl={activeTrip.imageUrl}
+              budget={mockBudgetBRL}
+              convertedBudget={mockBudgetEUR}
+              currency="BRL"
+              destCurrency="EUR"
+              visaRequired={mockVisaRequired}
+              vaccineRequired={mockVaccineRequired}
             />
             <div className="h-4" />
             <HomeAddTripButton />
@@ -105,7 +140,6 @@ const Index = () => {
 
             <HomeCommunityCard />
             <HomeTripSummaryCard />
-            {/* REMOVIDO O FOOTER DE SECRETS */}
           </>
         )}
       </main>
