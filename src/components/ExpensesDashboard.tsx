@@ -121,7 +121,7 @@ export default function ExpensesDashboard() {
     .slice(0, 4);
   const otherSum = Object.entries(expensesByCategory)
     .slice(4)
-    .reduce((sum, [ v]) => sum + v, 0);
+    .reduce((sum, [, value]) => sum + value, 0);
   const chartData = [
     ...topCategories.map(([cat, value]) => ({
       categoria: cat,
