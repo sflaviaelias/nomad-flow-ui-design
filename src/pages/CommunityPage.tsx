@@ -5,6 +5,7 @@ import CommunityGroupCard from "@/components/CommunityGroupCard";
 import CommunityNewsCard from "@/components/CommunityNewsCard";
 import { Plus } from "lucide-react";
 import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
+import CommunitySuggestedConnections from "@/components/CommunitySuggestedConnections";
 
 const nomads = [
   // Exemplo de dados mockados; em breve virá de API
@@ -79,6 +80,11 @@ export default function CommunityPage() {
   return (
     <div className="min-h-screen bg-[#FAF3EC] pb-20 relative">
       <PageHeader title="Comunidade Inteligente" showBack />
+
+      {/* NOVA seção IA de sugestões de conexões */}
+      <div className="px-4 pt-3">
+        <CommunitySuggestedConnections />
+      </div>
 
       <main className="px-4 py-3 w-full max-w-lg mx-auto">
         {/* Nômades próximos */}
