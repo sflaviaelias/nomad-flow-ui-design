@@ -1,6 +1,6 @@
 
 import React from "react";
-import { News } from "lucide-react";
+import { Newspaper } from "lucide-react";
 
 interface CommunityNewsCardProps {
   title: string;
@@ -33,11 +33,13 @@ export default function CommunityNewsCard({
         />
       ) : (
         <div className="w-16 h-16 rounded-lg bg-[#FAF3EC] flex items-center justify-center mr-3">
-          <News size={26} className="text-[#E76F51]" />
+          <Newspaper size={26} className="text-[#E76F51]" />
         </div>
       )}
       <div className="flex flex-col flex-1 gap-1 pr-1">
-        <div className="font-semibold text-[#AD4F36] text-base line-clamp-2 group-hover:underline">{title}</div>
+        <div className="font-semibold text-[#AD4F36] text-base line-clamp-2 group-hover:underline">
+          {title}
+        </div>
         <div className="text-xs text-neutral-600 line-clamp-2">{summary}</div>
         {date && (
           <div className="text-xs text-[#E76F51] mt-1">{date}</div>
