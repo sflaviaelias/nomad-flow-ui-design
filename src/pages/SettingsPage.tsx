@@ -1,14 +1,16 @@
+
 import React from "react";
-import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { LanguageSelect, LanguageCode } from "@/features/profile/LanguageSelect";
+import { LanguageCode } from "@/features/profile/LanguageSelect";
 import { useTranslation } from "react-i18next";
 import { useAppLanguage } from "@/hooks/useAppLanguage";
+import { SettingsHeader } from "./components/SettingsHeader";
+import { SettingsLanguageBlock } from "./components/SettingsLanguageBlock";
+import { SettingsPreferenceBlock } from "./components/SettingsPreferenceBlock";
 
 // Idioma padrão pelo browser
 function getDefaultLanguage(): LanguageCode {
@@ -27,7 +29,7 @@ export default function SettingsPage() {
   const [loadingLocation, setLoadingLocation] = React.useState<boolean>(false);
   const [saving, setSaving] = React.useState<boolean>(false);
 
-  // Novo: idioma do app
+  // Idioma do app
   const [appLanguage, setAppLanguage] = React.useState<LanguageCode>(getDefaultLanguage());
   useAppLanguage(appLanguage);
 
@@ -76,11 +78,10 @@ export default function SettingsPage() {
       .eq("id", user.id);
     setSaving(false);
     toast({
-      title: "Idioma atualizado com sucesso",
-      description: "A interface será ajustada conforme o idioma escolhido.",
+      title: t("language_updated"),
+      description: t("settings_saved_desc"),
       variant: "default"
     });
-    // TODO: disparar troca real do idioma na aplicação (i18n).
   };
 
   const handleLocationToggle = async (checked: boolean) => {
@@ -158,22 +159,16 @@ export default function SettingsPage() {
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
-      title: "Configurações salvas",
-      description: "Suas preferências foram atualizadas com sucesso!",
+      title: t("settings_saved"),
+      description: t("settings_saved_desc"),
     });
   };
 
   return (
     <main className="flex flex-col min-h-screen bg-background font-inter">
       {/* Cabeçalho */}
-      <div className="w-full flex flex-col items-center justify-center pt-8 pb-3 bg-[#FCF7F4] shadow-soft">
-        <span className="mb-2 rounded-full p-2 bg-[#E76F51]/10 flex items-center">
-          <Bell size={30} className="text-terra-600" />
-        </span>
-        <h1 className="text-2xl md:text-3xl font-bold text-terra-800">
-          {t("app_settings")}
-        </h1>
-      </div>
+      <SettingsHeader />
+
       {/* Conteúdo Scrollable */}
       <form
         onSubmit={handleSave}
@@ -182,54 +177,30 @@ export default function SettingsPage() {
         id="form-settings"
       >
         {/* Seletor de idioma */}
-        <div className="bg-white rounded-xl px-4 py-5 shadow-card flex items-center">
-          <div className="flex-1 flex flex-col">
-            <LanguageSelect value={appLanguage} onChange={handleLanguageChange} disabled={saving} label={t("language_app")} />
-          </div>
-        </div>
+        <SettingsLanguageBlock value={appLanguage} onChange={handleLanguageChange} disabled={saving} />
 
         <Separator className="my-1 bg-[#dadada]" />
 
         {/* Notificações */}
-        <div className="bg-white rounded-xl px-4 py-5 shadow-card flex items-center">
-          <div className="flex-1 flex flex-col">
-            <span className="font-medium text-base text-terra-900">
-              {t("notifications_label")}
-            </span>
-            <span className="text-sm text-neutral-500">{t("notifications_desc")}</span>
-          </div>
-          <Switch
-            checked={notifications}
-            onCheckedChange={setNotifications}
-            id="toggle-notifications"
-            aria-label={t("notifications_label")}
-            className="ml-2 data-[state=checked]:bg-[#E76F51] data-[state=checked]:border-[#E76F51]"
-          />
-        </div>
+        <SettingsPreferenceBlock
+          label={t("notifications_label")}
+          description={t("notifications_desc")}
+          checked={notifications}
+          onCheckedChange={setNotifications}
+          id="toggle-notifications"
+        />
 
         <Separator className="my-1 bg-[#dadada]" />
 
         {/* Localização */}
-        <div className="bg-white rounded-xl px-4 py-5 shadow-card flex items-center">
-          <div className="flex-1 flex flex-col">
-            <span className="font-medium text-base text-terra-900">
-              {t("location_label")}
-            </span>
-            <span className="text-sm text-neutral-500">
-              {t("location_desc")}
-            </span>
-          </div>
-          <Switch
-            checked={location}
-            onCheckedChange={handleLocationToggle}
-            id="toggle-location"
-            aria-label={t("location_label")}
-            disabled={loadingLocation}
-            className={`ml-2 data-[state=checked]:bg-[#E76F51] data-[state=checked]:border-[#E76F51] ${
-              loadingLocation ? "opacity-50 pointer-events-none cursor-not-allowed" : ""
-            }`}
-          />
-        </div>
+        <SettingsPreferenceBlock
+          label={t("location_label")}
+          description={t("location_desc")}
+          checked={location}
+          onCheckedChange={handleLocationToggle}
+          id="toggle-location"
+          disabled={loadingLocation}
+        />
 
         {/* Espaço extra para garantir visualização do botão fixo */}
         <div className="h-32" />
