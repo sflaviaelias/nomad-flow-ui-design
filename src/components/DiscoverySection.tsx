@@ -9,7 +9,7 @@ const discoveries = [
     icon: <MapPin size={20} className="text-terracotta" />,
     desc: "Compras locais, comida e mais",
     action: "Explorar",
-    route: "/discovery/mercados"
+    route: "/discovery/markets"
   },
   {
     name: "Cafés & Restaurantes",
@@ -43,17 +43,17 @@ const DiscoverySection = () => {
         {discoveries.map((item) => (
           <button
             key={item.name}
-            className="min-w-[210px] bg-card rounded-lg shadow-sm px-5 py-4 flex flex-col gap-2 hover:shadow-md transition flex-shrink-0 text-left focus-visible:ring-2 ring-terracotta outline-none"
-            style={{ fontFamily: "Inter, sans-serif", padding: 16, borderRadius: 12 }}
+            className="min-w-[210px] bg-[#FAF3EC] rounded-xl shadow-soft px-5 py-4 flex flex-col gap-2 hover:shadow-md transition flex-shrink-0 text-left focus-visible:ring-2 ring-[#E76F51] outline-none border border-[#E76F51]/8"
+            style={{ fontFamily: "Inter, sans-serif", padding: 16, borderRadius: 16 }}
             onClick={() => navigate(item.route)}
             aria-label={item.name}
           >
             <div className="flex items-center gap-2 mb-1">
               {item.icon}
-              <span className="font-bold text-base text-terracotta">{item.name}</span>
+              <span className="font-bold text-base text-[#E76F51]">{item.name}</span>
             </div>
             <div className="text-sm text-neutral-500">{item.desc}</div>
-            <span className="mt-2 w-fit font-semibold text-accent hover:text-terracotta text-[17px]">
+            <span className="mt-2 w-fit font-semibold text-[#6D4530] hover:text-[#E76F51] text-[17px]">
               {item.action}
             </span>
           </button>
@@ -64,3 +64,4 @@ const DiscoverySection = () => {
 };
 
 export default DiscoverySection;
+
