@@ -172,6 +172,7 @@ export type Database = {
           destination: string
           end_date: string
           id: string
+          is_smart_trip: boolean
           itinerary: Json | null
           notes: string | null
           start_date: string
@@ -186,6 +187,7 @@ export type Database = {
           destination: string
           end_date: string
           id?: string
+          is_smart_trip?: boolean
           itinerary?: Json | null
           notes?: string | null
           start_date: string
@@ -200,6 +202,7 @@ export type Database = {
           destination?: string
           end_date?: string
           id?: string
+          is_smart_trip?: boolean
           itinerary?: Json | null
           notes?: string | null
           start_date?: string

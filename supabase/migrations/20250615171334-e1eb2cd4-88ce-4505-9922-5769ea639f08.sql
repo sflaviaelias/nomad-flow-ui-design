@@ -1,0 +1,3 @@
+
+ALTER TABLE public.trips
+ADD COLUMN is_smart_trip BOOLEAN NOT NULL DEFAULT FALSE;

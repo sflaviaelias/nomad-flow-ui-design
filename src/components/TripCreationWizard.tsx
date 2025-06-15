@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
@@ -6,6 +5,7 @@ import TripDestinationStep from "./TripDestinationStep";
 import TripDatesStep from "./TripDatesStep";
 import TripCurrencyStep from "./TripCurrencyStep";
 import TripSummaryStep from "./TripSummaryStep";
+import SmartTripToggle from "./SmartTripToggle";
 import { useDestinationImageUnsplash } from "@/hooks/useDestinationImageUnsplash";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -24,6 +24,7 @@ const TripCreationWizard: React.FC = () => {
   const [currency, setCurrency] = React.useState("BRL");
   const [aiAdvice, setAiAdvice] = React.useState<{ dates?: string; budget?: string; forecast?: string } | null>(null);
   const [loadingAI, setLoadingAI] = React.useState(false);
+  const [isSmartTrip, setIsSmartTrip] = React.useState(false);
 
   // Usa hook para buscar imagem do destino via Unsplash
   const { imageUrl, loading: imgLoading } = useDestinationImageUnsplash(destination);
@@ -96,6 +97,7 @@ const TripCreationWizard: React.FC = () => {
           currency,
           budget: null, // Ajustar se orçamento for numérico
           notes: "",
+          is_smart_trip: isSmartTrip, // <-- NOVO!! 
           // Use imageUrl if available (additional column if your schema permits)
         });
 
@@ -103,7 +105,9 @@ const TripCreationWizard: React.FC = () => {
 
       toast({
         title: "Viagem salva!",
-        description: "Em breve: sugestões inteligentes da IA para otimizar seu planejamento ✨",
+        description: isSmartTrip
+          ? "Viagem Inteligente ativada. Você receberá sugestões automáticas, análises e cards IA no seu planejamento ✨"
+          : "Viagem salva! Em breve: sugestões inteligentes da IA para otimizar seu planejamento.",
       });
 
       // Resetar wizard (opcional: pode redirecionar ou só limpar)
@@ -112,6 +116,7 @@ const TripCreationWizard: React.FC = () => {
       setDates({ start: "", end: "" });
       setCurrency("BRL");
       setAiAdvice(null);
+      setIsSmartTrip(false);
     } catch (e: any) {
       toast({
         title: "Erro ao salvar",
@@ -130,6 +135,13 @@ const TripCreationWizard: React.FC = () => {
             <span className="font-bold text-xl text-terracotta">Nova Viagem</span>
             <span className="text-neutral-700 text-sm">Preencha as etapas para planejar sua próxima jornada.</span>
           </div>
+
+          {/* Toggle Viagem Inteligente aparece em FASE 0, antes de avançar */}
+          {phase === 0 && (
+            <div>
+              <SmartTripToggle value={isSmartTrip} onChange={setIsSmartTrip} />
+            </div>
+          )}
 
           {phase === 0 && (
             <TripDestinationStep
@@ -178,7 +190,6 @@ const TripCreationWizard: React.FC = () => {
           {saving && (
             <div className="text-center text-[#E76F51] text-sm">Salvando...</div>
           )}
-          {/* Mensagem extra de "em breve" após salvar está no toast */}
         </div>
       </CardContent>
     </Card>
