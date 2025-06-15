@@ -8,15 +8,16 @@ import { useNavigate } from "react-router-dom";
 export default function OnboardingFlow() {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
-  // Aumenta contraste e acessibilidade dos indicadores
   return (
-    <div className="min-h-screen w-full bg-[#FAF3EC] flex flex-col justify-center items-center font-sans">
-      <div className="w-full flex-1 flex flex-col justify-center items-center">
+    <div className="min-h-screen w-full bg-[#FAF3EC] flex flex-col items-center font-sans">
+      <div className="w-full flex-1 flex flex-col justify-between items-stretch max-w-md mx-auto">
+        {/* Telas */}
         {step === 1 && <OnboardingScreen1 onNext={() => setStep(2)} />}
         {step === 2 && <OnboardingScreen2 onNext={() => setStep(3)} />}
         {step === 3 && <OnboardingScreen3 onNext={() => navigate('/auth/access')} />}
+        {/* Indicador de progresso */}
         <nav
-          className="flex flex-row space-x-2 items-center justify-center mt-7 mb-3"
+          className="flex flex-row space-x-2 items-center justify-center mt-0 mb-8"
           aria-label="Progresso do onboarding"
         >
           {[1, 2, 3].map((n) => (
@@ -25,10 +26,10 @@ export default function OnboardingFlow() {
               aria-label={`Etapa ${n}`}
               aria-current={n === step}
               tabIndex={0}
-              className={`h-3 w-3 rounded-full border-[2.5px] focus:outline-none ring-2 ring-transparent focus-visible:ring-[#E76F51] transition
+              className={`h-3.5 w-3.5 rounded-full border-[2.5px] focus:outline-none ring-2 ring-transparent focus-visible:ring-[#E76F51] transition
                 ${n === step
                   ? "bg-[#E76F51] border-[#C9583C] scale-120 shadow-lg"
-                  : "bg-[#F9E1DA] border-[#E76F51] opacity-80"
+                  : "bg-[#F9E1DA] border-[#E76F51] opacity-85"
                 }`}
               onClick={() => setStep(n)}
             />
