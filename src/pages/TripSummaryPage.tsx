@@ -1,11 +1,11 @@
-
-import React from "react";
+import React, { useEffect } from "react";
 import PageHeader from "@/components/PageHeader";
 import { SummaryHighlights } from "@/components/SummaryHighlights";
 import { SummaryNotes } from "@/components/SummaryNotes";
 import { SummarySuggestions } from "@/components/SummarySuggestions";
 import { BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
 
 const mockPlaces = [
   {
@@ -26,6 +26,13 @@ const mockPlaces = [
 ];
 
 const TripSummaryPage = () => {
+  const { push } = useNavigationHistory();
+
+  useEffect(() => {
+    push(window.location.pathname);
+    // eslint-disable-next-line
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#FAF3EC] font-inter">
       <PageHeader

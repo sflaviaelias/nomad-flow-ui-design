@@ -23,6 +23,7 @@ import SignupScreen from "./features/auth/SignupScreen";
 import ProfileScreen from "./features/profile/ProfileScreen";
 import EditProfileScreen from "./features/profile/EditProfileScreen";
 import TripSummaryPage from "./pages/TripSummaryPage";
+import { NavigationHistoryProvider } from "@/contexts/NavigationHistoryContext";
 
 const queryClient = new QueryClient();
 
@@ -31,31 +32,33 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          {/* Onboarding and auth */}
-          <Route path="/onboarding" element={<OnboardingFlow />} />
-          <Route path="/auth/access" element={<AuthAccessScreen />} />
-          <Route path="/auth/signup" element={<SignupScreen />} />
-          <Route path="/auth/login" element={<LoginScreen />} />
-          <Route path="/auth" element={<AuthPage />} />
-          {/* Rotas principais agora SEM ProtectedRoute */}
-          <Route path="/" element={<Index />} />
-          <Route path="/concierge" element={<ConciergePage />} />
-          <Route path="/trip/active" element={<ActiveTripDetailsPage />} />
-          <Route path="/trips/upcoming" element={<NextTripsPage />} />
-          <Route path="/trip/new" element={<NewTripPage />} />
-          <Route path="/discovery/:category" element={<DiscoveryPage />} />
-          <Route path="/trip/add-expense" element={<AddExpensePage />} />
-          <Route path="/feedback/:placeId" element={<FeedbackPage />} />
-          <Route path="/community" element={<CommunityPage />} />
-          <Route path="/profile" element={<ProfileScreen />} />
-          <Route path="/profile/edit" element={<EditProfileScreen />} />
-          {/* Rotas customizadas acima */}
-          <Route path="*" element={<NotFound />} />
-          <Route path="/trip/summary" element={<TripSummaryPage />} />
-        </Routes>
-      </BrowserRouter>
+      <NavigationHistoryProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Onboarding and auth */}
+            <Route path="/onboarding" element={<OnboardingFlow />} />
+            <Route path="/auth/access" element={<AuthAccessScreen />} />
+            <Route path="/auth/signup" element={<SignupScreen />} />
+            <Route path="/auth/login" element={<LoginScreen />} />
+            <Route path="/auth" element={<AuthPage />} />
+            {/* Rotas principais agora SEM ProtectedRoute */}
+            <Route path="/" element={<Index />} />
+            <Route path="/concierge" element={<ConciergePage />} />
+            <Route path="/trip/active" element={<ActiveTripDetailsPage />} />
+            <Route path="/trips/upcoming" element={<NextTripsPage />} />
+            <Route path="/trip/new" element={<NewTripPage />} />
+            <Route path="/discovery/:category" element={<DiscoveryPage />} />
+            <Route path="/trip/add-expense" element={<AddExpensePage />} />
+            <Route path="/feedback/:placeId" element={<FeedbackPage />} />
+            <Route path="/community" element={<CommunityPage />} />
+            <Route path="/profile" element={<ProfileScreen />} />
+            <Route path="/profile/edit" element={<EditProfileScreen />} />
+            {/* Rotas customizadas acima */}
+            <Route path="*" element={<NotFound />} />
+            <Route path="/trip/summary" element={<TripSummaryPage />} />
+          </Routes>
+        </BrowserRouter>
+      </NavigationHistoryProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

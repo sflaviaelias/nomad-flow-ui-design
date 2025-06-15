@@ -1,7 +1,7 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "@/components/PageHeader";
+import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
 
 const tripData = {
   destination: "Paris, França",
@@ -36,6 +36,14 @@ const tripData = {
 
 export default function ActiveTripDetailsPage() {
   const navigate = useNavigate();
+  const { push } = useNavigationHistory();
+
+  // NEW: track navigation history on mount for back navigation
+  useEffect(() => {
+    push(window.location.pathname);
+    // eslint-disable-next-line
+  }, []);
+
   // Estado visual do checklist
   const [checkedChecklist, setCheckedChecklist] = useState<boolean[]>(Array(tripData.checklist.length).fill(false));
 

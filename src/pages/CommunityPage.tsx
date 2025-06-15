@@ -1,9 +1,9 @@
-
-import React from "react";
+import React, { useEffect } from "react";
 import PageHeader from "@/components/PageHeader";
 import CommunityNomadCard from "@/components/CommunityNomadCard";
 import CommunityGroupCard from "@/components/CommunityGroupCard";
 import { Plus } from "lucide-react";
+import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
 
 const nomads = [
   // Exemplo de dados mockados; em breve virá de API
@@ -38,6 +38,12 @@ const groups = [
 
 export default function CommunityPage() {
   const [showFab, setShowFab] = React.useState(true);
+  const { push } = useNavigationHistory();
+
+  useEffect(() => {
+    push(window.location.pathname);
+    // eslint-disable-next-line
+  }, []);
 
   // Estados vazios para testes:
   // const nomads: any[] = [];

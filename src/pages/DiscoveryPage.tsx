@@ -1,10 +1,17 @@
-
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import PageHeader from "@/components/PageHeader";
+import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
 
 const DiscoveryPage = () => {
   const { category } = useParams<{ category: string }>();
+  const { push } = useNavigationHistory();
+
+  useEffect(() => {
+    push(window.location.pathname);
+    // eslint-disable-next-line
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#FAF3EC]">
       <PageHeader
