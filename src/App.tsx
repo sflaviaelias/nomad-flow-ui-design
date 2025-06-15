@@ -33,7 +33,7 @@ import { useEffect, useState } from "react";
 import i18n from "@/i18n/config";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
-// Utilitário centralizado para onboarding (com localStorage)
+// Utilitário para controle do onboarding por dispositivo
 function useShouldShowOnboarding() {
   const { user, loading } = useSupabaseAuth();
   const [checked, setChecked] = useState(false);
@@ -41,11 +41,10 @@ function useShouldShowOnboarding() {
 
   useEffect(() => {
     if (loading) return;
-
-    // Onboarding já feito nesse dispositivo
+    // Marcação local: já viu onboarding nesse browser
     const onboardingDone = localStorage.getItem("onboarding_done") === "1";
 
-    // Só mostra onboarding se não autenticado e ainda não exibiu onboarding nesse device
+    // Mostra onboarding SOMENTE se não autenticado E não marcou onboarding_done localmente
     if (!user && !onboardingDone) {
       setShow(true);
     } else {
@@ -54,7 +53,7 @@ function useShouldShowOnboarding() {
     setChecked(true);
   }, [user, loading]);
 
-  // Função para marcar como feito (chamada ao finalizar onboarding)
+  // Marca onboarding como concluído localmente
   const finishOnboarding = () => {
     localStorage.setItem("onboarding_done", "1");
     setShow(false);
@@ -68,7 +67,7 @@ const queryClient = new QueryClient();
 function AppWrapper() {
   const onboarding = useShouldShowOnboarding();
 
-  // Enquanto não checou, não renderiza para evitar flicker
+  // Enquanto não determinar, não renderiza nada
   if (!onboarding.checked) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FAF3EC] text-terra-700">
@@ -78,7 +77,7 @@ function AppWrapper() {
   }
 
   if (onboarding.show) {
-    // Renderiza diretamente o onboarding
+    // Renderiza OnboardingFlow e bloqueia navegação
     return <OnboardingFlow onFinish={onboarding.finishOnboarding} />;
   }
 

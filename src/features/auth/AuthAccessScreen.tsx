@@ -18,12 +18,14 @@ export default function AuthAccessScreen() {
     }
   };
 
-  // Nova função: garantir navegação limpa como convidado
+  // Explorar como convidado — forçar signOut, limpar localStorage relacionado a sessão
   const handleExploreAsGuest = async () => {
-    // Faz signOut apenas se houver sessão ativa (para garantir estado de guest)
+    // Garante sign-out antes de liberar uso como guest
     await supabase.auth.signOut();
-    // Navega para a Home
-    navigate("/", { replace: true });
+    // Marca onboarding como feito (não mostra onboarding para guest)
+    localStorage.setItem("onboarding_done", "1");
+    // Navega p/ Home e força reload leve para limpar eventuais estados residuais de usuário
+    window.location.replace("/");
   };
 
   return (
