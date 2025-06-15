@@ -25,20 +25,6 @@ import EditProfileScreen from "./features/profile/EditProfileScreen";
 
 const queryClient = new QueryClient();
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { session, loading } = useSupabaseAuth();
-  const location = useLocation();
-
-  if (loading) {
-    return <div className="w-full flex justify-center items-center min-h-screen text-lg">Carregando...</div>;
-  }
-  if (!session) {
-    // Redireciona para Auth e preserva o destino
-    return <Navigate to="/auth" state={{ from: location }} replace />;
-  }
-  return <>{children}</>;
-}
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -52,94 +38,18 @@ const App = () => (
           <Route path="/auth/signup" element={<SignupScreen />} />
           <Route path="/auth/login" element={<LoginScreen />} />
           <Route path="/auth" element={<AuthPage />} />
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Index />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/concierge"
-            element={
-              <ProtectedRoute>
-                <ConciergePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/trip/active"
-            element={
-              <ProtectedRoute>
-                <ActiveTripDetailsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/trips/upcoming"
-            element={
-              <ProtectedRoute>
-                <NextTripsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/trip/new"
-            element={
-              <ProtectedRoute>
-                <NewTripPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/discovery/:category"
-            element={
-              <ProtectedRoute>
-                <DiscoveryPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/trip/add-expense"
-            element={
-              <ProtectedRoute>
-                <AddExpensePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/feedback/:placeId"
-            element={
-              <ProtectedRoute>
-                <FeedbackPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/community"
-            element={
-              <ProtectedRoute>
-                <CommunityPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <ProfileScreen />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile/edit"
-            element={
-              <ProtectedRoute>
-                <EditProfileScreen />
-              </ProtectedRoute>
-            }
-          />
+          {/* Rotas principais agora SEM ProtectedRoute */}
+          <Route path="/" element={<Index />} />
+          <Route path="/concierge" element={<ConciergePage />} />
+          <Route path="/trip/active" element={<ActiveTripDetailsPage />} />
+          <Route path="/trips/upcoming" element={<NextTripsPage />} />
+          <Route path="/trip/new" element={<NewTripPage />} />
+          <Route path="/discovery/:category" element={<DiscoveryPage />} />
+          <Route path="/trip/add-expense" element={<AddExpensePage />} />
+          <Route path="/feedback/:placeId" element={<FeedbackPage />} />
+          <Route path="/community" element={<CommunityPage />} />
+          <Route path="/profile" element={<ProfileScreen />} />
+          <Route path="/profile/edit" element={<EditProfileScreen />} />
           {/* Rotas customizadas acima */}
           <Route path="*" element={<NotFound />} />
         </Routes>
