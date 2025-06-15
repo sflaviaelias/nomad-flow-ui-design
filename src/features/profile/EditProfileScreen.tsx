@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { toast } from "@/hooks/use-toast";
@@ -63,8 +62,7 @@ export default function EditProfileScreen() {
           languages,
           travel_profiles: travelProfiles,
           ai_assistant: aiAssistant
-        },
-        complete: true // Marque como "completo" após edição inicial
+        }
       };
 
       const { error } = await supabase.from("profiles").upsert(updates, { onConflict: "id" });
