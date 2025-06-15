@@ -55,6 +55,8 @@ export type Database = {
           date: string | null
           description: string | null
           id: string
+          payment_method: string | null
+          receipt_url: string | null
           title: string
           trip_id: string | null
         }
@@ -65,6 +67,8 @@ export type Database = {
           date?: string | null
           description?: string | null
           id?: string
+          payment_method?: string | null
+          receipt_url?: string | null
           title: string
           trip_id?: string | null
         }
@@ -75,6 +79,8 @@ export type Database = {
           date?: string | null
           description?: string | null
           id?: string
+          payment_method?: string | null
+          receipt_url?: string | null
           title?: string
           trip_id?: string | null
         }

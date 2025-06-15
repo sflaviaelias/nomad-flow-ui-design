@@ -137,7 +137,7 @@ export default function ExpenseForm({ onCreated }: { onCreated: (summary: any) =
       }
     }
 
-    // Salva a despesa incluindo o novo campo description
+    // Salva a despesa incluindo todos os campos presentes na tabela
     const { error: insertError } = await supabase.from("expenses").insert([
       {
         trip_id: trip.id,
@@ -145,9 +145,9 @@ export default function ExpenseForm({ onCreated }: { onCreated: (summary: any) =
         amount: Number(values.amount),
         date: expenseDate,
         category,
-        description: values.description, // agora está garantido no banco!
-        payment_method: paymentMethod,
-        receipt_url: receiptUrl,
+        description: values.description, // já existe na tabela
+        payment_method: paymentMethod,   // agora existe na tabela!
+        receipt_url: receiptUrl,         // agora existe na tabela!
       }
     ]);
     setLoading(false);
@@ -159,7 +159,7 @@ export default function ExpenseForm({ onCreated }: { onCreated: (summary: any) =
     // Atualiza valores para o resumo
     const { data: exp } = await supabase
       .from("expenses")
-      .select("amount") // campos básicos, mas se quiser usar description pode incluir: .select("amount, description")
+      .select("amount")
       .eq("trip_id", trip.id);
     const totalSpent = (exp || []).reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
 
