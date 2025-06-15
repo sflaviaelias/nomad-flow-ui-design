@@ -2,31 +2,26 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 export default function HomeAddTripButton() {
   const navigate = useNavigate();
   return (
-    <div className="flex justify-center py-2">
+    <div className="flex justify-start items-center px-5 py-1 mt-1 mb-2">
       <Button
-        size="lg"
-        className="bg-[#E76F51] hover:bg-[#C9583C] text-white font-bold rounded-lg flex items-center gap-2 px-6 py-3 shadow-card"
+        variant="ghost"
+        size="sm"
+        className="text-[#E76F51] border border-[#E76F51] bg-transparent hover:bg-[#E76F5110] hover:border-[#C9583C] hover:text-[#C9583C] font-semibold rounded-md px-3 py-2 whitespace-nowrap transition-all shadow-none text-[15px]"
         style={{
-          fontSize: 17,
-          minWidth: 220,
-          minHeight: 44,
+          minWidth: 0,
+          minHeight: 36,
         }}
         onClick={() => navigate("/trip/new")}
         aria-label="Adicionar nova viagem"
       >
-        {/* Ícone plus Untitled UI style */}
-        <svg width="20" height="20" fill="none" viewBox="0 0 20 20" className="mr-1.5">
-          <rect x="9" y="4" width="2" height="12" rx="1" fill="white" />
-          <rect x="4" y="9" width="12" height="2" rx="1" fill="white" />
-          <rect x="1" y="1" width="18" height="18" rx="5" stroke="white" strokeWidth="2" fill="#E76F51" />
-        </svg>
+        <Plus size={16} strokeWidth={2.2} className="mr-2" />
         Adicionar nova viagem
       </Button>
     </div>
   );
 }
-

@@ -86,14 +86,15 @@ const Index = () => {
         ) : (
           <>
             <div className="h-8 md:h-12" />
+            {/* Button now ABOVE the travel card */}
+            <HomeAddTripButton />
             <ActiveTripSection
               hasActiveTrip={hasActiveTrip}
               activeTrip={activeTrip}
             />
             <div className="h-4" />
-            <HomeAddTripButton />
+            {/* Removed HomeAddTripButton from here (was previously under the card) */}
             <div className="h-6" />
-            {/* Concierge IA Proativo: agora exibe dica de IA */}
             <ConciergeSection />
             <div className="px-5 mb-2">
               <div className="bg-[#e76f5115] border border-[#E76F51]/20 rounded-lg px-4 py-2 mt-2 text-[#AD4F36] text-xs font-inter shadow-sm">
