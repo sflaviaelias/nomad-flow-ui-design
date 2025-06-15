@@ -47,6 +47,7 @@ export default function SettingsPage() {
             try { prefs = JSON.parse(data.preferences); } catch { prefs = {}; }
           }
           if (prefs.language) setAppLanguage(prefs.language);
+          if ("location_enabled" in prefs) setLocation(Boolean(prefs.location_enabled));
         });
     }
   }, [user?.id]);
@@ -83,8 +84,41 @@ export default function SettingsPage() {
   };
 
   const handleLocationToggle = async (checked: boolean) => {
+    if (!user?.id) {
+      setLocation(checked);
+      return;
+    }
+    setLoadingLocation(true);
+
+    // Atualiza local semântica/local state otimista
+    setLocation(checked);
+
+    // Consulta e atualiza preferências
+    const { data } = await supabase
+      .from("profiles")
+      .select("preferences")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    let prefs: any = {};
+    if (data?.preferences) {
+      if (typeof data.preferences === "object") { prefs = data.preferences; }
+      else if (typeof data.preferences === "string") {
+        try { prefs = JSON.parse(data.preferences); } catch { prefs = {}; }
+      }
+    }
+    // Persiste permissão no campo "location_enabled"
+    const updatedPrefs = { ...prefs, location_enabled: checked };
+
+    await supabase
+      .from("profiles")
+      .update({ preferences: updatedPrefs })
+      .eq("id", user.id);
+
+    setLoadingLocation(false);
+
+    // Exibe toast de acordo com a ação
     if (checked) {
-      setLoadingLocation(true);
       if (!navigator.geolocation) {
         toast({
           title: "Ops!",
@@ -92,24 +126,18 @@ export default function SettingsPage() {
           variant: "destructive",
         });
         setLocation(false);
-        setLoadingLocation(false);
         return;
       }
 
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation(true);
-          setLoadingLocation(false);
+        () => {
           toast({
             title: "Localização ativada!",
             description: "Agora o Go Nomad pode sugerir lugares perto de você.",
             variant: "default",
           });
-          // console.log('Localização:', position.coords);
         },
-        (error) => {
-          setLocation(false);
-          setLoadingLocation(false);
+        () => {
           toast({
             title: "Permissão negada",
             description:
@@ -119,7 +147,11 @@ export default function SettingsPage() {
         }
       );
     } else {
-      setLocation(false);
+      toast({
+        title: "Localização desativada",
+        description: "Você poderá ativar novamente sempre que quiser.",
+        variant: "default",
+      });
     }
   };
 
