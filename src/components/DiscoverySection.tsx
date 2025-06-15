@@ -30,8 +30,7 @@ const discoveries = [
 ];
 
 const DiscoverySection = () => (
-  <section>
-    <h3 className="font-semibold text-lg mb-3 text-neutral-800">Descoberta</h3>
+  <div>
     <div className="flex gap-4 overflow-x-auto pb-2">
       {discoveries.map((item) => (
         <div
@@ -49,7 +48,7 @@ const DiscoverySection = () => (
         </div>
       ))}
     </div>
-  </section>
+  </div>
 );
 
 export default DiscoverySection;
