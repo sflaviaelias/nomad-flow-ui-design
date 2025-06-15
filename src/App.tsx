@@ -29,43 +29,17 @@ import PoliciesPage from "./pages/PoliciesPage";
 import SettingsPage from "./pages/SettingsPage";
 import "./i18n/config";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import i18n from "@/i18n/config";
-import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { useOnboardingFlow } from "@/hooks/useOnboardingFlow";
 
 // Utilitário para controle do onboarding por dispositivo
-function useShouldShowOnboarding() {
-  const { user, loading } = useSupabaseAuth();
-  const [checked, setChecked] = useState(false);
-  const [show, setShow] = useState(false);
-
-  useEffect(() => {
-    if (loading) return;
-    // Marcação local: já viu onboarding nesse browser
-    const onboardingDone = localStorage.getItem("onboarding_done") === "1";
-
-    // Mostra onboarding SOMENTE se não autenticado E não marcou onboarding_done localmente
-    if (!user && !onboardingDone) {
-      setShow(true);
-    } else {
-      setShow(false);
-    }
-    setChecked(true);
-  }, [user, loading]);
-
-  // Marca onboarding como concluído localmente
-  const finishOnboarding = () => {
-    localStorage.setItem("onboarding_done", "1");
-    setShow(false);
-  };
-
-  return { show, checked, finishOnboarding };
-}
+// Função centralizada foi movida para hooks/useOnboardingFlow.ts
 
 const queryClient = new QueryClient();
 
 function AppWrapper() {
-  const onboarding = useShouldShowOnboarding();
+  const onboarding = useOnboardingFlow();
 
   // Enquanto não determinar, não renderiza nada
   if (!onboarding.checked) {
