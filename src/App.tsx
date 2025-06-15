@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,6 +23,7 @@ import EditProfileScreen from "./features/profile/EditProfileScreen";
 import TripSummaryPage from "./pages/TripSummaryPage";
 import { NavigationHistoryProvider } from "@/contexts/NavigationHistoryContext";
 import PlaceDetailsPage from "./pages/PlaceDetailsPage";
+import RequireAuth from "./features/auth/RequireAuth";
 
 const queryClient = new QueryClient();
 
@@ -35,27 +35,118 @@ const App = () => (
       <TooltipProvider>
         <NavigationHistoryProvider>
           <Routes>
-            {/* Onboarding and auth */}
+            {/* Rotas abertas */}
             <Route path="/onboarding" element={<OnboardingFlow />} />
             <Route path="/auth/access" element={<AuthAccessScreen />} />
             <Route path="/auth/signup" element={<SignupScreen />} />
             <Route path="/auth/login" element={<LoginScreen />} />
             <Route path="/auth" element={<AuthPage />} />
-            {/* Rotas principais agora SEM ProtectedRoute */}
-            <Route path="/" element={<Index />} />
-            <Route path="/concierge" element={<ConciergePage />} />
-            <Route path="/trip/active" element={<ActiveTripDetailsPage />} />
-            <Route path="/trips/upcoming" element={<NextTripsPage />} />
-            <Route path="/trip/new" element={<NewTripPage />} />
-            <Route path="/discovery/:category" element={<DiscoveryPage />} />
-            <Route path="/trip/add-expense" element={<AddExpensePage />} />
-            <Route path="/feedback/:placeId" element={<FeedbackPage />} />
-            <Route path="/community" element={<CommunityPage />} />
-            <Route path="/profile" element={<ProfileScreen />} />
-            <Route path="/profile/edit" element={<EditProfileScreen />} />
-            {/* Rotas customizadas acima */}
-            <Route path="/place/:placeId" element={<PlaceDetailsPage />} />
-            <Route path="/trip/summary" element={<TripSummaryPage />} />
+
+            {/* Rotas privadas (precisam de login) */}
+            <Route
+              path="/"
+              element={
+                <RequireAuth>
+                  <Index />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/concierge"
+              element={
+                <RequireAuth>
+                  <ConciergePage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/trip/active"
+              element={
+                <RequireAuth>
+                  <ActiveTripDetailsPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/trips/upcoming"
+              element={
+                <RequireAuth>
+                  <NextTripsPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/trip/new"
+              element={
+                <RequireAuth>
+                  <NewTripPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/discovery/:category"
+              element={
+                <RequireAuth>
+                  <DiscoveryPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/trip/add-expense"
+              element={
+                <RequireAuth>
+                  <AddExpensePage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/feedback/:placeId"
+              element={
+                <RequireAuth>
+                  <FeedbackPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/community"
+              element={
+                <RequireAuth>
+                  <CommunityPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <RequireAuth>
+                  <ProfileScreen />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/profile/edit"
+              element={
+                <RequireAuth>
+                  <EditProfileScreen />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/place/:placeId"
+              element={
+                <RequireAuth>
+                  <PlaceDetailsPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/trip/summary"
+              element={
+                <RequireAuth>
+                  <TripSummaryPage />
+                </RequireAuth>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </NavigationHistoryProvider>
