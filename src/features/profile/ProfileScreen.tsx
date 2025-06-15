@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useNavigate } from "react-router-dom";
@@ -5,8 +6,7 @@ import { ProfileAvatar } from "./ProfileAvatar";
 import PageHeader from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { LogOut, Edit2, Lock, Mail, Globe, Calendar, User, Bell, Shield, Languages, DollarSign, MapPin, Camera, CheckCircle, ArrowRight } from "lucide-react";
+import { LogOut, Edit2, Lock, Mail, Globe, Calendar, User, CheckCircle, ArrowRight, MapPin, DollarSign, Languages } from "lucide-react";
 
 export default function ProfileScreen() {
   const { user, loading, signOut } = useSupabaseAuth();
@@ -25,22 +25,9 @@ export default function ProfileScreen() {
       language: user_metadata?.language || "Português",
       birthdate: user_metadata?.birthdate || "",
       gender: user_metadata?.gender || "",
-      notifications: typeof user_metadata?.notifications === "boolean" ? user_metadata.notifications : true,
-      privacy: typeof user_metadata?.privacy === "boolean" ? user_metadata.privacy : true,
       sso_google: app_metadata?.provider === "google",
     };
   }, [user]);
-
-  // Preferências de tema (localStorage)
-  const [theme, setTheme] = React.useState<"light"|"dark">(
-    (localStorage.getItem("theme") as "light"|"dark") || "light"
-  );
-  const handleThemeToggle = (checked: boolean) => {
-    const newTheme = checked ? "dark" : "light";
-    setTheme(newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
-    localStorage.setItem("theme", newTheme);
-  };
 
   // Loading state melhorado
   if (loading) {
@@ -59,7 +46,7 @@ export default function ProfileScreen() {
         <h2 className="font-semibold text-lg mb-2">Faça login para visualizar seu perfil</h2>
         <Button
           variant="default"
-          className="bg-terra-600 text-white mt-2"
+          className="bg-terra-600 text-white mt-2 min-h-[44px] font-inter"
           onClick={() => navigate("/auth/access")}
         >Entrar / Criar conta</Button>
       </div>
@@ -67,28 +54,27 @@ export default function ProfileScreen() {
   }
 
   return (
-    <div className="bg-[#FAF3EC] min-h-screen pb-12">
+    <div className="bg-[#FAF3EC] min-h-screen pb-10">
       {/* Header com opção de voltar para Home */}
       <PageHeader title="Perfil" showBack />
 
       <main className="max-w-md mx-auto w-full px-4 pt-3 pb-8 flex flex-col font-sans">
         {/* Avatar, nome e email */}
-        <section className="flex flex-col items-center mt-1 mb-5">
+        <section className="flex flex-col items-center mt-2 mb-5">
           <ProfileAvatar
             avatarUrl={profile.avatar_url}
             editable
             name={profile.name}
             onChange={() => {/* no-op for now */}}
           />
-          <h1 className="mt-3 font-bold text-[1.55rem] md:text-2xl text-terra-700 text-center font-inter">
+          <h1 className="mt-3 font-bold text-[1.45rem] md:text-2xl text-terra-700 text-center font-inter">
             {profile.name || "Nome"}
           </h1>
           <div className="text-base text-terra-600/70 mt-1 text-center font-inter">
             {profile.email || "E-mail"}
           </div>
           <Button
-            className="mt-3 w-full max-w-[230px] bg-[#E76F51] hover:bg-[#C9583C] text-white font-semibold tracking-wide min-h-[44px]"
-            style={{ borderRadius: 10, fontFamily: "Inter" }}
+            className="mt-3 w-full max-w-[230px] bg-[#E76F51] hover:bg-[#C9583C] text-white font-semibold tracking-wide min-h-[44px] rounded-[10px] font-inter"
             onClick={() => navigate("/profile/edit")}
           >
             <Edit2 className="mr-2" size={18} /> Editar Perfil
@@ -126,53 +112,27 @@ export default function ProfileScreen() {
           </CardContent>
         </Card>
 
-        {/* CARD - Preferências */}
-        <Card className="mb-5 bg-white/80 border-none rounded-lg shadow-soft">
-          <CardContent className="py-4 px-5 flex flex-col gap-4">
-            <div className="flex items-center gap-3">
-              {theme === "dark"
-                ? <Moon className="text-terra-600" size={19} />
-                : <Sun className="text-terra-600" size={19} />}
-              <div className="flex-1">
-                <span className="text-sm font-medium">Tema: {theme === "dark" ? "Escuro" : "Claro"}</span>
-              </div>
-              <Switch
-                checked={theme === "dark"}
-                onCheckedChange={handleThemeToggle}
-                aria-label="Alternar tema claro/escuro"
-              />
-            </div>
-            <div className="flex items-center gap-3">
-              <Bell className="text-terra-600" size={18} />
-              <span className="text-sm font-medium flex-1">Notificações</span>
-              <Switch checked={profile.notifications} aria-label="Notificações" disabled />
-            </div>
-            <div className="flex items-center gap-3">
-              <Shield className="text-terra-600" size={16} />
-              <span className="text-sm font-medium flex-1">Compartilhar localização</span>
-              <Switch checked={profile.privacy} aria-label="Privacidade" disabled />
-            </div>
-          </CardContent>
-        </Card>
-
         {/* CARD - Segurança */}
-        <Card className="mb-5 bg-white/80 border-none rounded-lg shadow-soft">
+        <Card className="mb-3 bg-white/80 border-none rounded-lg shadow-soft">
           <CardContent className="py-4 px-5 flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <Lock className="text-terra-600" size={18} />
               <span className="text-sm font-medium flex-1">Alterar senha</span>
-              <Button size="sm" variant="ghost" className="text-terra-700 font-semibold px-2" style={{ fontFamily: "Inter" }} disabled>
+              <Button size="sm" variant="ghost" className="text-terra-700 font-semibold px-2 cursor-not-allowed font-inter" disabled>
                 Gerenciar
               </Button>
             </div>
-            <div className="flex items-center gap-3">
-              <Mail className="text-terra-600" size={17} />
-              <span className="text-sm font-medium flex-1">Google (SSO)</span>
-              <CheckCircle size={16} className={profile.sso_google ? "text-green-500" : "text-neutral-300"} />
-              <span className="text-xs text-terra-700/80 ml-1">
-                {profile.sso_google ? "Conectado" : "Desconectado"}
-              </span>
-            </div>
+            {/* Exibe SSO Google apenas se conectado */}
+            {profile.sso_google && (
+              <div className="flex items-center gap-3">
+                <Mail className="text-terra-600" size={17} />
+                <span className="text-sm font-medium flex-1">Google (SSO)</span>
+                <CheckCircle size={16} className="text-green-500" />
+                <span className="text-xs text-terra-700/80 ml-1">
+                  Conectado
+                </span>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -180,8 +140,7 @@ export default function ProfileScreen() {
         <Button
           type="button"
           variant="ghost"
-          className="w-full text-terra-700 bg-transparent hover:underline font-semibold min-h-[44px] hover:bg-terra-600/10 mb-2"
-          style={{ fontFamily: "Inter" }}
+          className="w-full text-terra-700 bg-transparent hover:underline font-semibold min-h-[44px] hover:bg-terra-600/10 mb-2 font-inter"
           onClick={async () => {
             await signOut?.();
             navigate("/auth/access");
@@ -193,7 +152,3 @@ export default function ProfileScreen() {
     </div>
   );
 }
-
-// Outline icons (não removidas)
-function Moon(props: any) { return <svg {...props} viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 0 1 12.21 3a7 7 0 1 0 8.79 9.79Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>; }
-function Sun(props: any) { return <svg {...props} viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>; }
