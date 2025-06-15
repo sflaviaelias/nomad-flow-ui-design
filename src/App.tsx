@@ -22,6 +22,7 @@ import LoginScreen from "./features/auth/LoginScreen";
 import SignupScreen from "./features/auth/SignupScreen";
 import ProfileScreen from "./features/profile/ProfileScreen";
 import EditProfileScreen from "./features/profile/EditProfileScreen";
+import TripSummaryPage from "./pages/TripSummaryPage";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const App = () => (
           <Route path="/profile/edit" element={<EditProfileScreen />} />
           {/* Rotas customizadas acima */}
           <Route path="*" element={<NotFound />} />
+          <Route path="/trip/summary" element={<TripSummaryPage />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
