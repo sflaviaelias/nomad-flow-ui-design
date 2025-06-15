@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,11 +9,30 @@ import { useCurrencyConversion } from "@/hooks/useCurrencyConversion";
 import { useVisaRequirement } from "@/hooks/useVisaRequirement";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import destinationsList from "@/components/destinationsList"; // Para autocomplete
+import countriesList from "@/components/countriesList";
 import { format, parseISO, isAfter } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import "tailwindcss/tailwind.css";
 
 const currencyMap = { BR: "BRL", US: "USD", PT: "EUR", FR: "EUR", ES: "EUR" }; // simplificado
+
+// Util to get country name from destination label (e.g., "Lisboa, Portugal" → "Portugal")
+function extractCountryFromLabel(label: string) {
+  const parts = label.split(",");
+  if (parts.length === 2) {
+    return parts[1].trim();
+  }
+  // If it's a country like "Portugal"
+  return label.trim();
+}
+
+// Util to get country code from country name (e.g., "Portugal" → "PT")
+function getCountryCodeByName(countryName: string) {
+  const country = countriesList.find(
+    (c) => c.name.toLowerCase() === countryName.toLowerCase()
+  );
+  return country ? country.code : undefined;
+}
 
 export default function NewTripMobileScreen() {
   // User context
@@ -44,8 +62,13 @@ export default function NewTripMobileScreen() {
     const found = destinationsList.find(d =>
       d.label.toLowerCase().includes(destination.toLowerCase())
     );
-    setDestinationCountry(found?.country || "");
-    setDestCurrency(currencyMap[found?.countryCode as string] || "USD");
+    // Instead of found?.country, let's extract
+    const countryName = found ? extractCountryFromLabel(found.label) : "";
+    setDestinationCountry(countryName);
+
+    // Instead of found?.countryCode, get code by name
+    const code = countryName ? getCountryCodeByName(countryName) : undefined;
+    setDestCurrency(code ? (currencyMap[code] || "USD") : "USD");
   }, [destination]);
 
   // Validação de datas
