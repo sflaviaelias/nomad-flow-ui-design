@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Globe } from "lucide-react";
@@ -17,6 +16,14 @@ export default function AuthAccessScreen() {
     } catch (e) {
       // erro tratado pelo provider
     }
+  };
+
+  // Nova função: garantir navegação limpa como convidado
+  const handleExploreAsGuest = async () => {
+    // Faz signOut apenas se houver sessão ativa (para garantir estado de guest)
+    await supabase.auth.signOut();
+    // Navega para a Home
+    navigate("/", { replace: true });
   };
 
   return (
@@ -52,7 +59,7 @@ export default function AuthAccessScreen() {
         <Button
           variant="link"
           className="w-full py-2 text-xs text-neutral-400"
-          onClick={() => navigate("/")}
+          onClick={handleExploreAsGuest}
         >
           Explorar como Convidado
         </Button>
