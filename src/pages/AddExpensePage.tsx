@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from "react";
 import PageHeader from "@/components/PageHeader";
 import ExpenseForm from "@/components/ExpenseForm";
@@ -17,9 +16,31 @@ type ExpenseFormData = {
   receipt_url?: string;
 };
 
+type SummaryData = {
+  budget: number;
+  totalSpent: number;
+  remaining: number;
+  percent: number;
+  currency: string;
+  onEditBudget?: (v: number) => void;
+  // keep originals for ExpenseForm
+  title?: string;
+  amount?: number;
+  category?: string;
+  payment_method?: string;
+  date?: Date;
+  receipt_url?: string;
+};
+
 export default function AddExpensePage() {
+  // For demo, set a default total budget
+  const DEFAULT_BUDGET = 1000;
+  const DEFAULT_CURRENCY = "BRL";
+
+  const [userBudget, setUserBudget] = useState<number>(DEFAULT_BUDGET);
+  const [currency, setCurrency] = useState<string>(DEFAULT_CURRENCY);
+
   const [showSummary, setShowSummary] = useState(false);
-  const [summaryData, setSummaryData] = useState<any>(null);
   const [allExpenses, setAllExpenses] = useState<any[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -27,9 +48,23 @@ export default function AddExpensePage() {
   // Para scroll suavemente no orçamento após salvar
   const summaryRef = useRef<HTMLDivElement | null>(null);
 
+  function computeSummaryData() {
+    const totalSpent = allExpenses.reduce((sum, x) => sum + (x.amount || 0), 0);
+    const remaining = Math.max(0, userBudget - totalSpent);
+    const percent = userBudget > 0 ? Math.round((totalSpent / userBudget) * 100) : 0;
+    return {
+      budget: userBudget,
+      totalSpent,
+      remaining,
+      percent,
+      currency,
+      onEditBudget: (v: number) => {
+        setUserBudget(v);
+      }
+    };
+  }
+
   function handleExpenseSubmit(data: ExpenseFormData) {
-    setSummaryData(data);
-    setShowSummary(true);
     setAllExpenses(expenses => [
       ...expenses,
       {
@@ -39,11 +74,11 @@ export default function AddExpensePage() {
     ]);
     setIsFormOpen(false);
     setShowSuccess(true);
+    setShowSummary(true);
 
-    // Após 2 segundos, oculta a mensagem de sucesso
     setTimeout(() => {
       setShowSuccess(false);
-      // Scroll suave para o resumo
+      // Scroll para o resumo suavemente
       if (summaryRef.current) {
         summaryRef.current.scrollIntoView({ behavior: "smooth" });
       }
@@ -60,6 +95,8 @@ export default function AddExpensePage() {
       }
     }, 350);
   }
+
+  const summaryData: SummaryData = computeSummaryData();
 
   return (
     <div className="min-h-screen bg-[#FAF3EC] flex flex-col">
@@ -110,7 +147,7 @@ export default function AddExpensePage() {
         </div>
 
         {/* Orçamento e insights, com referência para rolar suavemente */}
-        {showSummary && summaryData && (
+        {showSummary && (
           <div ref={summaryRef} className="transition-all animate-fade-in">
             <BudgetSummary data={summaryData} onEditBudget={summaryData.onEditBudget} />
             <ExpenseInsightsAI
