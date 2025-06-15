@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,6 +24,7 @@ import ProfileScreen from "./features/profile/ProfileScreen";
 import EditProfileScreen from "./features/profile/EditProfileScreen";
 import TripSummaryPage from "./pages/TripSummaryPage";
 import { NavigationHistoryProvider } from "@/contexts/NavigationHistoryContext";
+import PlaceDetailsPage from "./pages/PlaceDetailsPage";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +55,7 @@ const App = () => (
             <Route path="/profile" element={<ProfileScreen />} />
             <Route path="/profile/edit" element={<EditProfileScreen />} />
             {/* Rotas customizadas acima */}
+            <Route path="/place/:placeId" element={<PlaceDetailsPage />} />
             <Route path="*" element={<NotFound />} />
             <Route path="/trip/summary" element={<TripSummaryPage />} />
           </Routes>
@@ -65,4 +66,3 @@ const App = () => (
 );
 
 export default App;
-
