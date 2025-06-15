@@ -93,7 +93,16 @@ export default function EditProfileScreen() {
     if (!user?.id) return;
     const url = await upload(file, user.id);
     if (url) {
-      setAvatarUrl(url);
+      // Atualiza no banco (profiles.avatar_url)
+      const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_url: url })
+        .eq("id", user.id);
+      if (error) {
+        toast({ title: "Erro ao salvar avatar", description: error.message, variant: "destructive" });
+        return;
+      }
+      setAvatarUrl(url); // força re-render local
       toast({ title: "Foto atualizada!" });
     } else if (avatarError) {
       toast({ title: "Erro no avatar", description: avatarError, variant: "destructive" });
