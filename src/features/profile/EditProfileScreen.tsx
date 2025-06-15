@@ -30,7 +30,6 @@ export default function EditProfileScreen() {
 
   // Buscar dados completos do perfil ao montar
   useEffect(() => {
-    // Só busca se tiver user.id
     if (!user?.id) return;
     setLoading(true);
 
@@ -51,10 +50,24 @@ export default function EditProfileScreen() {
           setCountryResidence(data.country || "Brasil");
           setBirthDate(data.birth_date ? new Date(data.birth_date) : null);
 
-          // preferences é um JSON com nationality, currency, languages, travel_profiles, ai_assistant
-          const prefs = data.preferences || {};
-          setNationality(prefs.nationality || "Brasil");
-          setCurrency(prefs.currency || "BRL");
+          // --- CORREÇÃO DE PARSING AQUI ---
+          let prefs: any = {};
+          if (data.preferences && typeof data.preferences === "object") {
+            prefs = data.preferences as { [k: string]: any };
+          } else if (data.preferences && typeof data.preferences === "string") {
+            try {
+              prefs = JSON.parse(data.preferences);
+            } catch (e) {
+              prefs = {};
+            }
+          }
+
+          setNationality(
+            typeof prefs.nationality === "string" ? prefs.nationality : "Brasil"
+          );
+          setCurrency(
+            typeof prefs.currency === "string" ? prefs.currency : "BRL"
+          );
           setLanguages(
             Array.isArray(prefs.languages) && prefs.languages.length > 0
               ? prefs.languages
