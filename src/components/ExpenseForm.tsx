@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -56,19 +55,27 @@ export default function ExpenseForm({ onCreated }: { onCreated: (summary: any) =
     async function fetchTrip() {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
+      console.log('[ExpenseForm] user:', user); // DEBUG LOG
       if (!user) {
         toast({ title: "É necessário estar logada(o)." });
         setLoading(false);
         return;
       }
-      // Pega viagem ativa (simplificando: mais recente)
+      // Busca viagem ativa (mais recente)
       const { data: trips, error } = await supabase
         .from("trips")
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
-      if (error || !trips?.length) {
-        toast({ title: "Nenhuma viagem ativa encontrada." });
+      console.log('[ExpenseForm] trips:', trips, 'error:', error, 'user_id:', user.id); // DEBUG LOG
+
+      if (error) {
+        toast({ title: "Erro ao buscar viagens:", description: error.message });
+        setLoading(false);
+        return;
+      }
+      if (!trips?.length) {
+        toast({ title: "Nenhuma viagem ativa encontrada para seu usuário." });
         setLoading(false);
         return;
       }
