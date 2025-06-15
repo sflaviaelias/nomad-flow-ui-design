@@ -1,9 +1,10 @@
-
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Edit } from "lucide-react";
 
 // Utilitários simulados
 const getCityImage = async (city: string): Promise<string> => {
@@ -76,7 +77,7 @@ export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
 
   // Classes e estilos centralizados
   const cardClass =
-    "rounded-2xl bg-white shadow-card border border-[#E76F51]/10 overflow-hidden font-inter";
+    "relative rounded-2xl bg-white shadow-card border border-[#E76F51]/10 overflow-hidden font-inter";
   const badgeClass =
     "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-[#FAF3EC] border border-[#DADADA] text-[#E76F51] gap-1 min-w-[44px] min-h-[32px]";
   const badgeUtcClass =
@@ -98,6 +99,29 @@ export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
       <div className="px-4">
         {hasActiveTrip ? (
           <div className={cardClass + " mb-6 w-full"}>
+            {/* Edit Trip icon button (top-right) */}
+            <div className="absolute top-3 right-3 z-10">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    className="rounded-full bg-white/70 border border-[#E76F51]/20 p-2 hover:bg-[#E76F51]/10 active:bg-[#E76F51]/15 transition text-[#C9583C] shadow-none focus:outline-none focus:ring-2 focus:ring-[#E76F51] focus:ring-offset-2"
+                    style={{
+                      minWidth: 36,
+                      minHeight: 36,
+                      boxShadow: "0 1px 6px #E76F5112"
+                    }}
+                    aria-label="Editar viagem"
+                    onClick={() => navigate("/trip/new?edit=1")}
+                  >
+                    <Edit size={18} strokeWidth={2} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="left" sideOffset={10}>
+                  Editar viagem
+                </TooltipContent>
+              </Tooltip>
+            </div>
             {/* Imagem destino */}
             <div className="relative w-full h-44 md:h-56">
               <img
