@@ -21,6 +21,9 @@ const userFallback = {
     "https://ui-avatars.com/api/?background=E76F51&color=fff&size=128&name=Viajante"
 };
 
+const fallbackImage =
+  "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=900&q=80";
+
 const Index = () => {
   const navigate = useNavigate();
 
@@ -28,8 +31,8 @@ const Index = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   // Hook: fetch dynamic active trip
-  const { data: activeTrip, isLoading: tripLoading } = useActiveTrip();
-  const hasActiveTrip = !!activeTrip;
+  const { data: activeTripRaw, isLoading: tripLoading } = useActiveTrip();
+  const hasActiveTrip = !!activeTripRaw;
 
   useEffect(() => {
     async function fetchProfile() {
@@ -63,7 +66,29 @@ const Index = () => {
       ? profile.avatar_url
       : userFallback.avatarUrl;
 
-  // Infos de orçamento/currency mock removidos (tudo dinâmico agora!)
+  // Adapt activeTripRaw to TripData type for ActiveTripSection and HomeTripSummaryCard
+  let activeTrip = null;
+  if (activeTripRaw) {
+    activeTrip = {
+      destination: activeTripRaw.destination,
+      imageUrl: fallbackImage, // TODO: replace with real from backend/AI hook if exists
+      startDate: activeTripRaw.start_date || "",
+      endDate: activeTripRaw.end_date || "",
+      budget:
+        activeTripRaw.budget != null
+          ? `€${Number(activeTripRaw.budget).toLocaleString("pt-BR", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}`
+          : "—",
+      localBudget: activeTripRaw.budget != null
+        ? (Number(activeTripRaw.budget) * 5.4).toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          })
+        : "-",
+    };
+  }
 
   return (
     <div className="min-h-screen bg-[#FAF3EC]">
@@ -84,7 +109,6 @@ const Index = () => {
             <div className="h-4" />
 
             <div className="px-4">
-              {/* Pass activeTrip here if the summary needs it, or fetch inside HomeTripSummaryCard */}
               <HomeTripSummaryCard activeTrip={activeTrip} />
             </div>
             <UpcomingTripsSlider />
