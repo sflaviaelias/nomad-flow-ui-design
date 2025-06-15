@@ -29,11 +29,18 @@ export default function LoginScreen() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      setError("Credenciais inválidas. Tente novamente.");
+      // Não exibir mensagem do erro de backend em produção
+      if (
+        error.message?.toLowerCase().includes("invalid login credentials") ||
+        error.message?.toLowerCase().includes("invalid credentials")
+      ) {
+        setError("Credenciais inválidas. Tente novamente.");
+      } else {
+        setError("Falha ao entrar. Tente novamente.");
+      }
       setLoading(false);
       return;
     }
-    // Success: session will be set and hook will update everything
     setLoading(false);
     navigate("/", { replace: true });
   };

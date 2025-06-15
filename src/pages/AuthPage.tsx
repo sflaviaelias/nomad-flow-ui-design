@@ -97,6 +97,7 @@ export default function AuthPage() {
     // Detecta se já está logado (ex: após social login)
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) {
+        // Log não exibe tokens ou dados sensíveis
         console.log("[AuthPage] session encontrada, redirecionando para Home");
         navigate("/", { replace: true });
       }

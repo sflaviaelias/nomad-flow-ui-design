@@ -41,6 +41,19 @@ export default function SignupScreen() {
     });
   }, [navigate]);
 
+  function mostrarErroSeguro(error: any) {
+    // Não revelar mensagens técnicas para o usuário final
+    if (
+      error?.message?.toLowerCase().includes("duplic") ||
+      error?.message?.toLowerCase().includes("já existe um perfil cadastrado com este e-mail")
+    ) {
+      return "Já existe uma conta cadastrada com este e-mail.";
+    } else if (error?.message?.toLowerCase().includes("password")) {
+      return "Erro ao cadastrar: senha não atende aos critérios.";
+    }
+    return "Erro ao cadastrar. Tente novamente mais tarde.";
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErro(null);
@@ -72,14 +85,7 @@ export default function SignupScreen() {
     });
 
     if (error) {
-      if (
-        error.message?.toLowerCase().includes("duplic") ||
-        error.message?.toLowerCase().includes("já existe um perfil cadastrado com este e-mail")
-      ) {
-        setErro("Já existe uma conta cadastrada com este e-mail.");
-      } else {
-        setErro("Erro ao cadastrar: " + error.message);
-      }
+      setErro(mostrarErroSeguro(error));
       setLoading(false);
       return;
     }
