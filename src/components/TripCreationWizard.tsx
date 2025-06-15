@@ -8,6 +8,8 @@ import TripSummaryStep from "./TripSummaryStep";
 import SmartTripToggle from "./SmartTripToggle";
 import { useDestinationImageUnsplash } from "@/hooks/useDestinationImageUnsplash";
 import { supabase } from "@/integrations/supabase/client";
+import TripCreationHeader from "./TripCreationHeader";
+import TripIntelligentStep from "./TripIntelligentStep";
 
 type Phase = 0 | 1 | 2 | 3;
 
@@ -131,16 +133,11 @@ const TripCreationWizard: React.FC = () => {
     <Card className="mt-6">
       <CardContent>
         <div className="py-4 px-1 flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
-            <span className="font-bold text-xl text-terracotta">Nova Viagem</span>
-            <span className="text-neutral-700 text-sm">Preencha as etapas para planejar sua próxima jornada.</span>
-          </div>
+          <TripCreationHeader />
 
-          {/* Toggle Viagem Inteligente aparece em FASE 0, antes de avançar */}
+          {/* Toggle Viagem Inteligente separado em seu próprio step */}
           {phase === 0 && (
-            <div>
-              <SmartTripToggle value={isSmartTrip} onChange={setIsSmartTrip} />
-            </div>
+            <TripIntelligentStep value={isSmartTrip} onChange={setIsSmartTrip} />
           )}
 
           {phase === 0 && (
