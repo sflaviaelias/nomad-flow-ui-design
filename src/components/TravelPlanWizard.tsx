@@ -9,6 +9,8 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useGuestMode } from "@/hooks/useGuestMode";
 import { showGuestBlockedToast } from "./GuestLoginToast";
+import IATipCard from "./IATipCard";
+import SuggestionCard from "./SuggestionCard";
 
 const steps = [
   "Destino",
@@ -18,86 +20,91 @@ const steps = [
   "Confirmação"
 ];
 
-type Suggestion = { id: number, text: string };
+type Suggestion =
+  | { tipo: "coworking"; nome: string; descricao: string; adicionado: boolean }
+  | { tipo: "alerta"; mensagem: string; adicionado?: boolean }
+  | { [key: string]: any };
 
 export default function TravelPlanWizard() {
   const [step, setStep] = useState(0);
   const [destination, setDestination] = useState("");
   const [dates, setDates] = useState({ start: "", end: "" });
   const [budget, setBudget] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
+  // IA tips for each step
+  const [iaTip, setIATip] = useState<string | null>(null);
+  const [iaSuggestions, setIASuggestions] = useState<Suggestion[]>([]);
+  const [selectedSuggestions, setSelectedSuggestions] = useState<Suggestion[]>([]);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const {
-    iaText,
-    iaLoading,
-    fetchIATip,
-    fetchIASuggestions,
-  } = useTravelIAWizard();
-
-  // Debounce helpers para evitar chamadas excessivas
-  const debounceTimeout = useRef<NodeJS.Timeout|null>(null);
-
-  // Busca IA automaticamente para cada etapa relevante (Destino/Datas/Orçamento)
-  useEffect(() => {
-    if (step !== 0) return;
-    if (!destination) return;
-    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-    debounceTimeout.current = setTimeout(() => {
-      fetchIATip({ type: "destination", value: destination, context: {} });
-    }, 400);
-    // eslint-disable-next-line
-  }, [destination, step]);
-
-  useEffect(() => {
-    if (step !== 1) return;
-    if (!dates.start || !dates.end || !destination) return;
-    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-    debounceTimeout.current = setTimeout(() => {
-      fetchIATip({ type: "dates", value: dates, context: { destination } });
-    }, 400);
-    // eslint-disable-next-line
-  }, [dates.start, dates.end, destination, step]);
-
-  useEffect(() => {
-    if (step !== 2) return;
-    if (!budget || !destination || !dates.start || !dates.end) return;
-    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-    debounceTimeout.current = setTimeout(() => {
-      fetchIATip({ type: "budget", value: budget, context: { destination, dates } });
-    }, 400);
-    // eslint-disable-next-line
-  }, [budget, destination, dates.start, dates.end, step]);
-
-  // Lida com submissão de etapa/dados
-  const nextStep = async () => {
-    if (step === 3) {
-      // Sugestões reais da IA
-      const iaList = await fetchIASuggestions({ destination, dates, budget });
-      setSuggestions(iaList.map((t, idx) => ({ id: idx, text: t })));
-    }
-    setStep((s) => Math.min(s + 1, steps.length - 1));
-  };
-  const prevStep = () => setStep((s) => Math.max(s - 1, 0));
-
-  // Remover/editar sugestão IA
-  const removeSuggestion = (id: number) => {
-    setSuggestions(suggestions.filter(s => s.id !== id));
-  };
-  const editSuggestion = (id: number, text: string) => {
-    setSuggestions(suggestions.map(s => s.id === id ? { ...s, text } : s));
-  };
-
+  const { iaLoading, fetchIATip, fetchIASuggestions } = useTravelIAWizard();
   const { isGuest } = useGuestMode();
 
+  // Handler: show only relevant tip for the current step
+  useEffect(() => {
+    setIATip(null);
+    if (step === 0 && destination) {
+      fetchIATip({ type: "destination", value: destination, context: {} }).then(() => {
+        setIATip(iaTip); // Tip will be updated by the hook if used properly; adapt if async
+      });
+    } else if (step === 1 && destination && dates.start && dates.end) {
+      fetchIATip({ type: "dates", value: dates, context: { destination } }).then(() => {
+        setIATip(iaTip);
+      });
+    } else if (step === 2 && destination && dates.start && dates.end && budget) {
+      fetchIATip({ type: "budget", value: budget, context: { destination, dates } }).then(() => {
+        setIATip(iaTip);
+      });
+    }
+    // Clear IA tip on other steps
+    else {
+      setIATip(null);
+    }
+    // eslint-disable-next-line
+  }, [step, destination, dates.start, dates.end, budget]);
+
+  // Handler: fetch and display suggestions in Step 3
+  useEffect(() => {
+    if (step === 3 && destination && dates.start && dates.end && budget) {
+      setSuggestionsLoading(true);
+      fetchIASuggestions({ destination, dates, budget }).then(list => {
+        // Normalize suggestions to add "adicionado" flag for selection
+        setIASuggestions(
+          (list ?? []).map((s: any) => ({
+            ...s,
+            adicionado: false,
+          }))
+        );
+        setSuggestionsLoading(false);
+      });
+    } else if (step !== 3) {
+      setIASuggestions([]);
+    }
+  }, [step, destination, dates.start, dates.end, budget, fetchIASuggestions]);
+
+  // Select/unselect suggestion
+  const handleToggleSuggestion = (idx: number) => {
+    setIASuggestions(prev =>
+      prev.map((s, i) =>
+        i === idx ? { ...s, adicionado: !s.adicionado } : s
+      )
+    );
+  };
+
+  // On next from suggestions, collect only those with adicionado=true
+  const handleNextFromSuggestions = () => {
+    setSelectedSuggestions(iaSuggestions.filter(s => s.adicionado));
+    setStep(step + 1);
+  };
+
+  // Save trip including selected suggestions as checklist
   const handleSaveTrip = async () => {
     if (isGuest) {
       showGuestBlockedToast();
       return;
     }
     setSaving(true);
-
-    // Busca usuário logado
+    // Fetch user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
       toast({ title: "Erro: não foi possível identificar o usuário.", variant: "destructive" });
@@ -105,30 +112,35 @@ export default function TravelPlanWizard() {
       return;
     }
 
-    // Garante os tipos corretos
     const parsedBudget = budget ? parseFloat(budget) : null;
-
-    // Insere viagem na tabela trips
-    const { error } = await supabase.from("trips").insert({
+    // Create trip in DB - checklist as text array or suggestion JSON
+    const tripPayload: any = {
       destination,
       start_date: dates.start,
       end_date: dates.end,
       budget: parsedBudget,
       user_id: user.id,
-      checklist: suggestions.length ? suggestions.map(s => s.text) : null,
-      is_smart_trip: true, // sempre smart trip pelo wizard IA
-    });
+      is_smart_trip: true,
+      checklist: selectedSuggestions.length
+        ? selectedSuggestions.map(s => {
+            if ("mensagem" in s) return s.mensagem;
+            if ("nome" in s) return `${s.nome} (${s.tipo || ""}): ${s.descricao || ""}`;
+            return JSON.stringify(s);
+        })
+        : null,
+    };
 
+    const { error } = await supabase.from("trips").insert(tripPayload);
     if (error) {
       toast({ title: "Erro ao criar viagem", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "Viagem criada com sucesso!" });
-      setStep(steps.length - 1); // vai para confirmação
+      setStep(steps.length - 1);
     }
     setSaving(false);
   };
 
-  // Progresso ex: "Etapa 2 de 5"
+  // Visual progress
   const progress = `Etapa ${step + 1} de ${steps.length}`;
 
   return (
@@ -142,42 +154,48 @@ export default function TravelPlanWizard() {
         </div>
       </div>
       {step === 0 && (
-        <WizardStepDestination
-          value={destination}
-          onChange={setDestination}
-          onNext={nextStep}
-          disabled={!destination}
-          iaTip={step === 0 && iaText}
-          iaLoading={iaLoading}
-        />
+        <>
+          <WizardStepDestination
+            value={destination}
+            onChange={setDestination}
+            onNext={() => setStep(step + 1)}
+            disabled={!destination}
+            iaTip={iaTip ? <IATipCard text={iaTip} loading={iaLoading} /> : null}
+            iaLoading={iaLoading}
+          />
+        </>
       )}
       {step === 1 && (
-        <WizardStepDates
-          dates={dates}
-          onChange={setDates}
-          onNext={nextStep}
-          onPrev={prevStep}
-          iaTip={step === 1 && iaText}
-          iaLoading={iaLoading}
-        />
+        <>
+          <WizardStepDates
+            dates={dates}
+            onChange={setDates}
+            onNext={() => setStep(step + 1)}
+            onPrev={() => setStep(step - 1)}
+            iaTip={iaTip ? <IATipCard text={iaTip} loading={iaLoading} /> : null}
+            iaLoading={iaLoading}
+          />
+        </>
       )}
       {step === 2 && (
-        <WizardStepBudget
-          value={budget}
-          onChange={setBudget}
-          onNext={nextStep}
-          onPrev={prevStep}
-          iaTip={step === 2 && iaText}
-          iaLoading={iaLoading}
-        />
+        <>
+          <WizardStepBudget
+            value={budget}
+            onChange={setBudget}
+            onNext={() => setStep(step + 1)}
+            onPrev={() => setStep(step - 1)}
+            iaTip={iaTip ? <IATipCard text={iaTip} loading={iaLoading} /> : null}
+            iaLoading={iaLoading}
+          />
+        </>
       )}
       {step === 3 && (
         <WizardStepIASuggestions
-          suggestions={suggestions}
-          onEdit={editSuggestion}
-          onRemove={removeSuggestion}
-          onNext={nextStep}
-          onPrev={prevStep}
+          suggestions={iaSuggestions}
+          loading={suggestionsLoading}
+          onToggle={handleToggleSuggestion}
+          onNext={handleNextFromSuggestions}
+          onPrev={() => setStep(step - 1)}
         />
       )}
       {step === 4 && (
@@ -185,8 +203,10 @@ export default function TravelPlanWizard() {
           destination={destination}
           dates={dates}
           budget={budget}
-          suggestions={suggestions}
-          onBack={prevStep}
+          suggestions={selectedSuggestions.map((s, idx) =>
+            ({ id: idx, text: "mensagem" in s ? s.mensagem : ("nome" in s ? s.nome : JSON.stringify(s)) }))
+          }
+          onBack={() => setStep(step - 1)}
           onSave={handleSaveTrip}
           saving={saving}
         />
