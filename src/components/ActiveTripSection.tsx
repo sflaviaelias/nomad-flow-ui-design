@@ -1,29 +1,21 @@
+
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
-// Utilitário para buscar foto da cidade no Unsplash API (simulado para Barcelona)
+// Utilitários simulados
 const getCityImage = async (city: string): Promise<string> => {
-  // Normalmente, usaria fetch na API do Unsplash. Aqui retornamos uma URL representativa para Barcelona.
   return "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=900&q=80";
 };
-
-// Utilitário para buscar a temperatura atual (°C) da cidade (usando Open-Meteo API)
 const getCityWeather = async (city: string): Promise<{ temp: string }> => {
-  // Para demo, retorna "23°C" fixo para Barcelona.
   return { temp: "23°C" };
 };
-
-// Utilitário para pegar o fuso horário IANA e offset UTC de uma cidade (para Barcelona)
 const getCityTimezone = async (city: string): Promise<{ timezone: string; offset: string }> => {
-  // Para demo, retorna dados reais de Barcelona: "Europe/Madrid", UTC+2
   return { timezone: "Europe/Madrid", offset: "+2" };
 };
-
-// Utilitário “mock” para conversão de moeda (EUR->BRL)
 const convertCurrency = (amountEUR: number, nationality: string) => {
-  // Mock simples: 1 EUR = 5.4 BRL
   const rate = 5.4;
   if (nationality === "Brasil" || nationality === "BR") {
     return amountEUR * rate;
@@ -42,7 +34,7 @@ interface TripData {
 interface ActiveTripSectionProps {
   hasActiveTrip: boolean;
   activeTrip: TripData;
-  onShowDetails?: () => void; // Nova prop opcional para mostrar modal de detalhes
+  onShowDetails?: () => void;
 }
 
 export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
@@ -51,7 +43,6 @@ export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  // Estados adicionais para informações dinâmicas
   const [cityPhoto, setCityPhoto] = useState<string>(activeTrip.imageUrl);
   const [weather, setWeather] = useState<string>("");
   const [timezone, setTimezone] = useState<string>("");
@@ -59,7 +50,6 @@ export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
   const [brlBudget, setBrlBudget] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Obtém nacionalidade do usuário do localStorage ou default BR
   const nationality = localStorage.getItem("profile-country") || "BR";
 
   useEffect(() => {
@@ -75,9 +65,7 @@ export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
       setTimezone(tz.timezone);
       setUtcOffset(tz.offset);
 
-      // Calcula orçamento BRL
-      // Pega valor em EUR do orçamento (ex: €1200) remove símbolos e converte
-      const eur = Number(activeTrip.budget.replace(/[^\d.,]/g, "").replace(",","."));
+      const eur = Number(activeTrip.budget.replace(/[^\d.,]/g, "").replace(",", "."));
       const brl = convertCurrency(eur, nationality);
       setBrlBudget(brl.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }));
       setLoading(false);
@@ -86,7 +74,7 @@ export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
     // eslint-disable-next-line
   }, [activeTrip.destination, hasActiveTrip]);
 
-  // Cores, tipografia e classes Untitled UI/paleta Nomad
+  // Classes e estilos centralizados
   const cardClass =
     "rounded-2xl bg-white shadow-card border border-[#E76F51]/10 overflow-hidden font-inter";
   const badgeClass =
@@ -104,21 +92,20 @@ export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
 
   return (
     <section>
-      <h2 className={sectionTitle} style={{letterSpacing: 0}}>
+      <h2 className={sectionTitle} style={{ letterSpacing: 0 }}>
         Viagem ativa
       </h2>
       <div className="px-4">
         {hasActiveTrip ? (
           <div className={cardClass + " mb-6 w-full"}>
+            {/* Imagem destino */}
             <div className="relative w-full h-44 md:h-56">
-              {/* Imagem dinâmica, borda arredondada Untitled UI */}
               <img
                 src={cityPhoto}
                 alt={activeTrip.destination}
                 className="object-cover w-full h-full"
                 style={{ borderTopLeftRadius: 16, borderTopRightRadius: 16 }}
               />
-              {/* Badges: temperatura e UTC, como badges do DS acima da imagem */}
               <div className="absolute top-3 left-3 flex gap-2">
                 <span className={badgeClass}>
                   <svg width="20" height="20" fill="none" viewBox="0 0 24 24" className="inline">
@@ -133,9 +120,7 @@ export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
             </div>
             <div className="p-5 flex flex-col gap-2">
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-[#E76F51] font-bold text-lg md:text-xl font-inter">
-                  {activeTrip.destination}
-                </span>
+                <span className="text-[#E76F51] font-bold text-lg md:text-xl font-inter">{activeTrip.destination}</span>
               </div>
               <div className="text-xs text-[#AD4F36] font-medium mb-2">
                 {activeTrip.startDate} &mdash; {activeTrip.endDate}
@@ -150,6 +135,7 @@ export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
                   <div className={currencyEquivClass}>{brlBudget}</div>
                 </div>
               </div>
+              {/* Botões principais */}
               <div className="flex flex-col md:flex-row gap-3 mt-3">
                 <Button
                   className="bg-[#E76F51] hover:bg-[#C9583C] text-white font-bold rounded-md px-4 py-3 w-full md:w-auto"
@@ -170,9 +156,27 @@ export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
                   Acessar detalhes da viagem
                 </Button>
               </div>
+              {/* Botão adicionar nova viagem: discreto, dentro do card, só aparece com active trip */}
+              <div className="flex justify-center mt-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-[#E76F51] hover:bg-[#E76F5108] font-semibold rounded-md px-2 py-1 gap-1 shadow-none text-[15px]"
+                  style={{
+                    minWidth: 0,
+                    minHeight: 32,
+                  }}
+                  onClick={() => navigate("/trip/new")}
+                  aria-label="Adicionar nova viagem"
+                >
+                  <Plus size={16} strokeWidth={2.2} className="mr-1" />
+                  Adicionar nova viagem
+                </Button>
+              </div>
             </div>
           </div>
         ) : (
+          // Empty state (continua o mesmo)
           <div className={cardClass + " p-8 text-center mb-6 flex flex-col items-center"}>
             <span className="text-lg font-semibold text-[#E76F51] mb-2 font-inter">
               Nenhuma viagem ativa encontrada.
@@ -187,7 +191,6 @@ export const ActiveTripSection: React.FC<ActiveTripSectionProps> = ({
               style={{ fontSize: 17, minWidth: 220, minHeight: 44 }}
               aria-label="Adicionar nova viagem"
             >
-              {/* Ícone Untitled UI */}
               <svg width="20" height="20" fill="none" viewBox="0 0 20 20" className="mr-1.5">
                 <rect x="9" y="4" width="2" height="12" rx="1" fill="white" />
                 <rect x="4" y="9" width="12" height="2" rx="1" fill="white" />

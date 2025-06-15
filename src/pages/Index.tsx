@@ -86,8 +86,7 @@ const Index = () => {
         ) : (
           <>
             <div className="h-8 md:h-12" />
-            {/* Button now ABOVE the travel card */}
-            <HomeAddTripButton />
+            {/* Removido HomeAddTripButton externo – agora aparece dentro do card */}
             <ActiveTripSection
               hasActiveTrip={hasActiveTrip}
               activeTrip={activeTrip}
