@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import PageHeader from "@/components/PageHeader";
 import CommunityNomadCard from "@/components/CommunityNomadCard";
 import CommunityGroupCard from "@/components/CommunityGroupCard";
+import CommunityNewsCard from "@/components/CommunityNewsCard";
 import { Plus } from "lucide-react";
 import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
 
@@ -36,6 +37,31 @@ const groups = [
   },
 ];
 
+// MOCK DE NOTÍCIAS para nômades
+const news = [
+  {
+    title: "Novo café nômade abre no centro de Lisboa",
+    summary: "Espaço com wifi rápido, café gourmet e desconto para membros Go Nomad.",
+    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=400&q=80",
+    date: "15/06/2025",
+    content: "O Nomads Coffee inaugurou no centro! Espaço para coworking, café especial e ambiente acolhedor para quem trabalha remoto. Mostre seu app Go Nomad e ganhe desconto de 10%.",
+  },
+  {
+    title: "Evento especial: Meet & Work no Miradouro",
+    summary: "Participe do encontro de nômades digitais com vista panorâmica da cidade.",
+    image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=400&q=80",
+    date: "13/06/2025",
+    content: "Venha trabalhar e conhecer outros nômades no Miradouro. Traga seu notebook, aproveite o cenário e networking!",
+  },
+  {
+    title: "Dica local: Melhor padaria para café da manhã produtivo",
+    summary: "Conheça a padaria favorita da comunidade para começar o dia com energia.",
+    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=400&q=80",
+    date: "10/06/2025",
+    content: "A Padaria Lisboa foi eleita pela comunidade como o melhor ponto para café da manhã e trabalho tranquilo. Recomendada por nômades!",
+  },
+];
+
 export default function CommunityPage() {
   const [showFab, setShowFab] = React.useState(true);
   const { push } = useNavigationHistory();
@@ -45,9 +71,10 @@ export default function CommunityPage() {
     // eslint-disable-next-line
   }, []);
 
-  // Estados vazios para testes:
-  // const nomads: any[] = [];
-  // const groups: any[] = [];
+  // Novo: handler simples de modal/alert news
+  const handleNewsClick = (item: typeof news[0]) => {
+    window.alert(`${item.title}\n\n${item.content}`);
+  };
 
   return (
     <div className="min-h-screen bg-[#FAF3EC] pb-20 relative">
@@ -80,6 +107,25 @@ export default function CommunityPage() {
               />
             ))
           ) : null}
+        </section>
+        
+        {/* NOVA seção de notícias */}
+        <section className="mt-8">
+          <h2 className="font-inter font-semibold text-base md:text-lg mb-2 text-[#AD4F36] px-1">Notícias para nômades</h2>
+          {news.length > 0 ? (
+            news.map((n, idx) => (
+              <CommunityNewsCard
+                key={idx}
+                title={n.title}
+                summary={n.summary}
+                image={n.image}
+                date={n.date}
+                onClick={() => handleNewsClick(n)}
+              />
+            ))
+          ) : (
+            <div className="text-sm text-neutral-500">Sem novidades para este destino no momento.</div>
+          )}
         </section>
 
         {/* Estado vazio */}
