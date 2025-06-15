@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, ArrowRight, ImageOff } from "lucide-react";
-import { useDestinationImageAI } from "./useDestinationImageAI";
+import { useDestinationImageUnsplash } from "@/hooks/useDestinationImageUnsplash";
 import DestinationCombobox from "./DestinationCombobox";
 
 interface TripDestinationStepProps {
@@ -20,7 +20,7 @@ const TripDestinationStep: React.FC<TripDestinationStepProps> = ({
   onNext,
   disabled,
 }) => {
-  const { imageUrl, imgLoading } = useDestinationImageAI(value);
+  const { imageUrl, loading } = useDestinationImageUnsplash(value);
 
   return (
     <div>
@@ -34,12 +34,12 @@ const TripDestinationStep: React.FC<TripDestinationStepProps> = ({
         autoFocus
       />
       <div className="mt-3">
-        {imgLoading && (
+        {loading && (
           <div className="text-xs text-neutral-500 flex items-center gap-2">
             <Loader2 className="animate-spin" size={16} /> Buscando imagem do destino...
           </div>
         )}
-        {!imgLoading && (
+        {!loading && (
           <>
             {imageUrl ? (
               <div className="rounded-md overflow-hidden mt-2 max-h-40 border border-[#DADADA]">

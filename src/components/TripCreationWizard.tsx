@@ -6,7 +6,7 @@ import TripDestinationStep from "./TripDestinationStep";
 import TripDatesStep from "./TripDatesStep";
 import TripCurrencyStep from "./TripCurrencyStep";
 import TripSummaryStep from "./TripSummaryStep";
-import { useDestinationImageAI } from "./useDestinationImageAI";
+import { useDestinationImageUnsplash } from "@/hooks/useDestinationImageUnsplash";
 import { supabase } from "@/integrations/supabase/client";
 
 type Phase = 0 | 1 | 2 | 3;
@@ -25,8 +25,8 @@ const TripCreationWizard: React.FC = () => {
   const [aiAdvice, setAiAdvice] = React.useState<{ dates?: string; budget?: string; forecast?: string } | null>(null);
   const [loadingAI, setLoadingAI] = React.useState(false);
 
-  // Usa hook para buscar imagem do destino via IA
-  const { imageUrl, imgLoading } = useDestinationImageAI(destination);
+  // Usa hook para buscar imagem do destino via Unsplash
+  const { imageUrl, loading: imgLoading } = useDestinationImageUnsplash(destination);
 
   // Loading e feedback
   const [saving, setSaving] = React.useState(false);
@@ -38,7 +38,7 @@ const TripCreationWizard: React.FC = () => {
     setPhase((p) => (p > 0 ? ((p - 1) as Phase) : p));
   }
 
-  // Busca sugestões IA para orçamento/datas/clima
+  // Busca sugestões IA para orçamento/datas/clima (mantém pois não envolve imagens)
   React.useEffect(() => {
     if (phase === 2 && destination) {
       setLoadingAI(true);
@@ -186,4 +186,3 @@ const TripCreationWizard: React.FC = () => {
 };
 
 export default TripCreationWizard;
-
