@@ -25,6 +25,7 @@ import TripSmartSummaryPage from "./pages/TripSmartSummaryPage";
 import { NavigationHistoryProvider } from "@/contexts/NavigationHistoryContext";
 import PlaceDetailsPage from "./pages/PlaceDetailsPage";
 import RequireAuth from "./features/auth/RequireAuth";
+import PoliciesPage from "./pages/PoliciesPage";
 
 const queryClient = new QueryClient();
 
@@ -156,6 +157,7 @@ const App = () => (
                 </RequireAuth>
               }
             />
+            <Route path="/policies" element={<PoliciesPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </NavigationHistoryProvider>
