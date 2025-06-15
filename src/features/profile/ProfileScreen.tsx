@@ -2,6 +2,7 @@
 import React from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { ProfileAvatar } from "./ProfileAvatar";
 import PageHeader from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,26 +12,56 @@ import { LogOut, Edit2, Lock, Mail, Globe, Calendar, User, CheckCircle, ArrowRig
 export default function ProfileScreen() {
   const { user, loading, signOut } = useSupabaseAuth();
   const navigate = useNavigate();
+  const [profile, setProfile] = React.useState<any>(null);
+  const [profileLoading, setProfileLoading] = React.useState(true);
 
-  // Profile real — só usa user do Supabase
-  const profile = React.useMemo(() => {
-    if (!user) return null;
-    const { user_metadata = {}, email, app_metadata = {} } = user;
-    return {
-      name: user_metadata?.name || email?.split("@")[0] || "",
-      email: email || "",
-      avatar_url: user_metadata?.avatar_url || user?.avatar_url || "", // Fallback para colunas atualizadas
-      country: user_metadata?.country || "Não informado",
-      currency: user_metadata?.currency || "BRL",
-      language: user_metadata?.language || "Português",
-      birthdate: user_metadata?.birthdate || "",
-      gender: user_metadata?.gender || "",
-      sso_google: app_metadata?.provider === "google",
-    };
+  // Busca o perfil do Supabase ao montar (garante nome atualizado)
+  React.useEffect(() => {
+    if (!user?.id) {
+      setProfile(null);
+      setProfileLoading(false);
+      return;
+    }
+    setProfileLoading(true);
+    supabase
+      .from("profiles")
+      .select("name, email, avatar_url, country, preferences, birth_date")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (data) {
+          // Desconstrói as preferências se existirem
+          let prefs: any = {};
+          if (typeof data.preferences === "object" && data.preferences !== null) {
+            prefs = data.preferences;
+          } else if (typeof data.preferences === "string") {
+            try { prefs = JSON.parse(data.preferences); } catch { prefs = {}; }
+          }
+          setProfile({
+            ...data,
+            currency: prefs.currency || "BRL",
+            language:
+              Array.isArray(prefs.languages) && prefs.languages.length > 0
+                ? prefs.languages.join(", ")
+                : "Português",
+            birthdate:
+              data.birth_date ||
+              (prefs.birthdate
+                ? prefs.birthdate
+                : ""),
+            gender: prefs.gender || "",
+            nationality: prefs.nationality || data.country || "-",
+            sso_google: user.app_metadata?.provider === "google",
+          });
+        } else {
+          setProfile(null);
+        }
+        setProfileLoading(false);
+      });
   }, [user]);
 
-  // Loading state melhorado
-  if (loading) {
+  // Exibe loading mais robusto
+  if (loading || profileLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#FAF3EC] text-terra-700">
         <span className="animate-pulse text-lg">Carregando...</span>
@@ -38,8 +69,8 @@ export default function ProfileScreen() {
     );
   }
 
-  // Guest view: pede login de verdade
-  if (!user) {
+  // Guest view
+  if (!user || !profile) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#FAF3EC] text-terra-700">
         <User size={48} className="mb-2" />
@@ -67,7 +98,7 @@ export default function ProfileScreen() {
             name={profile.name}
             onChange={() => {/* no-op for now */}}
           />
-          <h1 className="mt-3 font-bold text-[1.45rem] md:text-2xl text-terra-700 text-center font-inter">
+          <h1 className="mt-3 font-bold text-[1.45rem] md:text-2xl text-terra-700 text-center font-inter lowercase">
             {profile.name || "Nome"}
           </h1>
           <div className="text-base text-terra-600/70 mt-1 text-center font-inter">
@@ -87,7 +118,7 @@ export default function ProfileScreen() {
             <div className="flex items-center gap-3">
               <MapPin className="text-terra-600" size={19} />
               <span className="text-sm text-terra-900/80 font-medium">Nacionalidade:</span>
-              <span className="ml-auto text-sm">{profile.country || "-"}</span>
+              <span className="ml-auto text-sm">{profile.nationality || "-"}</span>
             </div>
             <div className="flex items-center gap-3">
               <DollarSign className="text-terra-600" size={18} />
