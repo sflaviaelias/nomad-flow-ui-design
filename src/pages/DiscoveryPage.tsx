@@ -8,13 +8,23 @@ import { MapPin } from "lucide-react";
 
 const getCategoryData = (category: string): { title: string, places: PlaceMock[] } => {
   if (category === "markets") {
-    // Filtra apenas mercados e padarias (category market)
     const places = PLACES_MOCK.filter(
       (p) => p.category === "market"
     );
     return { title: "Mercados e Padarias", places };
   }
-  // Em breve para outras categorias
+  if (category === "cafes") {
+    const places = PLACES_MOCK.filter(
+      (p) => p.category === "cafe"
+    );
+    return { title: "Cafés e Restaurantes", places };
+  }
+  if (category === "coworkings") {
+    const places = PLACES_MOCK.filter(
+      (p) => p.category === "coworking"
+    );
+    return { title: "Co-workings por perto", places };
+  }
   return { title: "Descoberta Local", places: [] };
 };
 
