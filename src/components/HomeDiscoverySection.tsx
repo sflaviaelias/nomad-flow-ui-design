@@ -1,10 +1,11 @@
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 type DiscoveryItem = {
   name: string;
   desc: string;
-  link: string;
+  link: string; // Pode ser usado como o id/slug do local
 };
 
 type Block = {
@@ -17,6 +18,8 @@ type Props = {
 };
 
 export default function HomeDiscoverySection({ discoveryData }: Props) {
+  const navigate = useNavigate();
+
   return (
     <section>
       {discoveryData.map(({ title, nearby }) => (
@@ -30,7 +33,14 @@ export default function HomeDiscoverySection({ discoveryData }: Props) {
               >
                 <div className="font-bold text-terracotta text-[15px]">{item.name}</div>
                 <div className="text-xs text-neutral-500 mb-3">{item.desc}</div>
-                <button className="w-fit font-semibold text-[#E76F51] hover:text-[#C9583C] text-sm px-0.5 py-1">
+                <button
+                  className="w-fit font-semibold text-[#E76F51] hover:text-[#C9583C] text-sm px-0.5 py-1"
+                  onClick={() => {
+                    // utilize o `link` como slug/id para navegar
+                    // caso não tenha, pode gerar slug a partir do nome (simples), mas aqui usamos link
+                    navigate(`/place/${encodeURIComponent(item.link || item.name)}`);
+                  }}
+                >
                   Ir para {item.name}
                 </button>
               </div>
