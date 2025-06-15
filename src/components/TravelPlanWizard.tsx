@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import WizardStepDestination from "./WizardStepDestination";
 import WizardStepDates from "./WizardStepDates";
@@ -37,16 +36,16 @@ export default function TravelPlanWizard() {
   // Lida com submissão de etapa/dados
   const nextStep = async () => {
     if (step === 0 && destination) {
-      await fetchIATip({ type: "destination", value: destination });
+      await fetchIATip({ type: "destination", value: destination, context: {} });
     }
     if (step === 1 && dates.start && dates.end) {
-      await fetchIATip({ type: "dates", value: dates });
+      await fetchIATip({ type: "dates", value: dates, context: { destination } });
     }
     if (step === 2 && budget) {
-      await fetchIATip({ type: "budget", value: budget });
+      await fetchIATip({ type: "budget", value: budget, context: { destination, dates } });
     }
     if (step === 3) {
-      // Fetch suggestions para última etapa
+      // Sugestões reais da IA
       const iaList = await fetchIASuggestions({ destination, dates, budget });
       setSuggestions(iaList.map((t: string, idx: number) => ({ id: idx, text: t })));
     }
