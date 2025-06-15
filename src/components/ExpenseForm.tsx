@@ -1,9 +1,9 @@
+
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "@/hooks/use-toast";
-import { Expense } from "@/types";
 import ExpenseCategorySelect from "./ExpenseCategorySelect";
 import ExpensePaymentMethodSelect from "./ExpensePaymentMethodSelect";
 import ExpenseReceiptUpload from "./ExpenseReceiptUpload";
@@ -19,12 +19,14 @@ const expenseSchema = z.object({
     message: "Categoria é obrigatória.",
   }),
   payment_method: z.string().optional(),
-  date: z.date().optional(),
+  date: z.coerce.date().optional(),
   receipt_url: z.string().optional(),
 });
 
+type ExpenseFormData = z.infer<typeof expenseSchema>;
+
 interface ExpenseFormProps {
-  onSubmit: (data: Expense) => void;
+  onSubmit: (data: ExpenseFormData) => void;
 }
 
 export default function ExpenseForm({ onSubmit }: ExpenseFormProps) {
@@ -34,7 +36,7 @@ export default function ExpenseForm({ onSubmit }: ExpenseFormProps) {
     watch,
     setValue,
     formState: { errors, isSubmitting },
-  } = useForm<Expense>({
+  } = useForm<ExpenseFormData>({
     resolver: zodResolver(expenseSchema),
     defaultValues: {
       date: new Date(),
@@ -55,6 +57,9 @@ export default function ExpenseForm({ onSubmit }: ExpenseFormProps) {
           className="input"
           placeholder="Ex: Café da manhã no Mercado Central"
         />
+        {errors.title && (
+          <span className="text-xs text-[#C9583C]">{errors.title.message}</span>
+        )}
       </div>
 
       {/* Campo: Categoria */}
@@ -85,6 +90,9 @@ export default function ExpenseForm({ onSubmit }: ExpenseFormProps) {
           className="input"
           placeholder="Ex: 12.50"
         />
+        {errors.amount && (
+          <span className="text-xs text-[#C9583C]">{errors.amount.message}</span>
+        )}
       </div>
 
       {/* Campo: Data */}
@@ -117,3 +125,4 @@ export default function ExpenseForm({ onSubmit }: ExpenseFormProps) {
     </form>
   );
 }
+

@@ -5,10 +5,32 @@ import ExpenseForm from "@/components/ExpenseForm";
 import BudgetSummary from "@/components/BudgetSummary";
 import ExpenseInsightsAI from "@/components/ExpenseInsightsAI";
 
+// Tipagem compatível com ExpenseForm
+type ExpenseFormData = {
+  title: string;
+  amount: number;
+  category: string;
+  payment_method?: string;
+  date?: Date;
+  receipt_url?: string;
+};
+
 export default function AddExpensePage() {
   const [showSummary, setShowSummary] = useState(false);
   const [summaryData, setSummaryData] = useState<any>(null);
   const [allExpenses, setAllExpenses] = useState<any[]>([]); // Histórico bruto
+
+  function handleExpenseSubmit(data: ExpenseFormData) {
+    setSummaryData(data);
+    setShowSummary(true);
+    setAllExpenses(expenses => [
+      ...expenses,
+      {
+        amount: data.amount,
+        category: data.category || "Outros",
+      }
+    ]);
+  }
 
   return (
     <div className="min-h-screen bg-[#FAF3EC] flex flex-col">
@@ -21,21 +43,7 @@ export default function AddExpensePage() {
           <p className="text-sm text-neutral-600 mb-6 text-left">
             Preencha os detalhes abaixo para adicionar uma despesa à sua viagem.
           </p>
-          <ExpenseForm
-            onCreated={(summary) => {
-              setSummaryData(summary);
-              setShowSummary(true);
-              // Busque novamente as despesas da viagem recém-adicionada
-              // OU incremente ao array das atuais (mock simples)
-              setAllExpenses(expenses => [
-                ...expenses,
-                {
-                  amount: summary.amount,
-                  category: summary.category || "Outros",
-                }
-              ]);
-            }}
-          />
+          <ExpenseForm onSubmit={handleExpenseSubmit} />
         </div>
         {showSummary && summaryData && (
           <>
