@@ -7,6 +7,7 @@ import { EditProfileHeader } from "./EditProfileHeader";
 import { EditProfileAvatarBlock } from "./EditProfileAvatarBlock";
 import { EditProfileForm } from "./EditProfileForm";
 import { EditProfileActions } from "./EditProfileActions";
+import { useAvatarUpload } from "./useAvatarUpload";
 
 export default function EditProfileScreen() {
   const { user } = useSupabaseAuth();
@@ -86,6 +87,19 @@ export default function EditProfileScreen() {
       });
   }, [user?.id]);
 
+  // Novo: upload de avatar e salvar no supabase
+  const { upload, uploading: uploadingAvatar, error: avatarError } = useAvatarUpload();
+  const handleAvatarChange = async (file: File) => {
+    if (!user?.id) return;
+    const url = await upload(file, user.id);
+    if (url) {
+      setAvatarUrl(url);
+      toast({ title: "Foto atualizada!" });
+    } else if (avatarError) {
+      toast({ title: "Erro no avatar", description: avatarError, variant: "destructive" });
+    }
+  };
+
   // Salvar perfil
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,9 +175,16 @@ export default function EditProfileScreen() {
       >
         <EditProfileAvatarBlock
           avatarUrl={avatarUrl}
-          onChange={setAvatarFile}
+          onChange={handleAvatarChange}
           name={name}
         />
+        {/* Exibe loading/erro do avatar */}
+        {uploadingAvatar && (
+          <div className="text-center text-terra-700 font-inter text-sm py-2">Enviando imagem...</div>
+        )}
+        {avatarError && (
+          <div className="text-center text-red-600 font-inter text-xs pb-1">{avatarError}</div>
+        )}
         <EditProfileForm
           name={name}
           setName={setName}

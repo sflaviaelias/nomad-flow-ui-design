@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Camera } from "lucide-react";
 
@@ -20,6 +19,11 @@ export function ProfileAvatar({ avatarUrl, editable, onChange, name }: Props) {
     onChange && onChange(file);
   };
 
+  // Limpa preview se avatarUrl for atualizado depois do upload (ex: após salvar)
+  React.useEffect(() => {
+    setPreview(null);
+  }, [avatarUrl]);
+
   return (
     <div className="relative w-24 h-24 mx-auto">
       <Avatar className="w-24 h-24 border-4 border-terra-700">
@@ -34,7 +38,7 @@ export function ProfileAvatar({ avatarUrl, editable, onChange, name }: Props) {
           <Camera size={18} className="text-white" />
           <input
             type="file"
-            accept="image/*"
+            accept="image/png,image/jpeg"
             className="hidden"
             onChange={handleSelect}
             aria-label="Trocar avatar"

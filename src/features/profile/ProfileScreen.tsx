@@ -19,7 +19,7 @@ export default function ProfileScreen() {
     return {
       name: user_metadata?.name || email?.split("@")[0] || "",
       email: email || "",
-      avatar_url: user_metadata?.avatar_url || "",
+      avatar_url: user_metadata?.avatar_url || user?.avatar_url || "", // Fallback para colunas atualizadas
       country: user_metadata?.country || "Não informado",
       currency: user_metadata?.currency || "BRL",
       language: user_metadata?.language || "Português",
