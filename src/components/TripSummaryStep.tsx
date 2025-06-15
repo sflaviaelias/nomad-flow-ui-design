@@ -11,7 +11,7 @@ interface TripSummaryStepProps {
   imageUrl?: string | null;
   onPrev: () => void;
   onSave: () => void;
-+  saving?: boolean;
+  saving?: boolean;
 }
 
 const TripSummaryStep: React.FC<TripSummaryStepProps> = ({
@@ -22,7 +22,7 @@ const TripSummaryStep: React.FC<TripSummaryStepProps> = ({
   imageUrl,
   onPrev,
   onSave,
-+  saving
+  saving
 }) => (
   <div className="flex flex-col gap-3">
     <div className="font-medium text-lg flex items-center gap-2"><Users className="text-terracotta" /> Resumo da Viagem</div>
@@ -45,13 +45,11 @@ const TripSummaryStep: React.FC<TripSummaryStepProps> = ({
     )}
     <div className="mt-4 flex gap-2">
       <Button variant="outline" onClick={onPrev}>Voltar</Button>
--      <Button className="bg-terracotta" onClick={onSave}>Salvar viagem & finalizar</Button>
-+      <Button className="bg-terracotta" onClick={onSave} disabled={saving}>
-+        {saving ? "Salvando..." : "Salvar viagem & finalizar"}
-+      </Button>
+      <Button className="bg-terracotta" onClick={onSave} disabled={saving}>
+        {saving ? "Salvando..." : "Salvar viagem & finalizar"}
+      </Button>
     </div>
   </div>
 );
 
 export default TripSummaryStep;
-
