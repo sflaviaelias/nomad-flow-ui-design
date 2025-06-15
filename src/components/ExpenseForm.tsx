@@ -50,10 +50,12 @@ export default function ExpenseForm({ onCreated }: { onCreated: (summary: any) =
 
   const amount = Number(form.watch("amount") || 0);
 
-  // Busca viagem ativa do usuário
+  // Busca viagem ativa do usuário real, status + log detalhado
   useEffect(() => {
     async function fetchTrip() {
       setLoading(true);
+
+      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       console.log('[ExpenseForm] user:', user); // DEBUG LOG
       if (!user) {
@@ -61,7 +63,8 @@ export default function ExpenseForm({ onCreated }: { onCreated: (summary: any) =
         setLoading(false);
         return;
       }
-      // Busca viagem ativa (mais recente)
+
+      // Busca todas as viagens do usuário
       const { data: trips, error } = await supabase
         .from("trips")
         .select("*")
@@ -70,20 +73,34 @@ export default function ExpenseForm({ onCreated }: { onCreated: (summary: any) =
       console.log('[ExpenseForm] trips:', trips, 'error:', error, 'user_id:', user.id); // DEBUG LOG
 
       if (error) {
-        toast({ title: "Erro ao buscar viagens:", description: error.message });
+        toast({
+          title: "Erro ao buscar viagens:",
+          description: error.message
+        });
         setLoading(false);
         return;
       }
       if (!trips?.length) {
-        toast({ title: "Nenhuma viagem ativa encontrada para seu usuário." });
+        // Explicação detalhada para casos reais
+        toast({
+          title: "Nenhuma viagem REAL encontrada para seu usuário.",
+          description: "Cadastre uma viagem antes de inserir despesas (mocks não aparecem aqui)."
+        });
         setLoading(false);
         return;
       }
-      setTrip(trips[0]);
+      // Seleciona como ativa a viagem cuja data de início <= hoje <= fim, senão a mais recente
+      const today = new Date().toISOString().slice(0, 10);
+      let activeTrip = trips.find(
+        (t: any) => t.start_date <= today && t.end_date >= today
+      );
+      if (!activeTrip) activeTrip = trips[0];
+
+      setTrip(activeTrip);
       setBudgetInfo({
-        tripId: trips[0].id,
-        budget: Number(trips[0].budget) || 0,
-        currency: trips[0].currency || "BRL"
+        tripId: activeTrip.id,
+        budget: Number(activeTrip.budget) || 0,
+        currency: activeTrip.currency || "BRL"
       });
       setLoading(false);
     }
@@ -164,8 +181,16 @@ export default function ExpenseForm({ onCreated }: { onCreated: (summary: any) =
     setCategory("Alimentação");
   };
 
+  // Caso não haja viagem no banco, retorna visualmente explicação para o usuário
   return !trip ? (
-    <div className="text-neutral-400 text-sm py-6 text-center">Carregando informações da viagem...</div>
+    <div className="text-neutral-400 text-sm py-6 text-center">
+      {loading ? "Carregando informações da viagem..." :
+        <>
+          Nenhuma viagem cadastrada foi encontrada para o seu usuário.<br />
+          Para adicionar despesas, cadastre antes uma <span className="text-[#E76F51] font-semibold">viagem real</span> pelo app.
+        </>
+      }
+    </div>
   ) : (
     <form
       className="bg-white rounded-lg shadow-card p-6 space-y-6 border border-[#E76F5115]"
