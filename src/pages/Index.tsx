@@ -15,7 +15,6 @@ import { useActiveTrip } from "@/hooks/useActiveTrip";
 import { useGuestMode } from "@/hooks/useGuestMode";
 import GuestLoginButton from "@/components/GuestLoginButton";
 import { showGuestBlockedToast } from "@/components/GuestLoginToast";
-import SmartDiscoverySection from "@/components/SmartDiscoverySection";
 
 // Dummy data: in real app, replace with actual data and hooks.
 const userFallback = {
@@ -122,7 +121,6 @@ const Index = () => {
             <ActiveTripSection
               hasActiveTrip={!!activeTrip}
               activeTrip={activeTrip}
-              // Se convidado, desativa ações e mostra toast
               onShowDetails={isGuest ? () => showGuestBlockedToast() : undefined}
             />
             <div className="h-4" />
@@ -131,8 +129,9 @@ const Index = () => {
               <HomeTripSummaryCard activeTrip={activeTrip} />
             </div>
 
-            {/* Troca DiscoverySectionWrapper pelo SmartDiscoverySection */}
-            <SmartDiscoverySection />
+            {/* Descoberta — padrão genérico */}
+            <DiscoverySectionWrapper />
+
             <div className="px-5 mb-2">
               <div className="bg-[#dadada20] border border-[#E76F51]/5 rounded-lg px-4 py-2 mt-2 text-[#6D4530] text-xs font-inter shadow-sm">
                 ✨ Em breve: locais recomendados pela IA conforme seu perfil e localização.
