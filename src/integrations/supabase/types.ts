@@ -53,6 +53,7 @@ export type Database = {
           category: string | null
           created_at: string | null
           date: string | null
+          description: string | null
           id: string
           title: string
           trip_id: string | null
@@ -62,6 +63,7 @@ export type Database = {
           category?: string | null
           created_at?: string | null
           date?: string | null
+          description?: string | null
           id?: string
           title: string
           trip_id?: string | null
@@ -71,6 +73,7 @@ export type Database = {
           category?: string | null
           created_at?: string | null
           date?: string | null
+          description?: string | null
           id?: string
           title?: string
           trip_id?: string | null
