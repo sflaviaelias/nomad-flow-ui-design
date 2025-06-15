@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useNavigate } from "react-router-dom";
@@ -10,13 +9,13 @@ import { Switch } from "@/components/ui/switch";
 import { LogOut, Edit2, Lock, Mail, Globe, Calendar, User, Bell, Shield, Languages, DollarSign, MapPin, Camera, CheckCircle, ArrowRight } from "lucide-react";
 
 export default function ProfileScreen() {
-  const { user, signOut } = useSupabaseAuth();
+  const { user, loading, signOut } = useSupabaseAuth();
   const navigate = useNavigate();
 
-  // Returns Profile Data from user metadata or null if no user
+  // Profile real — só usa user do Supabase
   const profile = React.useMemo(() => {
     if (!user) return null;
-    const { user_metadata = {}, email } = user;
+    const { user_metadata = {}, email, app_metadata = {} } = user;
     return {
       name: user_metadata?.name || email?.split("@")[0] || "",
       email: email || "",
@@ -28,7 +27,7 @@ export default function ProfileScreen() {
       gender: user_metadata?.gender || "",
       notifications: typeof user_metadata?.notifications === "boolean" ? user_metadata.notifications : true,
       privacy: typeof user_metadata?.privacy === "boolean" ? user_metadata.privacy : true,
-      sso_google: user?.app_metadata?.provider === "google",
+      sso_google: app_metadata?.provider === "google",
     };
   }, [user]);
 
@@ -43,7 +42,16 @@ export default function ProfileScreen() {
     localStorage.setItem("theme", newTheme);
   };
 
-  // If not logged in, show login prompt
+  // Loading state melhorado
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#FAF3EC] text-terra-700">
+        <span className="animate-pulse text-lg">Carregando...</span>
+      </div>
+    );
+  }
+
+  // Guest view: pede login de verdade
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#FAF3EC] text-terra-700">
@@ -189,4 +197,3 @@ export default function ProfileScreen() {
 // Outline icons (não removidas)
 function Moon(props: any) { return <svg {...props} viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 0 1 12.21 3a7 7 0 1 0 8.79 9.79Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>; }
 function Sun(props: any) { return <svg {...props} viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>; }
-

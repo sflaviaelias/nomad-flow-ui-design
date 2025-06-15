@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,6 +47,7 @@ export default function SignupScreen() {
 
     setLoading(true);
 
+    // Usa SÓ signUp da Supabase, remove mocks!
     const { data, error } = await supabase.auth.signUp({
       email,
       password: senha,
@@ -79,7 +79,6 @@ export default function SignupScreen() {
       title: "Conta criada com sucesso!",
       description: "Se necessário, confirme o e-mail para ativar sua conta.",
     });
-    // Autologin: Redireciona ao Home, a nova sessão já estará ativa
     setLoading(false);
     navigate("/", { replace: true });
   }

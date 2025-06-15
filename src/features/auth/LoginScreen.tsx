@@ -1,8 +1,8 @@
-
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function LoginScreen() {
   const navigate = useNavigate();
@@ -15,13 +15,18 @@ export default function LoginScreen() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    // TODO: Call your backend/auth provider here
-    // For now, fake delay and success
-    setTimeout(() => {
+
+    // Usa SÓ autenticação real da Supabase!
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      setError("Credenciais inválidas. Tente novamente.");
       setLoading(false);
-      navigate("/");
-    }, 1000);
-    // Set error with: setError("Mensagem de erro").
+      return;
+    }
+    // Sucesso: session será salva, hook auth atualizará tudo (redirect automático!)
+    setLoading(false);
+    navigate("/");
   };
 
   return (
