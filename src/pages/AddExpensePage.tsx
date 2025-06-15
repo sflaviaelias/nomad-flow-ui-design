@@ -3,10 +3,12 @@ import React, { useState } from "react";
 import PageHeader from "@/components/PageHeader";
 import ExpenseForm from "@/components/ExpenseForm";
 import BudgetSummary from "@/components/BudgetSummary";
+import ExpenseInsightsAI from "@/components/ExpenseInsightsAI";
 
 export default function AddExpensePage() {
   const [showSummary, setShowSummary] = useState(false);
   const [summaryData, setSummaryData] = useState<any>(null);
+  const [allExpenses, setAllExpenses] = useState<any[]>([]); // Histórico bruto
 
   return (
     <div className="min-h-screen bg-[#FAF3EC] flex flex-col">
@@ -23,11 +25,28 @@ export default function AddExpensePage() {
             onCreated={(summary) => {
               setSummaryData(summary);
               setShowSummary(true);
+              // Busque novamente as despesas da viagem recém-adicionada
+              // OU incremente ao array das atuais (mock simples)
+              setAllExpenses(expenses => [
+                ...expenses,
+                {
+                  amount: summary.amount,
+                  category: summary.category || "Outros",
+                }
+              ]);
             }}
           />
         </div>
         {showSummary && summaryData && (
-          <BudgetSummary data={summaryData} onEditBudget={summaryData.onEditBudget} />
+          <>
+            <BudgetSummary data={summaryData} onEditBudget={summaryData.onEditBudget} />
+            {/* Insights inteligentes pós-resumo */}
+            <ExpenseInsightsAI
+              expenses={allExpenses}
+              budget={summaryData.budget}
+              currency={summaryData.currency}
+            />
+          </>
         )}
       </main>
     </div>
