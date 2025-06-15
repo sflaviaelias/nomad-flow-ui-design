@@ -7,6 +7,8 @@ import { toast } from "@/components/ui/use-toast";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { LanguageSelect, LanguageCode } from "@/features/profile/LanguageSelect";
+import { useTranslation } from "react-i18next";
+import { useAppLanguage } from "@/hooks/useAppLanguage";
 
 // Idioma padrão pelo browser
 function getDefaultLanguage(): LanguageCode {
@@ -19,6 +21,7 @@ function getDefaultLanguage(): LanguageCode {
 
 export default function SettingsPage() {
   const { user } = useSupabaseAuth();
+  const { t } = useTranslation();
   const [notifications, setNotifications] = React.useState<boolean>(true);
   const [location, setLocation] = React.useState<boolean>(false);
   const [loadingLocation, setLoadingLocation] = React.useState<boolean>(false);
@@ -26,6 +29,7 @@ export default function SettingsPage() {
 
   // Novo: idioma do app
   const [appLanguage, setAppLanguage] = React.useState<LanguageCode>(getDefaultLanguage());
+  useAppLanguage(appLanguage);
 
   React.useEffect(() => {
     // Carregar configuração de idioma ao abrir se logado
@@ -135,7 +139,7 @@ export default function SettingsPage() {
           <Bell size={30} className="text-terra-600" />
         </span>
         <h1 className="text-2xl md:text-3xl font-bold text-terra-800">
-          Configurações
+          {t("app_settings")}
         </h1>
       </div>
       {/* Conteúdo Scrollable */}
@@ -148,7 +152,7 @@ export default function SettingsPage() {
         {/* Seletor de idioma */}
         <div className="bg-white rounded-xl px-4 py-5 shadow-card flex items-center">
           <div className="flex-1 flex flex-col">
-            <LanguageSelect value={appLanguage} onChange={handleLanguageChange} disabled={saving} />
+            <LanguageSelect value={appLanguage} onChange={handleLanguageChange} disabled={saving} label={t("language_app")} />
           </div>
         </div>
 
@@ -158,15 +162,15 @@ export default function SettingsPage() {
         <div className="bg-white rounded-xl px-4 py-5 shadow-card flex items-center">
           <div className="flex-1 flex flex-col">
             <span className="font-medium text-base text-terra-900">
-              Ativar notificações
+              {t("notifications_label")}
             </span>
-            <span className="text-sm text-neutral-500">Receba avisos importantes sobre sua viagem</span>
+            <span className="text-sm text-neutral-500">{t("notifications_desc")}</span>
           </div>
           <Switch
             checked={notifications}
             onCheckedChange={setNotifications}
             id="toggle-notifications"
-            aria-label="Ativar notificações"
+            aria-label={t("notifications_label")}
             className="ml-2 data-[state=checked]:bg-[#E76F51] data-[state=checked]:border-[#E76F51]"
           />
         </div>
@@ -177,17 +181,17 @@ export default function SettingsPage() {
         <div className="bg-white rounded-xl px-4 py-5 shadow-card flex items-center">
           <div className="flex-1 flex flex-col">
             <span className="font-medium text-base text-terra-900">
-              Compartilhar localização
+              {t("location_label")}
             </span>
             <span className="text-sm text-neutral-500">
-              Melhore recomendações com base onde você está
+              {t("location_desc")}
             </span>
           </div>
           <Switch
             checked={location}
             onCheckedChange={handleLocationToggle}
             id="toggle-location"
-            aria-label="Compartilhar localização"
+            aria-label={t("location_label")}
             disabled={loadingLocation}
             className={`ml-2 data-[state=checked]:bg-[#E76F51] data-[state=checked]:border-[#E76F51] ${
               loadingLocation ? "opacity-50 pointer-events-none cursor-not-allowed" : ""
@@ -207,7 +211,7 @@ export default function SettingsPage() {
           size="lg"
           disabled={saving}
         >
-          Salvar alterações
+          {t("save_changes")}
         </Button>
       </div>
     </main>

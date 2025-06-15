@@ -28,18 +28,19 @@ interface Props {
   value: LanguageCode;
   onChange: (lang: LanguageCode) => void;
   disabled?: boolean;
+  label?: string;
 }
 
-export const LanguageSelect = ({ value, onChange, disabled }: Props) => {
+export const LanguageSelect = ({ value, onChange, disabled, label }: Props) => {
   return (
     <div className="flex flex-col gap-1">
       <label className="text-terra-900 font-medium text-sm font-inter mb-1">
-        Idioma do aplicativo
+        {label || "Idioma do aplicativo"}
       </label>
       <Select value={value} onValueChange={val => onChange(val as LanguageCode)} disabled={disabled}>
         <SelectTrigger
           className="w-full min-h-[44px] bg-[#FAF3EC] border-terra-900/10 font-inter text-base focus:ring-[#E76F51]"
-          aria-label="Selecione o idioma"
+          aria-label={label || "Idioma do aplicativo"}
         >
           <SelectValue />
         </SelectTrigger>

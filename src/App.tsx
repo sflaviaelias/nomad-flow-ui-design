@@ -27,152 +27,165 @@ import PlaceDetailsPage from "./pages/PlaceDetailsPage";
 import RequireAuth from "./features/auth/RequireAuth";
 import PoliciesPage from "./pages/PoliciesPage";
 import SettingsPage from "./pages/SettingsPage";
+import "./i18n/config";
+import { useEffect } from "react";
+import i18n from "@/i18n/config";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <Toaster />
-    <Sonner />
-    <BrowserRouter>
-      <TooltipProvider>
-        <NavigationHistoryProvider>
-          <Routes>
-            {/* Rotas abertas */}
-            <Route path="/onboarding" element={<OnboardingFlow />} />
-            <Route path="/auth/access" element={<AuthAccessScreen />} />
-            <Route path="/auth/signup" element={<SignupScreen />} />
-            <Route path="/auth/login" element={<LoginScreen />} />
-            <Route path="/auth" element={<AuthPage />} />
+const App = () => {
+  useEffect(() => {
+    // detect browser language if no saved user preference
+    const userLang = localStorage.getItem("language") || navigator.language;
+    if (["pt-BR", "en-US", "es-ES"].includes(userLang)) {
+      i18n.changeLanguage(userLang);
+    }
+  }, []);
 
-            {/* Rotas privadas (precisam de login) */}
-            <Route
-              path="/"
-              element={
-                <RequireAuth>
-                  <Index />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/concierge"
-              element={
-                <RequireAuth>
-                  <ConciergePage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/trip/active"
-              element={
-                <RequireAuth>
-                  <ActiveTripDetailsPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/trips/upcoming"
-              element={
-                <RequireAuth>
-                  <NextTripsPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/trip/new"
-              element={
-                <RequireAuth>
-                  <NewTripPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/discovery/:category"
-              element={
-                <RequireAuth>
-                  <DiscoveryPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/trip/add-expense"
-              element={
-                <RequireAuth>
-                  <AddExpensePage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/feedback/:placeId"
-              element={
-                <RequireAuth>
-                  <FeedbackPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/community"
-              element={
-                <RequireAuth>
-                  <CommunityPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <RequireAuth>
-                  <ProfileScreen />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/profile/edit"
-              element={
-                <RequireAuth>
-                  <EditProfileScreen />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/place/:placeId"
-              element={
-                <RequireAuth>
-                  <PlaceDetailsPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/trip/summary"
-              element={
-                <RequireAuth>
-                  <TripSummaryPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/trip/smart-summary"
-              element={
-                <RequireAuth>
-                  <TripSmartSummaryPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <RequireAuth>
-                  <SettingsPage />
-                </RequireAuth>
-              }
-            />
-            <Route path="/policies" element={<PoliciesPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </NavigationHistoryProvider>
-      </TooltipProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <TooltipProvider>
+          <NavigationHistoryProvider>
+            <Routes>
+              {/* Rotas abertas */}
+              <Route path="/onboarding" element={<OnboardingFlow />} />
+              <Route path="/auth/access" element={<AuthAccessScreen />} />
+              <Route path="/auth/signup" element={<SignupScreen />} />
+              <Route path="/auth/login" element={<LoginScreen />} />
+              <Route path="/auth" element={<AuthPage />} />
+
+              {/* Rotas privadas (precisam de login) */}
+              <Route
+                path="/"
+                element={
+                  <RequireAuth>
+                    <Index />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/concierge"
+                element={
+                  <RequireAuth>
+                    <ConciergePage />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/trip/active"
+                element={
+                  <RequireAuth>
+                    <ActiveTripDetailsPage />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/trips/upcoming"
+                element={
+                  <RequireAuth>
+                    <NextTripsPage />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/trip/new"
+                element={
+                  <RequireAuth>
+                    <NewTripPage />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/discovery/:category"
+                element={
+                  <RequireAuth>
+                    <DiscoveryPage />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/trip/add-expense"
+                element={
+                  <RequireAuth>
+                    <AddExpensePage />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/feedback/:placeId"
+                element={
+                  <RequireAuth>
+                    <FeedbackPage />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/community"
+                element={
+                  <RequireAuth>
+                    <CommunityPage />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <RequireAuth>
+                    <ProfileScreen />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/profile/edit"
+                element={
+                  <RequireAuth>
+                    <EditProfileScreen />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/place/:placeId"
+                element={
+                  <RequireAuth>
+                    <PlaceDetailsPage />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/trip/summary"
+                element={
+                  <RequireAuth>
+                    <TripSummaryPage />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/trip/smart-summary"
+                element={
+                  <RequireAuth>
+                    <TripSmartSummaryPage />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <RequireAuth>
+                    <SettingsPage />
+                  </RequireAuth>
+                }
+              />
+              <Route path="/policies" element={<PoliciesPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </NavigationHistoryProvider>
+        </TooltipProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

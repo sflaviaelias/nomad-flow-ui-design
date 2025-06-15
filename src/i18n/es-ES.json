@@ -1,0 +1,13 @@
+
+{
+  "app_settings": "Configuración",
+  "language_updated": "Idioma actualizado correctamente",
+  "language_app": "Idioma de la aplicación",
+  "notifications_label": "Activar notificaciones",
+  "notifications_desc": "Recibe avisos importantes sobre tu viaje",
+  "location_label": "Compartir ubicación",
+  "location_desc": "Mejora las recomendaciones según tu ubicación",
+  "save_changes": "Guardar cambios",
+  "settings_saved": "Configuración guardada",
+  "settings_saved_desc": "¡Tus preferencias han sido actualizadas correctamente!"
+}
