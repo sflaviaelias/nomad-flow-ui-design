@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 export default function AuthAccessScreen() {
   const navigate = useNavigate();
 
+  // Mantém função existente para o futuro
   const handleSocial = async () => {
     try {
       await supabase.auth.signInWithOAuth({
@@ -25,10 +26,15 @@ export default function AuthAccessScreen() {
           Crie sua conta
         </h2>
         <Button
-          className="w-full py-3 mb-3 bg-[#E76F51] text-white font-semibold text-base shadow-md hover:bg-[#CC5A3D]"
-          onClick={handleSocial}
+          className="w-full py-3 mb-3 bg-[#E76F51] text-white font-semibold text-base shadow-md relative opacity-70 cursor-not-allowed"
+          disabled
+          // onClick={handleSocial} // Desativa temporariamente
         >
-          <Globe className="mr-2" /> Entrar com Google
+          <Globe className="mr-2" /> 
+          Entrar com Google
+          <span className="ml-2 bg-white/80 text-[#E76F51] text-xs font-semibold px-2 py-0.5 rounded shadow-sm absolute right-4 top-1/2 -translate-y-1/2 select-none pointer-events-none">
+            Em breve
+          </span>
         </Button>
         <Button
           className="w-full py-3 mb-3 bg-white text-[#E76F51] border border-[#E76F51] font-semibold text-base shadow"
