@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -32,8 +33,8 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <NavigationHistoryProvider>
-        <BrowserRouter>
+      <BrowserRouter>
+        <NavigationHistoryProvider>
           <Routes>
             {/* Onboarding and auth */}
             <Route path="/onboarding" element={<OnboardingFlow />} />
@@ -57,10 +58,11 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
             <Route path="/trip/summary" element={<TripSummaryPage />} />
           </Routes>
-        </BrowserRouter>
-      </NavigationHistoryProvider>
+        </NavigationHistoryProvider>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
 
 export default App;
+
