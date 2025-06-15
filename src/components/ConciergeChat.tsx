@@ -6,6 +6,7 @@ import { toast } from "@/hooks/use-toast";
 import ConciergeContextModal from "./ConciergeContextModal";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "@/components/PageHeader";
+import { supabase } from "@/integrations/supabase/client";
 
 // Tipos
 interface Message {
@@ -46,11 +47,18 @@ const ConciergeChat: React.FC = () => {
     setValue("");
     setLoading(true);
     try {
+      // OBTÉM o token de autenticação da usuária
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
+
       const res = await fetch(
         SUPABASE_CONCIERGE_FN_URL,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...(accessToken && { Authorization: `Bearer ${accessToken}` })
+          },
           body: JSON.stringify({
             messages: [
               ...messages,
