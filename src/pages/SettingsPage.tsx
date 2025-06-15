@@ -1,18 +1,63 @@
 
 import React from "react";
-import { Bell, MapPin } from "lucide-react";
+import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "@/components/ui/use-toast";
 
 export default function SettingsPage() {
   const [notifications, setNotifications] = React.useState<boolean>(true);
   const [location, setLocation] = React.useState<boolean>(false);
+  const [loadingLocation, setLoadingLocation] = React.useState<boolean>(false);
 
-  // Só exibe toast ou feedback real se você desejar implementar no futuro.
+  const handleLocationToggle = async (checked: boolean) => {
+    if (checked) {
+      setLoadingLocation(true);
+      if (!navigator.geolocation) {
+        toast({
+          title: "Ops!",
+          description: "Seu dispositivo não suporta localização.",
+          variant: "destructive",
+        });
+        setLocation(false);
+        setLoadingLocation(false);
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation(true);
+          setLoadingLocation(false);
+          toast({
+            title: "Localização ativada!",
+            description: "Agora o Go Nomad pode sugerir lugares perto de você.",
+            variant: "default",
+          });
+          // console.log('Localização:', position.coords);
+        },
+        (error) => {
+          setLocation(false);
+          setLoadingLocation(false);
+          toast({
+            title: "Permissão negada",
+            description:
+              "Não foi possível acessar sua localização. Ative nas permissões do navegador se desejar utilizar este recurso.",
+            variant: "destructive",
+          });
+        }
+      );
+    } else {
+      setLocation(false);
+    }
+  };
+
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    // ex: trigger toast("Configurações salvas!")
+    toast({
+      title: "Configurações salvas",
+      description: "Suas preferências foram atualizadas com sucesso!",
+    });
   };
 
   return (
@@ -31,6 +76,7 @@ export default function SettingsPage() {
         onSubmit={handleSave}
         className="flex-1 w-full max-w-xl mx-auto px-5 py-7 flex flex-col gap-0"
         style={{ minHeight: 0 }}
+        id="form-settings"
       >
         {/* Notificações */}
         <div className="bg-white rounded-xl px-4 py-5 shadow-card flex items-center">
@@ -63,10 +109,13 @@ export default function SettingsPage() {
           </div>
           <Switch
             checked={location}
-            onCheckedChange={setLocation}
+            onCheckedChange={handleLocationToggle}
             id="toggle-location"
             aria-label="Compartilhar localização"
-            className="ml-2 data-[state=checked]:bg-[#E76F51] data-[state=checked]:border-[#E76F51]"
+            disabled={loadingLocation}
+            className={`ml-2 data-[state=checked]:bg-[#E76F51] data-[state=checked]:border-[#E76F51] ${
+              loadingLocation ? "opacity-50 pointer-events-none cursor-not-allowed" : ""
+            }`}
           />
         </div>
 
