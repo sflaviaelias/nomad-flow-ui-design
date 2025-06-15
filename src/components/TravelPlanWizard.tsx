@@ -7,6 +7,7 @@ import WizardStepIASuggestions from "./WizardStepIASuggestions";
 import WizardStepConfirmation from "./WizardStepConfirmation";
 import { useTravelIAWizard } from "@/hooks/useTravelIAWizard";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const steps = [
   "Destino",
@@ -52,7 +53,7 @@ export default function TravelPlanWizard() {
     setStep((s) => Math.min(s + 1, steps.length - 1));
   };
   const prevStep = () => setStep((s) => Math.max(s - 1, 0));
-  
+
   // Remover/editar sugestão IA
   const removeSuggestion = (id: number) => {
     setSuggestions(suggestions.filter(s => s.id !== id));
@@ -63,12 +64,34 @@ export default function TravelPlanWizard() {
 
   const handleSaveTrip = async () => {
     setSaving(true);
-    try {
-      // Chame API de trip aqui...
+
+    // Busca usuário logado
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      toast({ title: "Erro: não foi possível identificar o usuário.", variant: "destructive" });
+      setSaving(false);
+      return;
+    }
+
+    // Garante os tipos corretos
+    const parsedBudget = budget ? parseFloat(budget) : null;
+
+    // Insere viagem na tabela trips
+    const { error } = await supabase.from("trips").insert({
+      destination,
+      start_date: dates.start,
+      end_date: dates.end,
+      budget: parsedBudget,
+      user_id: user.id,
+      checklist: suggestions.length ? suggestions.map(s => s.text) : null,
+      is_smart_trip: true, // sempre smart trip pelo wizard IA
+    });
+
+    if (error) {
+      toast({ title: "Erro ao criar viagem", description: error.message, variant: "destructive" });
+    } else {
       toast({ title: "Viagem criada com sucesso!" });
       setStep(steps.length - 1); // vai para confirmação
-    } catch {
-      toast({ title: "Erro ao criar viagem", variant: "destructive" });
     }
     setSaving(false);
   };
