@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useNavigate } from "react-router-dom";
 import { ProfileAvatar } from "./ProfileAvatar";
@@ -12,29 +12,28 @@ import { LogOut, Edit2, Lock, Mail, Globe, Calendar, User, Bell, Shield, Languag
 export default function ProfileScreen() {
   const { user, signOut } = useSupabaseAuth();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<any>(null);
 
-  // Informações mock para exibir na tela. (em app real, trazer do Supabase)
-  useEffect(() => {
-    if (user) {
-      setProfile({
-        name: user.user_metadata?.name || user.email?.split("@")[0] || "",
-        email: user.email || "",
-        avatar_url: user.user_metadata?.avatar_url || "",
-        country: "Brasil",
-        currency: "BRL",
-        language: "Português",
-        birthdate: "1996-06-15",
-        gender: "Feminino",
-        notifications: true,
-        privacy: true,
-        sso_google: true,
-      });
-    }
+  // Returns Profile Data from user metadata or null if no user
+  const profile = React.useMemo(() => {
+    if (!user) return null;
+    const { user_metadata = {}, email } = user;
+    return {
+      name: user_metadata?.name || email?.split("@")[0] || "",
+      email: email || "",
+      avatar_url: user_metadata?.avatar_url || "",
+      country: user_metadata?.country || "Não informado",
+      currency: user_metadata?.currency || "BRL",
+      language: user_metadata?.language || "Português",
+      birthdate: user_metadata?.birthdate || "",
+      gender: user_metadata?.gender || "",
+      notifications: typeof user_metadata?.notifications === "boolean" ? user_metadata.notifications : true,
+      privacy: typeof user_metadata?.privacy === "boolean" ? user_metadata.privacy : true,
+      sso_google: user?.app_metadata?.provider === "google",
+    };
   }, [user]);
 
   // Preferências de tema (localStorage)
-  const [theme, setTheme] = useState<"light"|"dark">(
+  const [theme, setTheme] = React.useState<"light"|"dark">(
     (localStorage.getItem("theme") as "light"|"dark") || "light"
   );
   const handleThemeToggle = (checked: boolean) => {
@@ -44,6 +43,7 @@ export default function ProfileScreen() {
     localStorage.setItem("theme", newTheme);
   };
 
+  // If not logged in, show login prompt
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#FAF3EC] text-terra-700">
@@ -67,16 +67,16 @@ export default function ProfileScreen() {
         {/* Avatar, nome e email */}
         <section className="flex flex-col items-center mt-1 mb-5">
           <ProfileAvatar
-            avatarUrl={profile?.avatar_url}
+            avatarUrl={profile.avatar_url}
             editable
-            name={profile?.name || ""}
-            onChange={() => {/* mock: no-op */}}
+            name={profile.name}
+            onChange={() => {/* no-op for now */}}
           />
           <h1 className="mt-3 font-bold text-[1.55rem] md:text-2xl text-terra-700 text-center font-inter">
-            {profile?.name || "Nome"}
+            {profile.name || "Nome"}
           </h1>
           <div className="text-base text-terra-600/70 mt-1 text-center font-inter">
-            {profile?.email || "E-mail"}
+            {profile.email || "E-mail"}
           </div>
           <Button
             className="mt-3 w-full max-w-[230px] bg-[#E76F51] hover:bg-[#C9583C] text-white font-semibold tracking-wide min-h-[44px]"
@@ -93,27 +93,27 @@ export default function ProfileScreen() {
             <div className="flex items-center gap-3">
               <MapPin className="text-terra-600" size={19} />
               <span className="text-sm text-terra-900/80 font-medium">Nacionalidade:</span>
-              <span className="ml-auto text-sm">{profile?.country || "-"}</span>
+              <span className="ml-auto text-sm">{profile.country || "-"}</span>
             </div>
             <div className="flex items-center gap-3">
               <DollarSign className="text-terra-600" size={18} />
               <span className="text-sm text-terra-900/80 font-medium">Moeda:</span>
-              <span className="ml-auto text-sm">{profile?.currency || "-"}</span>
+              <span className="ml-auto text-sm">{profile.currency || "-"}</span>
             </div>
             <div className="flex items-center gap-3">
               <Languages className="text-terra-600" size={18} />
               <span className="text-sm text-terra-900/80 font-medium">Idioma:</span>
-              <span className="ml-auto text-sm">{profile?.language || "-"}</span>
+              <span className="ml-auto text-sm">{profile.language || "-"}</span>
             </div>
             <div className="flex items-center gap-3">
               <Calendar className="text-terra-600" size={17} />
               <span className="text-sm text-terra-900/80 font-medium">Nascimento:</span>
-              <span className="ml-auto text-sm">{profile?.birthdate || "-"}</span>
+              <span className="ml-auto text-sm">{profile.birthdate || "-"}</span>
             </div>
             <div className="flex items-center gap-3">
               <User className="text-terra-600" size={17} />
               <span className="text-sm text-terra-900/80 font-medium">Gênero:</span>
-              <span className="ml-auto text-sm">{profile?.gender || "-"}</span>
+              <span className="ml-auto text-sm">{profile.gender || "-"}</span>
             </div>
           </CardContent>
         </Card>
@@ -137,12 +137,12 @@ export default function ProfileScreen() {
             <div className="flex items-center gap-3">
               <Bell className="text-terra-600" size={18} />
               <span className="text-sm font-medium flex-1">Notificações</span>
-              <Switch checked={profile?.notifications} aria-label="Notificações" disabled />
+              <Switch checked={profile.notifications} aria-label="Notificações" disabled />
             </div>
             <div className="flex items-center gap-3">
               <Shield className="text-terra-600" size={16} />
               <span className="text-sm font-medium flex-1">Compartilhar localização</span>
-              <Switch checked={profile?.privacy} aria-label="Privacidade" disabled />
+              <Switch checked={profile.privacy} aria-label="Privacidade" disabled />
             </div>
           </CardContent>
         </Card>
@@ -160,9 +160,9 @@ export default function ProfileScreen() {
             <div className="flex items-center gap-3">
               <Mail className="text-terra-600" size={17} />
               <span className="text-sm font-medium flex-1">Google (SSO)</span>
-              <CheckCircle size={16} className="text-green-500" />
+              <CheckCircle size={16} className={profile.sso_google ? "text-green-500" : "text-neutral-300"} />
               <span className="text-xs text-terra-700/80 ml-1">
-                {profile?.sso_google ? "Conectado" : "Desconectado"}
+                {profile.sso_google ? "Conectado" : "Desconectado"}
               </span>
             </div>
           </CardContent>
@@ -186,7 +186,7 @@ export default function ProfileScreen() {
   );
 }
 
-/// Avatar reutilizável - mock editável
+// Outline icons (não removidas)
 function Moon(props: any) { return <svg {...props} viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 0 1 12.21 3a7 7 0 1 0 8.79 9.79Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>; }
 function Sun(props: any) { return <svg {...props} viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>; }
 
