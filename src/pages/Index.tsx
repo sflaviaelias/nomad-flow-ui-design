@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HomeHeader from "../components/HomeHeader";
@@ -12,7 +13,7 @@ import TripDetailsModal from "@/components/TripDetailsModal";
 import { supabase } from "@/integrations/supabase/client";
 import UpcomingTripsSlider from "@/components/UpcomingTripsSlider";
 import { useActiveTrip } from "@/hooks/useActiveTrip";
-import { useGuestMode } from "@/hooks/useGuestMode";
+import { useGuestSession } from "@/hooks/useGuestSession";
 import GuestLoginButton from "@/components/GuestLoginButton";
 import { showGuestBlockedToast } from "@/components/GuestLoginToast";
 
@@ -36,7 +37,7 @@ const Index = () => {
   const { data: activeTripRaw, isLoading: tripLoading } = useActiveTrip();
   const hasActiveTrip = !!activeTripRaw;
 
-  const { isGuest, isLoading } = useGuestMode();
+  const { isGuestSession, isAuthenticated, isLoading } = useGuestSession();
 
   useEffect(() => {
     async function fetchProfile() {
@@ -64,26 +65,17 @@ const Index = () => {
     };
   }, []);
 
-  // Se convidado, gera dados de exemplo:
-  const userName = isGuest ? "Nômade" : (profile?.name || userFallback.name);
-  const avatarUrl = isGuest
+  // Determinar nome do usuário baseado no tipo de sessão
+  const userName = isGuestSession ? "Nômade" : (profile?.name || userFallback.name);
+  const avatarUrl = isGuestSession
     ? userFallback.avatarUrl
     : (profile?.avatar_url && profile.avatar_url !== ""
         ? profile.avatar_url
         : userFallback.avatarUrl);
 
-  // Adapt activeTripRaw to TripData type for ActiveTripSection and HomeTripSummaryCard
+  // Lógica corrigida: só criar activeTrip se há dados reais do banco
   let activeTrip = null;
-  if (isGuest) {
-    activeTrip = {
-      destination: "Barcelona, Espanha",
-      imageUrl: fallbackImage,
-      startDate: "01/07/2024",
-      endDate: "15/07/2024",
-      budget: "€1200",
-      localBudget: "R$ 6.850",
-    };
-  } else if (activeTripRaw) {
+  if (isAuthenticated && activeTripRaw) {
     activeTrip = {
       destination: activeTripRaw.destination,
       imageUrl: fallbackImage, // TODO: replace with real from backend/AI hook if exists
@@ -107,11 +99,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-[#FAF3EC]">
-      {isGuest && <GuestLoginButton />}
+      {isGuestSession && <GuestLoginButton />}
       {/* Header */}
       <HomeHeader user={{ name: userName, avatarUrl }} />
       <main className="max-w-md mx-auto w-full px-0 pb-8">
-        {loading || tripLoading ? (
+        {loading || tripLoading || isLoading ? (
           <div className="h-32 flex items-center justify-center text-[#E76F51] text-lg font-medium">
             Carregando informações...
           </div>
@@ -121,13 +113,16 @@ const Index = () => {
             <ActiveTripSection
               hasActiveTrip={!!activeTrip}
               activeTrip={activeTrip}
-              onShowDetails={isGuest ? () => showGuestBlockedToast() : undefined}
+              onShowDetails={isGuestSession ? () => showGuestBlockedToast() : undefined}
             />
             <div className="h-4" />
 
-            <div className="px-4">
-              <HomeTripSummaryCard activeTrip={activeTrip} />
-            </div>
+            {/* Só mostrar HomeTripSummaryCard se há viagem ativa real */}
+            {activeTrip && (
+              <div className="px-4">
+                <HomeTripSummaryCard activeTrip={activeTrip} />
+              </div>
+            )}
 
             {/* Descoberta — padrão genérico */}
             <DiscoverySectionWrapper />
