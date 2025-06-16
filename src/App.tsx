@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -34,16 +35,11 @@ import i18n from "@/i18n/config";
 import { useOnboardingFlow } from "@/hooks/useOnboardingFlow";
 import { supabase } from "@/integrations/supabase/client";
 
-// Utilitário para controle do onboarding por dispositivo
-// Função centralizada foi movida para hooks/useOnboardingFlow.ts
-
 const queryClient = new QueryClient();
 
 function getInitialLanguage() {
-  // Retorna a ordem correta de preferências
   const saved = localStorage.getItem("language");
   if (saved) return saved;
-  // Usa idioma navegador como fallback
   const userLang = navigator.language;
   if (["pt-BR", "en-US", "es-ES"].includes(userLang)) return userLang;
   return "pt-BR";
@@ -52,7 +48,6 @@ function getInitialLanguage() {
 function AppWrapper() {
   const onboarding = useOnboardingFlow();
 
-  // Enquanto não determinar, não renderiza nada
   if (!onboarding.checked) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FAF3EC] text-terra-700">
@@ -62,161 +57,153 @@ function AppWrapper() {
   }
 
   if (onboarding.show) {
-    // Renderiza OnboardingFlow e bloqueia navegação
     return <OnboardingFlow onFinish={onboarding.finishOnboarding} />;
   }
 
   return (
-    <BrowserRouter>
-      <TooltipProvider>
-        <NavigationHistoryProvider>
-          <Routes>
-            {/* Mantém rota onboarding acessível, mas fluxo é controlado no App */}
-            <Route path="/onboarding" element={<OnboardingFlow onFinish={onboarding.finishOnboarding} />} />
-            {/* Rotas abertas */}
-            <Route path="/auth/access" element={<AuthAccessScreen />} />
-            <Route path="/auth/signup" element={<SignupScreen />} />
-            <Route path="/auth/login" element={<LoginScreen />} />
-            <Route path="/auth" element={<AuthPage />} />
+    <TooltipProvider>
+      <NavigationHistoryProvider>
+        <Routes>
+          <Route path="/onboarding" element={<OnboardingFlow onFinish={onboarding.finishOnboarding} />} />
+          <Route path="/auth/access" element={<AuthAccessScreen />} />
+          <Route path="/auth/signup" element={<SignupScreen />} />
+          <Route path="/auth/login" element={<LoginScreen />} />
+          <Route path="/auth" element={<AuthPage />} />
 
-            {/* Rotas privadas (precisam de login) */}
-            <Route
-              path="/"
-              element={
-                <RequireAuth>
-                  <Index />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/concierge"
-              element={
-                <RequireAuth>
-                  <ConciergePage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/trip/active"
-              element={
-                <RequireAuth>
-                  <ActiveTripDetailsPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/trips/upcoming"
-              element={
-                <RequireAuth>
-                  <NextTripsPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/trip/new"
-              element={
-                <RequireAuth>
-                  <NewTripPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/discovery/:category"
-              element={
-                <RequireAuth>
-                  <DiscoveryPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/trip/add-expense"
-              element={
-                <RequireAuth>
-                  <AddExpensePage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/feedback/:placeId"
-              element={
-                <RequireAuth>
-                  <FeedbackPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/community"
-              element={
-                <RequireAuth>
-                  <CommunityPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <RequireAuth>
-                  <ProfileScreen />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/profile/edit"
-              element={
-                <RequireAuth>
-                  <EditProfileScreen />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/place/:placeId"
-              element={
-                <RequireAuth>
-                  <PlaceDetailsPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/trip/summary"
-              element={
-                <RequireAuth>
-                  <TripSummaryPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/trip/smart-summary"
-              element={
-                <RequireAuth>
-                  <TripSmartSummaryPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <RequireAuth>
-                  <SettingsPage />
-                </RequireAuth>
-              }
-            />
-            <Route path="/policies" element={<PoliciesPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </NavigationHistoryProvider>
-      </TooltipProvider>
-    </BrowserRouter>
+          <Route
+            path="/"
+            element={
+              <RequireAuth>
+                <Index />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/concierge"
+            element={
+              <RequireAuth>
+                <ConciergePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/trip/active"
+            element={
+              <RequireAuth>
+                <ActiveTripDetailsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/trips/upcoming"
+            element={
+              <RequireAuth>
+                <NextTripsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/trip/new"
+            element={
+              <RequireAuth>
+                <NewTripPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/discovery/:category"
+            element={
+              <RequireAuth>
+                <DiscoveryPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/trip/add-expense"
+            element={
+              <RequireAuth>
+                <AddExpensePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/feedback/:placeId"
+            element={
+              <RequireAuth>
+                <FeedbackPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/community"
+            element={
+              <RequireAuth>
+                <CommunityPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <RequireAuth>
+                <ProfileScreen />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/profile/edit"
+            element={
+              <RequireAuth>
+                <EditProfileScreen />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/place/:placeId"
+            element={
+              <RequireAuth>
+                <PlaceDetailsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/trip/summary"
+            element={
+              <RequireAuth>
+                <TripSummaryPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/trip/smart-summary"
+            element={
+              <RequireAuth>
+                <TripSmartSummaryPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <RequireAuth>
+                <SettingsPage />
+              </RequireAuth>
+            }
+          />
+          <Route path="/policies" element={<PoliciesPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </NavigationHistoryProvider>
+    </TooltipProvider>
   );
 }
 
 const App = () => {
   useEffect(() => {
-    // Aguardar autenticação do usuário
     supabase.auth.getUser().then(async ({ data }) => {
       const user = data?.user;
       let set = false;
       if (user?.id) {
-        // Busca preferências do perfil Supabase
         const { data } = await supabase
           .from("profiles")
           .select("preferences")
@@ -235,7 +222,6 @@ const App = () => {
           set = true;
         }
       }
-      // Caso não esteja autenticado ou não tenha uma preferência no Supabase:
       if (!set) {
         const lang = getInitialLanguage();
         i18n.changeLanguage(lang);
@@ -247,7 +233,9 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <Toaster />
       <Sonner />
-      <AppWrapper />
+      <BrowserRouter>
+        <AppWrapper />
+      </BrowserRouter>
     </QueryClientProvider>
   );
 };
