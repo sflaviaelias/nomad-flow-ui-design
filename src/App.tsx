@@ -49,7 +49,15 @@ function getInitialLanguage() {
 function AppWrapper() {
   const onboarding = useOnboardingFlow();
 
+  // Debug logs temporários
+  console.log("[App] Deploy Debug - AppWrapper carregado em:", new Date().toISOString());
+  console.log("[App] Deploy Debug - Onboarding status:", { 
+    checked: onboarding.checked, 
+    show: onboarding.show 
+  });
+
   if (!onboarding.checked) {
+    console.log("[App] Deploy Debug - Aguardando verificação de onboarding");
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FAF3EC] text-terra-700">
         <span className="animate-pulse text-lg">Carregando...</span>
@@ -58,8 +66,11 @@ function AppWrapper() {
   }
 
   if (onboarding.show) {
+    console.log("[App] Deploy Debug - Mostrando onboarding");
     return <OnboardingFlow onFinish={onboarding.finishOnboarding} />;
   }
+
+  console.log("[App] Deploy Debug - Renderizando rotas principais");
 
   return (
     <TooltipProvider>
@@ -206,9 +217,13 @@ function AppWrapper() {
 }
 
 const App = () => {
+  console.log("[App] Deploy Debug - App component iniciado em:", new Date().toISOString());
+
   useEffect(() => {
+    console.log("[App] Deploy Debug - useEffect iniciado, verificando usuário e idioma");
     supabase.auth.getUser().then(async ({ data }) => {
       const user = data?.user;
+      console.log("[App] Deploy Debug - Usuário obtido:", !!user);
       let set = false;
       if (user?.id) {
         const { data } = await supabase
@@ -233,6 +248,7 @@ const App = () => {
         const lang = getInitialLanguage();
         i18n.changeLanguage(lang);
       }
+      console.log("[App] Deploy Debug - Idioma configurado");
     });
   }, []);
 

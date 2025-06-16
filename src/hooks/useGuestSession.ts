@@ -17,6 +17,15 @@ export function useGuestSession() {
   // É autenticado se há usuário logado
   const isAuthenticated = !loading && !!user;
   
+  // Debug logs temporários
+  console.log("[useGuestSession] Deploy Debug - Hook chamado:", {
+    user: !!user,
+    loading,
+    onboardingDone,
+    isGuestSession,
+    isAuthenticated
+  });
+  
   return {
     isGuestSession,
     isAuthenticated,

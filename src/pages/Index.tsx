@@ -39,10 +39,21 @@ const Index = () => {
 
   const { isGuestSession, isAuthenticated, isLoading } = useGuestSession();
 
+  // Debug logs temporários
+  console.log("[Index] Deploy Debug - Componente carregado em:", new Date().toISOString());
+  console.log("[Index] Deploy Debug - Status de sessão:", {
+    isGuestSession,
+    isAuthenticated,
+    isLoading,
+    hasActiveTrip,
+    activeTripRaw
+  });
+
   useEffect(() => {
     async function fetchProfile() {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
+      console.log("[Index] Deploy Debug - fetchProfile, usuário:", !!user?.id);
       if (!user?.id) {
         setProfile(null);
         setLoading(false);
@@ -53,11 +64,13 @@ const Index = () => {
         .select("*")
         .eq("id", user.id)
         .maybeSingle();
+      console.log("[Index] Deploy Debug - Profile obtido:", !!data);
       setProfile(data);
       setLoading(false);
     }
     fetchProfile();
     const { data: authListener } = supabase.auth.onAuthStateChange(() => {
+      console.log("[Index] Deploy Debug - Auth state mudou, buscando profile novamente");
       fetchProfile();
     });
     return () => {
@@ -73,9 +86,13 @@ const Index = () => {
         ? profile.avatar_url
         : userFallback.avatarUrl);
 
-  // Lógica corrigida: só criar activeTrip se há dados reais do banco
+  console.log("[Index] Deploy Debug - Nome do usuário:", userName);
+  console.log("[Index] Deploy Debug - É sessão guest:", isGuestSession);
+
+  // Lógica corrigida: só criar activeTrip se há dados reais do banco E usuário autenticado
   let activeTrip = null;
   if (isAuthenticated && activeTripRaw) {
+    console.log("[Index] Deploy Debug - Criando activeTrip para usuário autenticado");
     activeTrip = {
       destination: activeTripRaw.destination,
       imageUrl: fallbackImage, // TODO: replace with real from backend/AI hook if exists
@@ -95,6 +112,8 @@ const Index = () => {
           })
         : "-",
     };
+  } else {
+    console.log("[Index] Deploy Debug - Não criando activeTrip - usuário guest ou sem viagem");
   }
 
   return (
