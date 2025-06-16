@@ -1,12 +1,13 @@
 
-import { useSupabaseAuth } from "./useSupabaseAuth";
+import { useGuestSession } from "./useGuestSession";
 
 /**
  * Detecta se o usuário está acessando como convidado (não autenticado).
  * Retorna { isGuest, isLoading }
+ * 
+ * @deprecated Use useGuestSession() para mais controle
  */
 export function useGuestMode() {
-  const { user, loading } = useSupabaseAuth();
-  // Se não está carregando E não há user, é convidado
-  return { isGuest: !loading && !user, isLoading: loading };
+  const { isGuestSession, isLoading } = useGuestSession();
+  return { isGuest: isGuestSession, isLoading };
 }

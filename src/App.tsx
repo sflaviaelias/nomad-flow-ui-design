@@ -26,6 +26,7 @@ import TripSmartSummaryPage from "./pages/TripSmartSummaryPage";
 import { NavigationHistoryProvider } from "@/contexts/NavigationHistoryContext";
 import PlaceDetailsPage from "./pages/PlaceDetailsPage";
 import RequireAuth from "./features/auth/RequireAuth";
+import GuestOrAuthRoute from "./features/auth/GuestOrAuthRoute";
 import PoliciesPage from "./pages/PoliciesPage";
 import SettingsPage from "./pages/SettingsPage";
 import "./i18n/config";
@@ -70,22 +71,51 @@ function AppWrapper() {
           <Route path="/auth/login" element={<LoginScreen />} />
           <Route path="/auth" element={<AuthPage />} />
 
+          {/* Rota principal que permite tanto usuários autenticados quanto convidados */}
           <Route
             path="/"
             element={
-              <RequireAuth>
+              <GuestOrAuthRoute>
                 <Index />
-              </RequireAuth>
+              </GuestOrAuthRoute>
             }
           />
+          
+          {/* Rotas que permitem modo convidado */}
           <Route
             path="/concierge"
             element={
-              <RequireAuth>
+              <GuestOrAuthRoute>
                 <ConciergePage />
-              </RequireAuth>
+              </GuestOrAuthRoute>
             }
           />
+          <Route
+            path="/discovery/:category"
+            element={
+              <GuestOrAuthRoute>
+                <DiscoveryPage />
+              </GuestOrAuthRoute>
+            }
+          />
+          <Route
+            path="/place/:placeId"
+            element={
+              <GuestOrAuthRoute>
+                <PlaceDetailsPage />
+              </GuestOrAuthRoute>
+            }
+          />
+          <Route
+            path="/community"
+            element={
+              <GuestOrAuthRoute>
+                <CommunityPage />
+              </GuestOrAuthRoute>
+            }
+          />
+
+          {/* Rotas que realmente precisam de autenticação */}
           <Route
             path="/trip/active"
             element={
@@ -111,14 +141,6 @@ function AppWrapper() {
             }
           />
           <Route
-            path="/discovery/:category"
-            element={
-              <RequireAuth>
-                <DiscoveryPage />
-              </RequireAuth>
-            }
-          />
-          <Route
             path="/trip/add-expense"
             element={
               <RequireAuth>
@@ -135,14 +157,6 @@ function AppWrapper() {
             }
           />
           <Route
-            path="/community"
-            element={
-              <RequireAuth>
-                <CommunityPage />
-              </RequireAuth>
-            }
-          />
-          <Route
             path="/profile"
             element={
               <RequireAuth>
@@ -155,14 +169,6 @@ function AppWrapper() {
             element={
               <RequireAuth>
                 <EditProfileScreen />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/place/:placeId"
-            element={
-              <RequireAuth>
-                <PlaceDetailsPage />
               </RequireAuth>
             }
           />
@@ -190,6 +196,7 @@ function AppWrapper() {
               </RequireAuth>
             }
           />
+          
           <Route path="/policies" element={<PoliciesPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
