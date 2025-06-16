@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, Github, Globe, Twitter } from "lucide-react";
 import { cn } from "@/lib/utils";
+import LogoMini from "@/components/LogoMini";
 
 export default function AuthPage() {
   const [loading, setLoading] = useState(false);
@@ -108,6 +109,11 @@ export default function AuthPage() {
     <main className="min-h-screen flex flex-col items-center justify-center bg-background">
       <Toaster />
       <div className="mx-auto w-full max-w-md bg-white shadow-sm rounded-lg p-8 space-y-5 border border-neutral-100">
+        {/* Logo centralizada */}
+        <div className="flex justify-center mb-6">
+          <LogoMini size="medium" showText={true} />
+        </div>
+
         <h1 className="font-bold text-2xl text-center mb-2">
           {variant === "login"
             ? "Acessar sua conta"

@@ -1,18 +1,12 @@
 
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import LogoMini from "@/components/LogoMini";
 
 export default function OnboardingHeader() {
-  const navigate = useNavigate();
   return (
-    <div className="w-full flex justify-end px-0 pt-6 pb-2 pr-6">
-      <button
-        className="text-sm font-medium text-[#C9583C] bg-transparent focus:outline-none focus:underline underline underline-offset-2 rounded px-3 py-1 transition hover:text-[#AD4F36] focus-visible:ring-2 ring-[#E76F51]"
-        onClick={() => navigate("/")}
-        aria-label="Pular onboarding"
-        tabIndex={0}
-      >
-        Pular onboarding
-      </button>
-    </div>
+    <header className="w-full flex flex-col items-center pt-8 pb-6 bg-[#FAF3EC]">
+      <LogoMini size="large" showText={true} className="mb-2" />
+      <div className="w-16 h-1 bg-[#E76F51] rounded-full opacity-60"></div>
+    </header>
   );
 }

@@ -1,7 +1,9 @@
+
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Globe } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import LogoMini from "@/components/LogoMini";
 
 export default function AuthAccessScreen() {
   const navigate = useNavigate();
@@ -31,6 +33,11 @@ export default function AuthAccessScreen() {
   return (
     <div className="h-screen flex flex-col justify-center items-center bg-[#FAF3EC] px-4">
       <div className="w-full max-w-md">
+        {/* Logo centralizada */}
+        <div className="flex justify-center mb-8">
+          <LogoMini size="medium" showText={true} />
+        </div>
+
         <h2 className="font-bold text-2xl mb-6 text-terra-700 text-center" style={{fontFamily: "Inter"}}>
           Crie sua conta
         </h2>

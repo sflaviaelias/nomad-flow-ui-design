@@ -1,9 +1,11 @@
+
 import React from "react";
 import { Menu, User } from "lucide-react"; // Lucide ícones do Untitled UI
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import AppMenuDrawer from "./AppMenuDrawer";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import LogoMini from "./LogoMini";
 
 // Novo Header conforme guidelines e DS
 type Props = {
@@ -26,16 +28,19 @@ export default function HomeHeader({ user }: Props) {
 
   return (
     <header className="flex items-center justify-between px-3 pt-4 pb-2 bg-[#FAF3EC] select-none">
-      {/* Menu Hambúrguer */}
-      <button
-        type="button"
-        aria-label="Abrir menu"
-        className="flex items-center justify-center rounded-md p-2 hover:bg-[#E76F5112] transition"
-        style={{ minWidth: 44, minHeight: 44 }}
-        onClick={() => setDrawerOpen(true)}
-      >
-        <Menu size={28} className="text-[#E76F51]" />
-      </button>
+      {/* Logo no canto superior esquerdo */}
+      <div className="flex items-center gap-3">
+        <LogoMini size="small" showText={false} />
+        <button
+          type="button"
+          aria-label="Abrir menu"
+          className="flex items-center justify-center rounded-md p-2 hover:bg-[#E76F5112] transition"
+          style={{ minWidth: 44, minHeight: 44 }}
+          onClick={() => setDrawerOpen(true)}
+        >
+          <Menu size={24} className="text-[#E76F51]" />
+        </button>
+      </div>
 
       <AppMenuDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />
 
