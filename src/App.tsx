@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -91,6 +90,9 @@ function AppWrapper() {
               </GuestOrAuthRoute>
             }
           />
+          
+          {/* Nova rota para o processador de logo */}
+          <Route path="/logo-processor" element={<LogoProcessorPage />} />
           
           {/* Rotas que permitem modo convidado */}
           <Route
