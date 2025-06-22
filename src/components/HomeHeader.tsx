@@ -81,8 +81,8 @@ export default function HomeHeader({ user }: Props) {
         </div>
       </div>
 
-      {/* Saudação alinhada à direita */}
-      <div className="flex justify-end">
+      {/* Saudação alinhada à esquerda */}
+      <div className="flex justify-start">
         <h1 className="font-inter text-xl font-semibold text-[#6D4530] tracking-tight">
           {saudacao}
         </h1>
@@ -143,8 +143,8 @@ export default function HomeHeader({ user }: Props) {
           </div>
         </div>
 
-        {/* Saudação desktop alinhada à direita */}
-        <div className="flex justify-end">
+        {/* Saudação desktop alinhada à esquerda */}
+        <div className="flex justify-start">
           <h1 className="font-inter text-2xl font-bold text-[#6D4530] tracking-tight">
             {saudacao}
           </h1>
