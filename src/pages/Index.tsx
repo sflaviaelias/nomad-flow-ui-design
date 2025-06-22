@@ -34,19 +34,20 @@ const Index = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   // Hook: fetch dynamic active trip
-  const { data: activeTripRaw, isLoading: tripLoading } = useActiveTrip();
+  const { data: activeTripRaw, isLoading: tripLoading, error: tripError } = useActiveTrip();
   const hasActiveTrip = !!activeTripRaw;
 
   const { isGuestSession, isAuthenticated, isLoading } = useGuestSession();
 
-  // Debug logs temporários
+  // Debug logs
   console.log("[Index] Deploy Debug - Componente carregado em:", new Date().toISOString());
   console.log("[Index] Deploy Debug - Status de sessão:", {
     isGuestSession,
     isAuthenticated,
     isLoading,
     hasActiveTrip,
-    activeTripRaw
+    activeTripRaw,
+    tripError
   });
 
   useEffect(() => {
@@ -93,29 +94,57 @@ const Index = () => {
   console.log("[Index] Deploy Debug - Avatar URL final:", avatarUrl);
   console.log("[Index] Deploy Debug - É sessão guest:", isGuestSession);
 
-  // Lógica corrigida: só criar activeTrip se há dados reais do banco E usuário autenticado
+  // Lógica melhorada para criar activeTrip
   let activeTrip = null;
   if (isAuthenticated && activeTripRaw) {
     console.log("[Index] Deploy Debug - Criando activeTrip para usuário autenticado");
+    console.log("[Index] Deploy Debug - Dados da viagem:", activeTripRaw);
+    
+    // Função auxiliar para formatar orçamento
+    const formatBudget = (budget: number | null, currency: string = "EUR") => {
+      if (budget === null || budget === undefined) {
+        return "Orçamento não definido";
+      }
+      try {
+        return new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: currency,
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }).format(budget);
+      } catch (error) {
+        return `${currency} ${budget}`;
+      }
+    };
+
+    // Função auxiliar para conversão local
+    const formatLocalBudget = (budget: number | null, rate: number = 5.4) => {
+      if (budget === null || budget === undefined) {
+        return "—";
+      }
+      try {
+        const localAmount = budget * rate;
+        return new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }).format(localAmount);
+      } catch (error) {
+        return "—";
+      }
+    };
+
     activeTrip = {
       destination: activeTripRaw.destination,
-      imageUrl: fallbackImage, // TODO: replace with real from backend/AI hook if exists
+      imageUrl: fallbackImage,
       startDate: activeTripRaw.start_date || "",
       endDate: activeTripRaw.end_date || "",
-      budget:
-        activeTripRaw.budget != null
-          ? `€${Number(activeTripRaw.budget).toLocaleString("pt-BR", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}`
-          : "—",
-      localBudget: activeTripRaw.budget != null
-        ? (Number(activeTripRaw.budget) * 5.4).toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          })
-        : "-",
+      budget: formatBudget(activeTripRaw.budget, activeTripRaw.currency || "EUR"),
+      localBudget: formatLocalBudget(activeTripRaw.budget),
     };
+    
+    console.log("[Index] Deploy Debug - ActiveTrip formatado:", activeTrip);
   } else {
     console.log("[Index] Deploy Debug - Não criando activeTrip - usuário guest ou sem viagem");
   }

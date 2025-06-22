@@ -20,10 +20,53 @@ interface Props {
   onShowDetails?: () => void;
 }
 
+// Função para formatar orçamento com tratamento de valores nulos
+function formatBudget(budget: number | null, currency: string = "EUR"): string {
+  if (budget === null || budget === undefined) {
+    return "Orçamento não definido";
+  }
+  
+  try {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(budget);
+  } catch (error) {
+    console.error("[ActiveTripSection] Error formatting budget:", error);
+    return `${currency} ${budget}`;
+  }
+}
+
+// Função para converter para moeda local
+function formatLocalBudget(budget: number | null, rate: number = 5.4): string {
+  if (budget === null || budget === undefined) {
+    return "—";
+  }
+  
+  try {
+    const localAmount = budget * rate;
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(localAmount);
+  } catch (error) {
+    console.error("[ActiveTripSection] Error formatting local budget:", error);
+    return "—";
+  }
+}
+
 export function ActiveTripSection({ hasActiveTrip, activeTrip, onShowDetails }: Props) {
   const navigate = useNavigate();
 
+  console.log("[ActiveTripSection] Render - hasActiveTrip:", hasActiveTrip, "activeTrip:", activeTrip);
+
   if (hasActiveTrip && activeTrip) {
+    const fallbackImage = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=900&q=80";
+    
     return (
       <div className="px-5 mb-6">
         <h2 className="text-lg font-semibold text-[#6D4530] mb-4 font-inter">
@@ -32,14 +75,12 @@ export function ActiveTripSection({ hasActiveTrip, activeTrip, onShowDetails }: 
         <Card className="overflow-hidden border border-[#E76F51]/20 shadow-lg bg-white/90 backdrop-blur-sm">
           <CardContent className="p-0">
             <div className="relative">
-              {activeTrip.imageUrl && (
-                <div 
-                  className="h-32 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${activeTrip.imageUrl})` }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                </div>
-              )}
+              <div 
+                className="h-32 bg-cover bg-center"
+                style={{ backgroundImage: `url(${activeTrip.imageUrl || fallbackImage})` }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+              </div>
               <div className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-xl font-bold text-[#6D4530] font-inter">
@@ -48,7 +89,9 @@ export function ActiveTripSection({ hasActiveTrip, activeTrip, onShowDetails }: 
                   <PlaneIcon size={20} className="text-[#E76F51]" />
                 </div>
                 <div className="space-y-2 text-sm text-[#6D4530]/80">
-                  <p>Orçamento: <span className="font-semibold text-[#E76F51]">{activeTrip.budget}</span></p>
+                  <p>
+                    <span className="font-semibold text-[#E76F51]">{activeTrip.budget}</span>
+                  </p>
                   {activeTrip.localBudget && (
                     <p className="text-xs text-[#6D4530]/60">≈ {activeTrip.localBudget}</p>
                   )}

@@ -17,19 +17,45 @@ export function useActiveTrip() {
     queryKey: ["active-trip"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.id) return null;
+      if (!user?.id) {
+        console.log("[useActiveTrip] No user found");
+        return null;
+      }
+
+      console.log("[useActiveTrip] Fetching trips for user:", user.id);
+      
       const { data: trips, error } = await supabase
         .from("trips")
         .select("*")
-        .eq("user_id", user.id);
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false }); // Ordenar por mais recente primeiro
 
-      if (error) throw new Error(error.message);
-      if (!trips) return null;
+      if (error) {
+        console.error("[useActiveTrip] Error fetching trips:", error);
+        throw new Error(error.message);
+      }
+      
+      if (!trips || trips.length === 0) {
+        console.log("[useActiveTrip] No trips found");
+        return null;
+      }
 
-      const activeTrip = trips.find(trip =>
-        isTodayWithin(trip.start_date, trip.end_date)
-      );
-      return activeTrip || null;
+      console.log("[useActiveTrip] Found trips:", trips.length);
+
+      // Procurar viagem ativa (data atual dentro do período da viagem)
+      const activeTrip = trips.find(trip => {
+        const isActive = isTodayWithin(trip.start_date, trip.end_date);
+        console.log(`[useActiveTrip] Trip ${trip.destination}: ${trip.start_date} to ${trip.end_date}, active: ${isActive}`);
+        return isActive;
+      });
+
+      if (activeTrip) {
+        console.log("[useActiveTrip] Active trip found:", activeTrip.destination);
+        return activeTrip;
+      }
+
+      console.log("[useActiveTrip] No active trip found");
+      return null;
     }
   });
 }
