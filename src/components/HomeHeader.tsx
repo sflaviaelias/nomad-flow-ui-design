@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Menu, Bell, MapPin } from "lucide-react";
+import { Menu, Bell } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import AppMenuDrawer from "./AppMenuDrawer";
@@ -24,7 +24,7 @@ export default function HomeHeader({ user }: Props) {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   return (
-    <header className="bg-gradient-to-b from-[#FAF3EC] to-[#FAF3EC]/95 px-5 pt-12 pb-6 select-none">
+    <header className="bg-gradient-to-b from-[#FAF3EC] to-[#FAF3EC]/95 px-5 pt-12 pb-8 select-none">
       {/* Header principal */}
       <div className="flex items-center justify-between">
         {/* Menu hambúrguer à esquerda */}
@@ -38,21 +38,15 @@ export default function HomeHeader({ user }: Props) {
           <Menu size={22} className="text-[#6D4530]" strokeWidth={1.8} />
         </button>
 
-        {/* Saudação personalizada */}
-        <div className="flex-1 px-6 text-center">
-          <div className="flex items-center justify-center gap-2">
-            <MapPin size={18} className="text-[#E76F51] opacity-70" strokeWidth={2} />
+        {/* Lado direito - Saudação e Avatar */}
+        <div className="flex items-center gap-4">
+          {/* Saudação personalizada alinhada à direita */}
+          <div className="text-right">
             <span className="font-inter text-xl font-semibold text-[#6D4530] tracking-tight">
               {saudacao}
             </span>
           </div>
-          <p className="text-sm text-[#6D4530]/60 font-medium mt-1">
-            Pronto para sua próxima aventura?
-          </p>
-        </div>
 
-        {/* Avatar do usuário à direita */}
-        <div className="flex items-center gap-3">
           {/* Notificações */}
           <button
             type="button"
@@ -96,11 +90,11 @@ export default function HomeHeader({ user }: Props) {
 
       <AppMenuDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />
 
-      {/* Versão alternativa para desktop - mais refinada */}
+      {/* Versão para desktop - mais refinada */}
       <div className="hidden lg:block">
         <div className="flex items-center justify-between pt-4">
-          {/* Lado esquerdo - Menu e localização */}
-          <div className="flex items-center gap-6">
+          {/* Lado esquerdo - Menu */}
+          <div className="flex items-center">
             <button
               type="button"
               aria-label="Abrir menu"
@@ -109,25 +103,17 @@ export default function HomeHeader({ user }: Props) {
             >
               <Menu size={24} className="text-[#6D4530]" strokeWidth={1.8} />
             </button>
-            
-            <div className="flex items-center gap-3 bg-white/50 px-4 py-3 rounded-xl shadow-sm border border-white/40">
-              <MapPin size={20} className="text-[#E76F51]" strokeWidth={2} />
-              <span className="text-[#6D4530] font-medium">São Paulo, BR</span>
+          </div>
+
+          {/* Lado direito - Saudação, Notificações e Avatar */}
+          <div className="flex items-center gap-6">
+            {/* Saudação principal alinhada à direita */}
+            <div className="text-right">
+              <h1 className="font-inter text-2xl font-bold text-[#6D4530] tracking-tight">
+                {saudacao}
+              </h1>
             </div>
-          </div>
 
-          {/* Centro - Saudação principal */}
-          <div className="text-center">
-            <h1 className="font-inter text-2xl font-bold text-[#6D4530] tracking-tight">
-              {saudacao}
-            </h1>
-            <p className="text-[#6D4530]/70 font-medium mt-1">
-              Que tal explorar algo novo hoje?
-            </p>
-          </div>
-
-          {/* Lado direito - Notificações e Avatar */}
-          <div className="flex items-center gap-4">
             <button
               type="button"
               aria-label="Notificações"
