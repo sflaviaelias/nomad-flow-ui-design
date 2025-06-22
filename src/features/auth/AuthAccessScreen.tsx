@@ -1,9 +1,10 @@
 
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Globe } from "lucide-react";
+import { Globe, Mail, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import LogoMini from "@/components/LogoMini";
+import { Separator } from "@/components/ui/separator";
 
 export default function AuthAccessScreen() {
   const navigate = useNavigate();
@@ -43,47 +44,83 @@ export default function AuthAccessScreen() {
   };
 
   return (
-    <div className="h-screen flex flex-col justify-center items-center bg-[#FAF3EC] px-4">
-      <div className="w-full max-w-md">
-        {/* Logo centralizada */}
-        <div className="flex justify-center mb-8">
-          <LogoMini size="medium" showText={true} />
+    <div className="min-h-screen flex flex-col justify-center items-center bg-[#FAF3EC] px-6 py-8">
+      <div className="w-full max-w-sm">
+        {/* Logo centralizada com mais espaço */}
+        <div className="flex justify-center mb-12">
+          <LogoMini size="large" showText={true} />
         </div>
 
-        <h2 className="font-bold text-2xl mb-6 text-terra-700 text-center" style={{fontFamily: "Inter"}}>
-          Crie sua conta
-        </h2>
-        <Button
-          className="w-full py-3 mb-3 bg-[#E76F51] text-white font-semibold text-base shadow-md relative opacity-70 cursor-not-allowed"
-          disabled
-          // onClick={handleSocial} // Desativa temporariamente
-        >
-          <Globe className="mr-2" /> 
-          Entrar com Google
-          <span className="ml-2 bg-white/80 text-[#E76F51] text-xs font-semibold px-2 py-0.5 rounded shadow-sm absolute right-4 top-1/2 -translate-y-1/2 select-none pointer-events-none">
-            Em breve
-          </span>
-        </Button>
-        <Button
-          className="w-full py-3 mb-3 bg-white text-[#E76F51] border border-[#E76F51] font-semibold text-base shadow"
-          onClick={() => navigate("/auth/signup")}
-        >
-          Cadastrar com e-mail
-        </Button>
-        <Button
-          variant="ghost"
-          className="w-full py-2 mb-4 text-neutral-500 underline text-sm"
-          onClick={() => navigate("/auth/login")}
-        >
-          Já tem conta? <span className="ml-1 underline">Entrar</span>
-        </Button>
-        <Button
-          variant="link"
-          className="w-full py-2 text-xs text-neutral-400 hover:text-neutral-600 transition-colors"
-          onClick={handleExploreAsGuest}
-        >
-          Explorar como Convidado
-        </Button>
+        {/* Título principal */}
+        <div className="text-center mb-8">
+          <h1 className="font-semibold text-3xl mb-3 text-[#1D2939]" style={{fontFamily: "Inter"}}>
+            Bem-vindo
+          </h1>
+          <p className="text-[#667085] text-base leading-6">
+            Crie sua conta para começar a planejar suas viagens
+          </p>
+        </div>
+
+        {/* Ações principais de cadastro */}
+        <div className="space-y-4 mb-6">
+          {/* Botão Google - Ação principal futura */}
+          <Button
+            className="w-full h-12 bg-white text-[#344054] border border-[#D0D5DD] font-medium text-base hover:bg-[#F9FAFB] hover:border-[#98A2B3] transition-all duration-200 relative opacity-50 cursor-not-allowed shadow-sm"
+            disabled
+            // onClick={handleSocial} // Desativa temporariamente
+          >
+            <Globe className="mr-3 h-5 w-5" /> 
+            Cadastrar com Google
+            <span className="ml-auto bg-[#F79009] text-white text-xs font-medium px-2 py-1 rounded-md absolute right-3 top-1/2 -translate-y-1/2 select-none pointer-events-none">
+              Em breve
+            </span>
+          </Button>
+
+          {/* Botão Email - Ação principal disponível */}
+          <Button
+            className="w-full h-12 bg-[#E76F51] text-white font-medium text-base hover:bg-[#D85D3F] active:bg-[#C2513B] transition-all duration-200 shadow-sm"
+            onClick={() => navigate("/auth/signup")}
+          >
+            <Mail className="mr-3 h-5 w-5" />
+            Cadastrar com e-mail
+          </Button>
+        </div>
+
+        {/* Divisor visual */}
+        <div className="relative mb-6">
+          <Separator className="bg-[#EAECF0]" />
+          <div className="absolute inset-0 flex justify-center">
+            <span className="bg-[#FAF3EC] px-3 text-sm text-[#98A2B3] font-medium">
+              ou
+            </span>
+          </div>
+        </div>
+
+        {/* Ação secundária - Login */}
+        <div className="mb-8">
+          <Button
+            variant="outline"
+            className="w-full h-11 text-[#344054] border-[#D0D5DD] font-medium text-base hover:bg-[#F9FAFB] hover:border-[#98A2B3] transition-all duration-200"
+            onClick={() => navigate("/auth/login")}
+          >
+            Já tem conta? Entrar
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Ação terciária - Explorar como convidado */}
+        <div className="text-center">
+          <Button
+            variant="ghost"
+            className="text-[#667085] hover:text-[#344054] font-medium text-sm hover:bg-[#F9FAFB] transition-all duration-200 px-4 py-3"
+            onClick={handleExploreAsGuest}
+          >
+            Explorar como Convidado
+          </Button>
+          <p className="text-xs text-[#98A2B3] mt-2 leading-5">
+            Acesse funcionalidades básicas sem criar conta
+          </p>
+        </div>
       </div>
     </div>
   );
