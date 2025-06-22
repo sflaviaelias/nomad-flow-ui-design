@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HomeHeader from "../components/HomeHeader";
@@ -14,7 +13,6 @@ import { supabase } from "@/integrations/supabase/client";
 import UpcomingTripsSlider from "@/components/UpcomingTripsSlider";
 import { useActiveTrip } from "@/hooks/useActiveTrip";
 import { useGuestSession } from "@/hooks/useGuestSession";
-import GuestLoginButton from "@/components/GuestLoginButton";
 import { showGuestBlockedToast } from "@/components/GuestLoginToast";
 
 // Dummy data: in real app, replace with actual data and hooks.
@@ -151,8 +149,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-[#FAF3EC]">
-      {isGuestSession && <GuestLoginButton />}
-      {/* Header */}
+      {/* Header sem botão de login flutuante */}
       <HomeHeader user={{ name: userName, avatarUrl }} />
       <main className="max-w-md mx-auto w-full px-0 pb-8">
         {loading || tripLoading || isLoading ? (
@@ -161,7 +158,8 @@ const Index = () => {
           </div>
         ) : (
           <>
-            <div className="h-8 md:h-12" />
+            {/* Espaçamento reduzido após o header */}
+            <div className="h-4 md:h-6" />
             <ActiveTripSection
               hasActiveTrip={!!activeTrip}
               activeTrip={activeTrip}

@@ -24,9 +24,9 @@ export default function HomeHeader({ user }: Props) {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   return (
-    <header className="bg-gradient-to-b from-[#FAF3EC] to-[#FAF3EC]/95 px-5 pt-12 pb-8 select-none">
-      {/* Header principal */}
-      <div className="flex items-center justify-between">
+    <header className="bg-gradient-to-b from-[#FAF3EC] to-[#FAF3EC]/95 px-5 pt-12 pb-6 select-none">
+      {/* Header principal - elementos no topo */}
+      <div className="flex items-center justify-between mb-4">
         {/* Menu hambúrguer à esquerda */}
         <button
           type="button"
@@ -38,15 +38,8 @@ export default function HomeHeader({ user }: Props) {
           <Menu size={22} className="text-[#6D4530]" strokeWidth={1.8} />
         </button>
 
-        {/* Lado direito - Saudação e Avatar */}
-        <div className="flex items-center gap-4">
-          {/* Saudação personalizada alinhada à direita */}
-          <div className="text-right">
-            <span className="font-inter text-xl font-semibold text-[#6D4530] tracking-tight">
-              {saudacao}
-            </span>
-          </div>
-
+        {/* Lado direito - Notificações e Avatar */}
+        <div className="flex items-center gap-3">
           {/* Notificações */}
           <button
             type="button"
@@ -88,32 +81,30 @@ export default function HomeHeader({ user }: Props) {
         </div>
       </div>
 
+      {/* Saudação alinhada à direita */}
+      <div className="flex justify-end">
+        <h1 className="font-inter text-xl font-semibold text-[#6D4530] tracking-tight">
+          {saudacao}
+        </h1>
+      </div>
+
       <AppMenuDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />
 
-      {/* Versão para desktop - mais refinada */}
+      {/* Versão para desktop - layout otimizado */}
       <div className="hidden lg:block">
-        <div className="flex items-center justify-between pt-4">
-          {/* Lado esquerdo - Menu */}
-          <div className="flex items-center">
-            <button
-              type="button"
-              aria-label="Abrir menu"
-              className="flex items-center justify-center rounded-2xl p-4 hover:bg-white/60 transition-all duration-200 shadow-md border border-white/50"
-              onClick={() => setDrawerOpen(true)}
-            >
-              <Menu size={24} className="text-[#6D4530]" strokeWidth={1.8} />
-            </button>
-          </div>
+        <div className="flex items-center justify-between mb-6">
+          {/* Menu */}
+          <button
+            type="button"
+            aria-label="Abrir menu"
+            className="flex items-center justify-center rounded-2xl p-4 hover:bg-white/60 transition-all duration-200 shadow-md border border-white/50"
+            onClick={() => setDrawerOpen(true)}
+          >
+            <Menu size={24} className="text-[#6D4530]" strokeWidth={1.8} />
+          </button>
 
-          {/* Lado direito - Saudação, Notificações e Avatar */}
-          <div className="flex items-center gap-6">
-            {/* Saudação principal alinhada à direita */}
-            <div className="text-right">
-              <h1 className="font-inter text-2xl font-bold text-[#6D4530] tracking-tight">
-                {saudacao}
-              </h1>
-            </div>
-
+          {/* Notificações e Avatar */}
+          <div className="flex items-center gap-4">
             <button
               type="button"
               aria-label="Notificações"
@@ -150,6 +141,13 @@ export default function HomeHeader({ user }: Props) {
               </div>
             </button>
           </div>
+        </div>
+
+        {/* Saudação desktop alinhada à direita */}
+        <div className="flex justify-end">
+          <h1 className="font-inter text-2xl font-bold text-[#6D4530] tracking-tight">
+            {saudacao}
+          </h1>
         </div>
       </div>
     </header>
