@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useNavigate } from "react-router-dom";
@@ -86,8 +85,8 @@ export default function ProfileScreen() {
 
   return (
     <div className="bg-[#FAF3EC] min-h-screen pb-10">
-      {/* Header com opção de voltar para Home */}
-      <PageHeader title="Perfil" showBack />
+      {/* Header com botão de voltar */}
+      <PageHeader title="Perfil" showBack backTo="/" />
 
       <main className="max-w-md mx-auto w-full px-4 pt-3 pb-8 flex flex-col font-sans">
         {/* Avatar, nome e email */}
