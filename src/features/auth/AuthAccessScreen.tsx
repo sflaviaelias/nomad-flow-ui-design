@@ -20,14 +20,26 @@ export default function AuthAccessScreen() {
     }
   };
 
-  // Explorar como convidado — forçar signOut, limpar localStorage relacionado a sessão
+  // Explorar como convidado — corrigido para usar React Router
   const handleExploreAsGuest = async () => {
-    // Garante sign-out antes de liberar uso como guest
-    await supabase.auth.signOut();
-    // Marca onboarding como feito (não mostra onboarding para guest)
-    localStorage.setItem("onboarding_done", "1");
-    // Navega p/ Home e força reload leve para limpar eventuais estados residuais de usuário
-    window.location.replace("/");
+    console.log("[AuthAccessScreen] Iniciando processo de convidado");
+    
+    try {
+      // Garante sign-out antes de liberar uso como guest
+      await supabase.auth.signOut();
+      console.log("[AuthAccessScreen] Sign-out realizado");
+      
+      // Marca onboarding como feito (não mostra onboarding para guest)
+      localStorage.setItem("onboarding_done", "1");
+      console.log("[AuthAccessScreen] Onboarding marcado como feito");
+      
+      // Navega para Home usando React Router em vez de window.location
+      console.log("[AuthAccessScreen] Navegando para home como convidado");
+      navigate("/", { replace: true });
+      
+    } catch (error) {
+      console.error("[AuthAccessScreen] Erro ao entrar como convidado:", error);
+    }
   };
 
   return (
@@ -67,7 +79,7 @@ export default function AuthAccessScreen() {
         </Button>
         <Button
           variant="link"
-          className="w-full py-2 text-xs text-neutral-400"
+          className="w-full py-2 text-xs text-neutral-400 hover:text-neutral-600 transition-colors"
           onClick={handleExploreAsGuest}
         >
           Explorar como Convidado
