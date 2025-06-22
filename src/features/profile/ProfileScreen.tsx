@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useNavigate } from "react-router-dom";
@@ -29,6 +30,7 @@ export default function ProfileScreen() {
       .maybeSingle()
       .then(({ data, error }) => {
         if (data) {
+          console.log("Profile data loaded:", data);
           // Desconstrói as preferências se existirem
           let prefs: any = {};
           if (typeof data.preferences === "object" && data.preferences !== null) {
@@ -93,9 +95,8 @@ export default function ProfileScreen() {
         <section className="flex flex-col items-center mt-2 mb-5">
           <ProfileAvatar
             avatarUrl={profile.avatar_url}
-            editable
+            editable={false}
             name={profile.name}
-            onChange={() => {/* no-op for now */}}
           />
           <h1 className="mt-3 font-bold text-[1.45rem] md:text-2xl text-terra-700 text-center font-inter lowercase">
             {profile.name || "Nome"}

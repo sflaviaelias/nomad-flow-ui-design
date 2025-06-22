@@ -26,25 +26,33 @@ export function useAvatarUpload() {
     setUploading(true);
     try {
       const ext = file.name.split(".").pop();
-      const filePath = `avatars/${userId}.${ext}`;
+      const filePath = `${userId}.${ext}`;
+      
       // Remove imagem antiga se existir (ignorado em caso de erro por não existir)
       await supabase.storage.from("avatars").remove([filePath]).catch(() => {});
+      
       // Faz upload (pode sobrescrever)
       const { data, error: uploadError } = await supabase.storage.from("avatars").upload(
         filePath,
         file,
         { upsert: true, cacheControl: "3600", contentType: file.type }
       );
+      
       if (uploadError) {
+        console.error("Upload error:", uploadError);
         setError(uploadError.message);
         setUploading(false);
         return null;
       }
+      
       // Monta URL pública
       const { data: pub } = supabase.storage.from("avatars").getPublicUrl(filePath);
+      console.log("Public URL gerada:", pub?.publicUrl);
+      
       setUploading(false);
       return pub?.publicUrl ?? null;
     } catch (e: any) {
+      console.error("Upload exception:", e);
       setError(e.message || "Erro ao fazer upload.");
       setUploading(false);
       return null;

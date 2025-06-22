@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { toast } from "@/hooks/use-toast";
@@ -15,7 +16,6 @@ export default function EditProfileScreen() {
   const [loading, setLoading] = useState(false);
 
   // Campos do formulário
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarUrl, setAvatarUrl] = useState(user?.user_metadata?.avatar_url || null);
   const [name, setName] = useState(user?.user_metadata?.name || "");
   const [nationality, setNationality] = useState("Brasil");
@@ -87,24 +87,34 @@ export default function EditProfileScreen() {
       });
   }, [user?.id]);
 
-  // Novo: upload de avatar e salvar no supabase
+  // Upload de avatar corrigido
   const { upload, uploading: uploadingAvatar, error: avatarError } = useAvatarUpload();
+  
   const handleAvatarChange = async (file: File) => {
     if (!user?.id) return;
+    
+    console.log("Iniciando upload de avatar para usuário:", user.id);
     const url = await upload(file, user.id);
+    
     if (url) {
+      console.log("URL do avatar obtida:", url);
       // Atualiza no banco (profiles.avatar_url)
       const { error } = await supabase
         .from("profiles")
         .update({ avatar_url: url })
         .eq("id", user.id);
+        
       if (error) {
+        console.error("Erro ao salvar avatar no banco:", error);
         toast({ title: "Erro ao salvar avatar", description: error.message, variant: "destructive" });
         return;
       }
+      
       setAvatarUrl(url); // força re-render local
-      toast({ title: "Foto atualizada!" });
+      toast({ title: "Foto atualizada com sucesso!" });
+      console.log("Avatar salvo com sucesso no banco");
     } else if (avatarError) {
+      console.error("Erro no upload do avatar:", avatarError);
       toast({ title: "Erro no avatar", description: avatarError, variant: "destructive" });
     }
   };
@@ -122,7 +132,6 @@ export default function EditProfileScreen() {
     if (Object.values(newErrors).some(Boolean)) return;
     setLoading(true);
     try {
-      // Avatar: upload futuramente
       const updates = {
         id: user?.id,
         name,

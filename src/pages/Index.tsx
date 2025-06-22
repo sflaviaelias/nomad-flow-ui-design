@@ -65,6 +65,9 @@ const Index = () => {
         .eq("id", user.id)
         .maybeSingle();
       console.log("[Index] Deploy Debug - Profile obtido:", !!data);
+      if (data) {
+        console.log("[Index] Avatar URL no profile:", data.avatar_url);
+      }
       setProfile(data);
       setLoading(false);
     }
@@ -87,6 +90,7 @@ const Index = () => {
         : userFallback.avatarUrl);
 
   console.log("[Index] Deploy Debug - Nome do usuário:", userName);
+  console.log("[Index] Deploy Debug - Avatar URL final:", avatarUrl);
   console.log("[Index] Deploy Debug - É sessão guest:", isGuestSession);
 
   // Lógica corrigida: só criar activeTrip se há dados reais do banco E usuário autenticado

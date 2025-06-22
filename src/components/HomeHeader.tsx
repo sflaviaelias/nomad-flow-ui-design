@@ -63,7 +63,14 @@ export default function HomeHeader({ user }: Props) {
         >
           <Avatar className="w-10 h-10 ring-2 ring-[#E76F51] shadow-sm">
             {user.avatarUrl ? (
-              <AvatarImage src={user.avatarUrl} alt={`Avatar de ${user.name ?? "Nômade"}`} />
+              <AvatarImage 
+                src={user.avatarUrl} 
+                alt={`Avatar de ${user.name ?? "Nômade"}`}
+                className="object-cover"
+                onError={(e) => {
+                  console.error("Erro ao carregar avatar no header:", user.avatarUrl);
+                }}
+              />
             ) : (
               <AvatarFallback
                 className="bg-[#E76F51] text-white font-medium text-sm"
@@ -110,7 +117,14 @@ export default function HomeHeader({ user }: Props) {
             >
               <Avatar className="w-12 h-12 ring-2 ring-[#E76F51] shadow-md">
                 {user.avatarUrl ? (
-                  <AvatarImage src={user.avatarUrl} alt={`Avatar de ${user.name ?? "Nômade"}`} />
+                  <AvatarImage 
+                    src={user.avatarUrl} 
+                    alt={`Avatar de ${user.name ?? "Nômade"}`}
+                    className="object-cover"
+                    onError={(e) => {
+                      console.error("Erro ao carregar avatar no header desktop:", user.avatarUrl);
+                    }}
+                  />
                 ) : (
                   <AvatarFallback
                     className="bg-[#E76F51] text-white font-bold"
