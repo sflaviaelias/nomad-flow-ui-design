@@ -24,74 +24,75 @@ export default function HomeHeader({ user }: Props) {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   return (
-    <header className="bg-gradient-to-b from-[#FAF3EC] to-[#FAF3EC]/95 px-5 pt-12 pb-6 select-none">
-      {/* Header principal - elementos no topo */}
-      <div className="flex items-center justify-between mb-4">
-        {/* Menu hambúrguer à esquerda */}
-        <button
-          type="button"
-          aria-label="Abrir menu"
-          className="flex items-center justify-center rounded-xl p-3 hover:bg-white/60 transition-all duration-200 shadow-sm border border-white/40"
-          style={{ minWidth: 48, minHeight: 48 }}
-          onClick={() => setDrawerOpen(true)}
-        >
-          <Menu size={22} className="text-[#6D4530]" strokeWidth={1.8} />
-        </button>
-
-        {/* Lado direito - Notificações e Avatar */}
-        <div className="flex items-center gap-3">
-          {/* Notificações */}
+    <>
+      {/* Header Mobile - oculto em desktop */}
+      <header className="bg-gradient-to-b from-[#FAF3EC] to-[#FAF3EC]/95 px-5 pt-12 pb-6 select-none lg:hidden">
+        {/* Header principal - elementos no topo */}
+        <div className="flex items-center justify-between mb-4">
+          {/* Menu hambúrguer à esquerda */}
           <button
             type="button"
-            aria-label="Notificações"
-            className="flex items-center justify-center rounded-xl p-3 hover:bg-white/60 transition-all duration-200 shadow-sm border border-white/40 relative"
+            aria-label="Abrir menu"
+            className="flex items-center justify-center rounded-xl p-3 hover:bg-white/60 transition-all duration-200 shadow-sm border border-white/40"
             style={{ minWidth: 48, minHeight: 48 }}
+            onClick={() => setDrawerOpen(true)}
           >
-            <Bell size={20} className="text-[#6D4530]" strokeWidth={1.8} />
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#E76F51] rounded-full border-2 border-white"></div>
+            <Menu size={22} className="text-[#6D4530]" strokeWidth={1.8} />
           </button>
 
-          {/* Avatar com efeito sofisticado */}
-          <button
-            type="button"
-            aria-label="Perfil"
-            className="relative group"
-            onClick={() => navigate("/profile")}
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-[#E76F51] to-[#C9583C] rounded-2xl blur-sm opacity-60 group-hover:opacity-80 transition-all duration-300"></div>
-            <div className="relative bg-white p-1 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300">
-              <Avatar className="w-12 h-12 border-2 border-[#E76F51]/20">
-                {user.avatarUrl ? (
-                  <AvatarImage 
-                    src={user.avatarUrl} 
-                    alt={`Avatar de ${user.name ?? "Nômade"}`}
-                    className="object-cover"
-                    onError={(e) => {
-                      console.error("Erro ao carregar avatar no header:", user.avatarUrl);
-                    }}
-                  />
-                ) : (
-                  <AvatarFallback className="bg-gradient-to-br from-[#E76F51] to-[#C9583C] text-white font-bold text-lg">
-                    {user.name?.[0]?.toUpperCase() ?? "N"}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-            </div>
-          </button>
+          {/* Lado direito - Notificações e Avatar */}
+          <div className="flex items-center gap-3">
+            {/* Notificações */}
+            <button
+              type="button"
+              aria-label="Notificações"
+              className="flex items-center justify-center rounded-xl p-3 hover:bg-white/60 transition-all duration-200 shadow-sm border border-white/40 relative"
+              style={{ minWidth: 48, minHeight: 48 }}
+            >
+              <Bell size={20} className="text-[#6D4530]" strokeWidth={1.8} />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#E76F51] rounded-full border-2 border-white"></div>
+            </button>
+
+            {/* Avatar com efeito sofisticado */}
+            <button
+              type="button"
+              aria-label="Perfil"
+              className="relative group"
+              onClick={() => navigate("/profile")}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-[#E76F51] to-[#C9583C] rounded-2xl blur-sm opacity-60 group-hover:opacity-80 transition-all duration-300"></div>
+              <div className="relative bg-white p-1 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300">
+                <Avatar className="w-12 h-12 border-2 border-[#E76F51]/20">
+                  {user.avatarUrl ? (
+                    <AvatarImage 
+                      src={user.avatarUrl} 
+                      alt={`Avatar de ${user.name ?? "Nômade"}`}
+                      className="object-cover"
+                      onError={(e) => {
+                        console.error("Erro ao carregar avatar no header:", user.avatarUrl);
+                      }}
+                    />
+                  ) : (
+                    <AvatarFallback className="bg-gradient-to-br from-[#E76F51] to-[#C9583C] text-white font-bold text-lg">
+                      {user.name?.[0]?.toUpperCase() ?? "N"}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+              </div>
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* Saudação alinhada à esquerda */}
-      <div className="flex justify-start">
-        <h1 className="font-inter text-xl font-semibold text-[#6D4530] tracking-tight">
-          {saudacao}
-        </h1>
-      </div>
+        {/* Saudação alinhada à esquerda */}
+        <div className="flex justify-start">
+          <h1 className="font-inter text-xl font-semibold text-[#6D4530] tracking-tight">
+            {saudacao}
+          </h1>
+        </div>
+      </header>
 
-      <AppMenuDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />
-
-      {/* Versão para desktop - layout otimizado */}
-      <div className="hidden lg:block">
+      {/* Header Desktop - visível apenas em desktop */}
+      <header className="hidden lg:block bg-gradient-to-b from-[#FAF3EC] to-[#FAF3EC]/95 px-8 pt-16 pb-8 select-none">
         <div className="flex items-center justify-between mb-6">
           {/* Menu */}
           <button
@@ -149,7 +150,9 @@ export default function HomeHeader({ user }: Props) {
             {saudacao}
           </h1>
         </div>
-      </div>
-    </header>
+      </header>
+
+      <AppMenuDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />
+    </>
   );
 }
