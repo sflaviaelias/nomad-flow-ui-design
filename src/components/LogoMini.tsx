@@ -20,17 +20,14 @@ export default function LogoMini({ size = "small", showText = true, className = 
     large: "text-2xl"
   };
 
-  // Debug log temporário para verificar se a logo está sendo renderizada
-  console.log("[LogoMini] Deploy Debug - Logo renderizada com size:", size, "showText:", showText);
-
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <img 
-        src="/lovable-uploads/78fdfd19-ff72-4092-9052-7c83a8f1e12f.png"
+        src="/lovable-uploads/go-nomad-logo.png"
         alt="Go Nomad Logo"
         className={`${sizeClasses[size]} object-contain`}
-        onLoad={() => console.log("[LogoMini] Deploy Debug - Imagem da logo carregada com sucesso")}
-        onError={(e) => console.error("[LogoMini] Deploy Debug - Erro ao carregar logo:", e)}
+        onLoad={() => console.log("[LogoMini] Logo carregada com sucesso")}
+        onError={(e) => console.error("[LogoMini] Erro ao carregar logo:", e)}
       />
       {showText && (
         <span className={`font-bold tracking-tight text-[#C9583C] ${textSizeClasses[size]} font-inter`}>
