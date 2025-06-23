@@ -92,6 +92,9 @@ function AppWrapper() {
             }
           />
           
+          {/* Nova rota para prompt de nova viagem */}
+          <Route path="/new-trip" element={<NewTripAuthPrompt />} />
+          
           {/* Rota do processador de logo - deploy forçado */}
           <Route path="/logo-processor" element={<LogoProcessorPage />} />
           
