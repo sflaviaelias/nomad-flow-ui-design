@@ -26,7 +26,7 @@ export default function LogoMini({ size = "small", showText = true, className = 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <img 
-        src="/lovable-uploads/27904f0e-c6d8-4bb1-b158-ebbb5a1487e1.png"
+        src="/lovable-uploads/78fdfd19-ff72-4092-9052-7c83a8f1e12f.png"
         alt="Go Nomad Logo"
         className={`${sizeClasses[size]} object-contain`}
         onLoad={() => console.log("[LogoMini] Deploy Debug - Imagem da logo carregada com sucesso")}
