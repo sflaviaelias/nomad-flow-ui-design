@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,6 +24,7 @@ import EditProfileScreen from "./features/profile/EditProfileScreen";
 import TripSummaryPage from "./pages/TripSummaryPage";
 import TripSmartSummaryPage from "./pages/TripSmartSummaryPage";
 import LogoProcessorPage from "./pages/LogoProcessorPage";
+import NewTripAuthPrompt from "./components/NewTripAuthPrompt";
 import { NavigationHistoryProvider } from "@/contexts/NavigationHistoryContext";
 import PlaceDetailsPage from "./pages/PlaceDetailsPage";
 import RequireAuth from "./features/auth/RequireAuth";
