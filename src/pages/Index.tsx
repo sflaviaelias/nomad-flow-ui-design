@@ -149,9 +149,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-[#FAF3EC]">
-      {/* Header sem botão de login flutuante */}
+      {/* Header fixo */}
       <HomeHeader user={{ name: userName, avatarUrl }} />
-      <main className="max-w-md mx-auto w-full px-0 pb-8">
+      
+      {/* Conteúdo principal com padding-top para compensar o header fixo */}
+      <main className="max-w-md mx-auto w-full px-0 pb-8 pt-32">
         {loading || tripLoading || isLoading ? (
           <div className="h-32 flex items-center justify-center text-[#E76F51] text-lg font-medium">
             Carregando informações...
