@@ -26,7 +26,17 @@ export default function HomeHeader({ user }: Props) {
   return (
     <>
       {/* Header fixo unificado para todas as telas */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-[#FAF3EC] to-[#FAF3EC]/95 backdrop-blur-sm px-5 pt-12 pb-6 select-none border-b border-white/20">
+      <header 
+        className="fixed top-0 left-0 right-0 z-[9999] bg-gradient-to-b from-[#FAF3EC] to-[#FAF3EC]/95 backdrop-blur-sm px-5 pt-12 pb-6 select-none border-b border-white/20"
+        style={{ 
+          position: 'fixed !important',
+          top: '0 !important',
+          left: '0 !important',
+          right: '0 !important',
+          zIndex: '9999 !important',
+          transform: 'translateZ(0)'
+        }}
+      >
         {/* Header principal - elementos no topo */}
         <div className="flex items-center justify-between mb-4">
           {/* Menu hambúrguer à esquerda */}
