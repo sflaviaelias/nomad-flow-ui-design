@@ -23,7 +23,7 @@ import ProfileScreen from "./features/profile/ProfileScreen";
 import EditProfileScreen from "./features/profile/EditProfileScreen";
 import TripSummaryPage from "./pages/TripSummaryPage";
 import TripSmartSummaryPage from "./pages/TripSmartSummaryPage";
-import LogoProcessorPage from "./pages/LogoProcessorPage";
+
 import NewTripAuthPrompt from "./components/NewTripAuthPrompt";
 import { NavigationHistoryProvider } from "@/contexts/NavigationHistoryContext";
 import PlaceDetailsPage from "./pages/PlaceDetailsPage";
@@ -97,8 +97,6 @@ function AppWrapper() {
           {/* Nova rota para prompt de nova viagem */}
           <Route path="/new-trip" element={<NewTripAuthPrompt />} />
           
-          {/* Rota do processador de logo - deploy forçado */}
-          <Route path="/logo-processor" element={<LogoProcessorPage />} />
           
           {/* Rotas que permitem modo convidado */}
           <Route
