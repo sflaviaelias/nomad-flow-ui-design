@@ -144,7 +144,7 @@ def main():
 
     def query(sql):
         return json.loads(run("consulta somente leitura", ["psql", "-XAtq", "-v", "ON_ERROR_STOP=1",
-            "--dbname", read_url, "--command", sql], env=env, show=False))
+            "--dbname", read_url, "--command", "BEGIN READ ONLY; " + sql.rstrip(";") + "; COMMIT;"], env=env, show=False))
 
     state = query("""select json_build_object(
         'version', current_setting('server_version_num')::int,
