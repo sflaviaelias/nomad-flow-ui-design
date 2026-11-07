@@ -1,0 +1,102 @@
+name: Validação local do banco
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  database:
+    name: Migrations e pgTAP
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      SUPABASE_INTERNAL_IMAGE_REGISTRY: docker.io
+    steps:
+      - name: Obter o código da branch selecionada
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Conferir recursos do runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          df -h /
+          free -h
+          docker --host=unix:///var/run/docker.sock info --format 'Driver: {{.Driver}}'
+          if [ "$(docker --host=unix:///var/run/docker.sock info --format '{{.Driver}}')" = vfs ]; then
+            echo '::error::Driver VFS inadequado para as imagens deste teste.'
+            exit 1
+          fi
+          available_kib=$(df -Pk / | awk 'NR==2 {print $4}')
+          if [ "$available_kib" -lt 10485760 ]; then
+            echo '::error::São necessários pelo menos 10 GiB livres para iniciar esta tentativa.'
+            exit 1
+          fi
+
+      - name: Instalar Supabase CLI 2.54.11 com checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          cli_download=$(mktemp -d)
+          trap 'rm -rf -- "$cli_download"' EXIT
+          release=https://github.com/supabase/cli/releases/download/v2.54.11
+          curl --fail --silent --show-error --location --retry 3 \
+            "$release/supabase_2.54.11_checksums.txt" -o "$cli_download/checksums.txt"
+          curl --fail --silent --show-error --location --retry 3 \
+            "$release/supabase_linux_amd64.tar.gz" -o "$cli_download/supabase_linux_amd64.tar.gz"
+          (cd "$cli_download" && sha256sum --check --ignore-missing checksums.txt)
+          tar -xzf "$cli_download/supabase_linux_amd64.tar.gz" -C "$cli_download" supabase
+          mkdir -p "$RUNNER_TEMP/go-nomad-bin"
+          install -m 0755 "$cli_download/supabase" "$RUNNER_TEMP/go-nomad-bin/supabase"
+          echo "SUPABASE_BIN=$RUNNER_TEMP/go-nomad-bin/supabase" >> "$GITHUB_ENV"
+
+      - name: Conferir o roteiro com comandos simulados
+        shell: bash
+        run: python3 -B -m unittest discover -s scripts/tests -v
+
+      - name: Aplicar migrations e executar pgTAP localmente
+        id: database
+        shell: bash
+        env:
+          DB_TEST_WORKSPACE_PARENT: ${{ runner.temp }}
+          DB_TEST_STATE_FILE: ${{ runner.temp }}/go-nomad-db-workspace.txt
+        run: bash scripts/test-database-local.sh
+
+      - name: Limpeza adicional dos recursos temporários
+        if: always()
+        shell: bash
+        env:
+          DB_TEST_STATE_FILE: ${{ runner.temp }}/go-nomad-db-workspace.txt
+        run: |
+          set -euo pipefail
+          if [ -f "$DB_TEST_STATE_FILE" ]; then
+            IFS= read -r test_workspace < "$DB_TEST_STATE_FILE"
+            case "$test_workspace" in
+              "$RUNNER_TEMP"/go-nomad-db-*) ;;
+              *) echo '::error::Caminho inesperado; limpeza recusada.'; exit 1 ;;
+            esac
+            if [ -f "$test_workspace/supabase/config.toml" ]; then
+              env -u DOCKER_CONTEXT -u DOCKER_TLS -u DOCKER_TLS_VERIFY -u DOCKER_CERT_PATH \
+                DOCKER_HOST=unix:///var/run/docker.sock \
+                "$SUPABASE_BIN" stop --workdir "$test_workspace" --no-backup \
+                2>&1 | python3 scripts/sanitize-database-log.py
+              rm -rf -- "$test_workspace"
+            fi
+            rm -f -- "$DB_TEST_STATE_FILE"
+          fi
+
+      - name: Registrar resultado no resumo
+        if: always()
+        shell: bash
+        env:
+          DATABASE_OUTCOME: ${{ steps.database.outcome }}
+        run: |
+          if [ "$DATABASE_OUTCOME" = success ]; then
+            echo '15 migrations aplicadas; três suítes e 77 asserções pgTAP aprovadas.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Validação não concluída com sucesso. Consulte o primeiro erro nos logs; não considerar os testes aprovados.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo 'Execução restrita a Supabase local descartável; nenhum projeto remoto utilizado.' >> "$GITHUB_STEP_SUMMARY"

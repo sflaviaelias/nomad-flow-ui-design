@@ -3,6 +3,9 @@
 Branch: `dev/database-stabilization`, derivada de `dev/supabase-env-preparation`.
 Sem push, PR, merge, conexão remota ou alteração do deployment Lovable.
 
+Para a preparação posterior de CI manual, consultar
+[validação no GitHub Actions](validacao-banco-github-actions.md).
+
 ## O que muda
 
 As 11 migrations históricas foram renomeadas para `<timestamp>_<nome>.sql`.
