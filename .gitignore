@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Configurações locais; o .env legado já versionado é preservado.
+.env
+.env.*
+!.env.example

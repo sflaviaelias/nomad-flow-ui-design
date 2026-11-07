@@ -1,7 +1,7 @@
 
 import { useRef, useState } from "react";
 import { toast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, SUPABASE_URL } from "@/integrations/supabase/client";
 
 export interface Message {
   role: "user" | "assistant";
@@ -9,7 +9,7 @@ export interface Message {
 }
 
 export const SUPABASE_CONCIERGE_FN_URL =
-  "https://hxjjdutzpzrchfkrbxcd.functions.supabase.co/concierge-chat";
+  `${SUPABASE_URL}/functions/v1/concierge-chat`;
 
 const QUICK_SUGGESTIONS = [
   "Sugira cafés para trabalhar perto de mim",

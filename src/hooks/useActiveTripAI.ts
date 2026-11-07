@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, SUPABASE_URL } from "@/integrations/supabase/client";
 
 type TravelAIResult = {
   visa_required?: boolean | null;
@@ -42,7 +42,7 @@ export function useActiveTripAI(opts: UseActiveTripAIOptions) {
 
       // Fallback country
       const nationality = profile?.country || "Brasil";
-      const res = await fetch("/functions/v1/active-trip-ai", {
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/active-trip-ai`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -7,7 +7,7 @@ import TripCurrencyStep from "./TripCurrencyStep";
 import TripSummaryStep from "./TripSummaryStep";
 import SmartTripToggle from "./SmartTripToggle";
 import { useDestinationImageUnsplash } from "@/hooks/useDestinationImageUnsplash";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, SUPABASE_URL } from "@/integrations/supabase/client";
 import TripCreationHeader from "./TripCreationHeader";
 import TripIntelligentStep from "./TripIntelligentStep";
 
@@ -45,7 +45,7 @@ const TripCreationWizard: React.FC = () => {
   React.useEffect(() => {
     if (phase === 2 && destination) {
       setLoadingAI(true);
-      fetch("/functions/v1/concierge-chat", {
+      fetch(`${SUPABASE_URL}/functions/v1/concierge-chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

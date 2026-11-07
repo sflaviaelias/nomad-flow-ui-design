@@ -1,9 +1,10 @@
 
 import * as React from "react";
+import { SUPABASE_URL } from "@/integrations/supabase/client";
 
 // URL da função edge do Supabase
 const SUPABASE_DEST_IMAGE_FN_URL =
-  "https://hxjjdutzpzrchfkrbxcd.functions.supabase.co/destination-image-ai";
+  `${SUPABASE_URL}/functions/v1/destination-image-ai`;
 
 export function useDestinationImageAI(destination: string) {
   const [imageUrl, setImageUrl] = React.useState<string | null>(null);

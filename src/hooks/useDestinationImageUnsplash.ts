@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { SUPABASE_URL } from "@/integrations/supabase/client";
 
 export function useDestinationImageUnsplash(destination: string) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -13,7 +14,7 @@ export function useDestinationImageUnsplash(destination: string) {
     setLoading(true);
     setImageUrl(null);
 
-    fetch("/functions/v1/destination-image-unsplash", {
+    fetch(`${SUPABASE_URL}/functions/v1/destination-image-unsplash`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ destination }),
