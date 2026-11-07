@@ -70,6 +70,7 @@ jobs:
           SUPABASE_DEV_DB_HOST: ${{ vars.SUPABASE_DEV_DB_HOST }}
           SUPABASE_DEV_ACCESS_TOKEN: ${{ secrets.SUPABASE_DEV_ACCESS_TOKEN }}
           SUPABASE_DEV_DB_PASSWORD: ${{ secrets.SUPABASE_DEV_DB_PASSWORD }}
+          SUPABASE_DEV_CA_CERT: ${{ secrets.SUPABASE_DEV_CA_CERT }}
         run: python3 -B scripts/deploy-supabase-development.py
 
       - name: Registrar resultado
