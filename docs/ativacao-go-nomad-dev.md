@@ -129,6 +129,12 @@ executar os comandos sem olhar os resultados. Não copiar chaves privadas.
 
 ### B. Primeira autorização: conexão e conferência do plano
 
+**Correção posterior:** no CLI 2.54.11, `link` pode criar tabelas de histórico
+e seeds. O bloco histórico abaixo não atende a uma inspeção estritamente sem
+DDL de banco novo. Não executá-lo para esse objetivo; usar o novo
+[workflow manual de desenvolvimento](deploy-banco-desenvolvimento.md), com
+conexão explícita e leitura obrigatória, sem link.
+
 ```bash
 supabase link --project-ref "$GO_NOMAD_DEV_REF" --workdir "$activation_dir"
 supabase migration list --linked --workdir "$activation_dir"
@@ -136,7 +142,8 @@ supabase db push --linked --dry-run --workdir "$activation_dir"
 ```
 
 Impacto: acessa o projeto remoto para vínculo/conferência; cria metadados locais
-de vínculo. A simulação não aplica as migrations. Não considerar essa etapa
+e pode criar objetos de histórico remotamente durante link. A simulação em si
+não aplica as migrations. Não considerar essa etapa
 offline. Usar autenticação própria do operador pelo fluxo seguro do CLI, sem
 senha, token ou URL com credenciais em argumentos, arquivos do Git ou chat.
 Não iniciar login interativo nem solicitar valores privados nesta preparação.
