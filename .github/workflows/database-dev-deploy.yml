@@ -1,0 +1,84 @@
+name: Banco go-nomad-dev — manual
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Operação autorizada
+        required: true
+        default: dry-run
+        type: choice
+        options:
+          - dry-run
+          - apply
+      confirm_project_ref:
+        description: Para apply, digite mksylwolwshpxhfrgldq (não é uma senha)
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-go-nomad-dev-database
+  cancel-in-progress: false
+
+jobs:
+  development-database:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment: go-nomad-dev
+    steps:
+      - name: Checkout da branch selecionada
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Conferir ferramentas e roteiro offline
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v psql
+          psql --version
+          sha256sum --check docs/go-nomad-dev-migrations.sha256
+          python3 -B -m unittest discover -s scripts/tests -p test_supabase_deploy.py -v
+
+      - name: Instalar Supabase CLI 2.54.11
+        shell: bash
+        run: |
+          set -euo pipefail
+          cli_download=$(mktemp -d)
+          trap 'rm -rf -- "$cli_download"' EXIT
+          release=https://github.com/supabase/cli/releases/download/v2.54.11
+          curl --fail --silent --show-error --location --retry 3 \
+            "$release/supabase_2.54.11_checksums.txt" -o "$cli_download/checksums.txt"
+          curl --fail --silent --show-error --location --retry 3 \
+            "$release/supabase_linux_amd64.tar.gz" -o "$cli_download/supabase_linux_amd64.tar.gz"
+          (cd "$cli_download" && sha256sum --check --ignore-missing checksums.txt)
+          tar -xzf "$cli_download/supabase_linux_amd64.tar.gz" -C "$cli_download" supabase
+          mkdir -p "$RUNNER_TEMP/go-nomad-bin"
+          install -m 0755 "$cli_download/supabase" "$RUNNER_TEMP/go-nomad-bin/supabase"
+          echo "$RUNNER_TEMP/go-nomad-bin" >> "$GITHUB_PATH"
+
+      - name: Inspecionar ou aplicar somente em go-nomad-dev
+        id: database
+        shell: bash
+        env:
+          DEPLOY_MODE: ${{ inputs.mode }}
+          CONFIRM_PROJECT_REF: ${{ inputs.confirm_project_ref }}
+          SUPABASE_DEV_DB_HOST: ${{ vars.SUPABASE_DEV_DB_HOST }}
+          SUPABASE_DEV_ACCESS_TOKEN: ${{ secrets.SUPABASE_DEV_ACCESS_TOKEN }}
+          SUPABASE_DEV_DB_PASSWORD: ${{ secrets.SUPABASE_DEV_DB_PASSWORD }}
+        run: python3 -B scripts/deploy-supabase-development.py
+
+      - name: Registrar resultado
+        if: always()
+        shell: bash
+        env:
+          MODE: ${{ inputs.mode }}
+          OUTCOME: ${{ steps.database.outcome }}
+        run: |
+          printf 'Projeto fixo: go-nomad-dev (mksylwolwshpxhfrgldq).\nModo: %s. Resultado: %s.\n' \
+            "$MODE" "$OUTCOME" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Em caso de erro, revisar logs; não executar reset ou repair.' >> "$GITHUB_STEP_SUMMARY"
