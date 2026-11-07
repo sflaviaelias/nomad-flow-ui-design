@@ -87,17 +87,17 @@ validada em um banco e o inventário não é aprovação para aplicação remota
 
 | Ordem | Arquivo em `supabase/migrations/` | Efeito |
 | --- | --- | --- |
-| 1 | `20250614182224-e24e575c-9875-4617-aeb7-34629e3792dd.sql` | Cria profiles, trips, expenses, places e community_posts; relacionamentos e RLS inicial. |
-| 2 | `20250614210746-971857b7-11f4-4fb8-be75-029309014f38.sql` | Cria trigger de duplicidade de e-mail em profiles. |
-| 3 | `20250615103002-606ebda4-d24c-484c-ac2a-98a36a96bc7b.sql` | Acrescenta birth_date ao perfil. |
-| 4 | `20250615103535-85a9d5ca-afb1-4fa0-8393-901968d1880c.sql` | Permite inserir, atualizar e excluir o próprio perfil. |
-| 5 | `20250615170036-e7251b32-6fba-41fd-ae28-3f338bd35053.sql` | Acrescenta description às despesas. |
-| 6 | `20250615170742-160498c0-c962-4e46-957f-40d14c527dab.sql` | Acrescenta payment_method e receipt_url às despesas. |
-| 7 | `20250615171334-e1eb2cd4-88ce-4505-9922-5769ea639f08.sql` | Acrescenta is_smart_trip às viagens. |
-| 8 | `20250615172612-6d57f4a0-7a47-4092-b7d6-02b4f0b11011.sql` | Habilita RLS de places e operações para autenticados. |
-| 9 | `20250615190000-community-posts-rls.sql` | Substitui políticas de community_posts por operações do autor. |
-| 10 | `20250615210449-1dae4a3c-44b0-4508-80a7-76040a6b4d36.sql` | Define políticas de Storage para avatars. |
-| 11 | `20250622222155-10ce06f8-986c-4973-9532-6f7c607bba74.sql` | Cria/ajusta bucket avatars público, limite de 5 MB e políticas adicionais. |
+| 1 | `20250614182224_e24e575c-9875-4617-aeb7-34629e3792dd.sql` | Cria profiles, trips, expenses, places e community_posts; relacionamentos e RLS inicial. |
+| 2 | `20250614210746_971857b7-11f4-4fb8-be75-029309014f38.sql` | Cria trigger de duplicidade de e-mail em profiles. |
+| 3 | `20250615103002_606ebda4-d24c-484c-ac2a-98a36a96bc7b.sql` | Acrescenta birth_date ao perfil. |
+| 4 | `20250615103535_85a9d5ca-afb1-4fa0-8393-901968d1880c.sql` | Permite inserir, atualizar e excluir o próprio perfil. |
+| 5 | `20250615170036_e7251b32-6fba-41fd-ae28-3f338bd35053.sql` | Acrescenta description às despesas. |
+| 6 | `20250615170742_160498c0-c962-4e46-957f-40d14c527dab.sql` | Acrescenta payment_method e receipt_url às despesas. |
+| 7 | `20250615171334_e1eb2cd4-88ce-4505-9922-5769ea639f08.sql` | Acrescenta is_smart_trip às viagens. |
+| 8 | `20250615172612_6d57f4a0-7a47-4092-b7d6-02b4f0b11011.sql` | Habilita RLS de places e operações para autenticados. |
+| 9 | `20250615190000_community-posts-rls.sql` | Substitui políticas de community_posts por operações do autor. |
+| 10 | `20250615210449_1dae4a3c-44b0-4508-80a7-76040a6b4d36.sql` | Define políticas de Storage para avatars. |
+| 11 | `20250622222155_10ce06f8-986c-4973-9532-6f7c607bba74.sql` | Cria/ajusta bucket avatars público, limite de 5 MB e políticas adicionais. |
 
 Para o fluxo de perfil/viagem, os arquivos 1, 3, 4 e 7 são diretamente relevantes.
 Os demais completam o schema e comportamento históricos, incluindo despesas,
@@ -107,10 +107,13 @@ Evitar aplicar uma seleção parcial ad hoc e perder o histórico de migrations.
 
 ### Revisões necessárias antes de executar
 
-- Os nomes usam hífen depois do timestamp, fora da convenção usual do CLI
-  `<timestamp>_<nome>.sql`. Confirmar descoberta pela versão escolhida do CLI;
-  preparar a normalização em tarefa própria antes de aplicar. Não presumir que
-  `db push` encontrará os 11 arquivos.
+Atualização: os nomes históricos foram normalizados na branch de estabilização.
+Os pontos abaixo registram o diagnóstico anterior às novas migrations corretivas;
+consulte [estabilização do banco](estabilizacao-banco.md) para as soluções e testes.
+
+- Os nomes agora seguem `<timestamp>_<nome>.sql`, com timestamps e SQL
+  preservados. As quatro migrations corretivas vêm depois das 11 históricas.
+  A execução local deve comprovar que todos os 15 arquivos são reconhecidos.
 - Não há trigger de criação automática de profiles a partir de auth.users.
   Recriar o schema não resolve sozinho o cadastro → perfil → viagem.
 - O trigger de e-mail pode rejeitar o `upsert` de um perfil já existente antes
