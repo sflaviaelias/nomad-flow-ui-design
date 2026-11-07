@@ -25,6 +25,11 @@ class DeploymentTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 deploy.validate_mode(mode, confirmation)
 
+    def test_url_uses_explicit_ca_and_strict_tls(self):
+        url = deploy.database_url("aws-0-us-east-2.pooler.supabase.com", ca_file="/tmp/custom-ca.crt")
+        self.assertIn("sslmode=verify-full", url)
+        self.assertIn("sslrootcert=%2Ftmp%2Fcustom-ca.crt", url)
+
     def test_url_pins_tenant_and_read_only_without_password(self):
         for host in [f"db.{deploy.TARGET_REF}.supabase.co", "aws-0-eu-west-1.pooler.supabase.com"]:
             url = deploy.database_url(host)
@@ -74,7 +79,8 @@ class DeploymentTests(unittest.TestCase):
         environment = dict(GITHUB_ACTIONS="true", DEPLOY_MODE=mode,
             CONFIRM_PROJECT_REF=deploy.TARGET_REF if mode == "apply" else "",
             SUPABASE_DEV_ACCESS_TOKEN="token-ficticio", SUPABASE_DEV_DB_PASSWORD="senha-ficticia",
-            SUPABASE_DEV_DB_HOST="aws-0-eu-west-1.pooler.supabase.com")
+            SUPABASE_DEV_DB_HOST="aws-0-eu-west-1.pooler.supabase.com",
+            SUPABASE_DEV_CA_CERT="-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----")
         project = project or {"id": deploy.TARGET_REF, "name": deploy.TARGET_NAME, "status": "ACTIVE_HEALTHY"}
         with patch.dict(os.environ, environment, clear=True), patch.object(deploy, "urlopen", return_value=io.BytesIO(json.dumps(project).encode())) as api, \
              patch.object(deploy.subprocess, "run", side_effect=run), patch("sys.stdout", new_callable=io.StringIO) as output:
@@ -88,6 +94,7 @@ class DeploymentTests(unittest.TestCase):
             self.assertEqual(api.call_args.args[0].full_url, f"https://api.supabase.com/v1/projects/{deploy.TARGET_REF}")
         self.assertNotIn("token-ficticio", text)
         self.assertNotIn("senha-ficticia", text)
+        self.assertNotIn("BEGIN CERTIFICATE", text)
         return calls, error
 
     def test_dry_run_never_invokes_write_or_link(self):
