@@ -27,3 +27,6 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Cache/vínculo local do Supabase CLI não deve acompanhar o código.
+supabase/.temp/
