@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import LogoMini from "@/components/LogoMini";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 export default function LoginScreen() {
   const navigate = useNavigate();
@@ -13,38 +14,27 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Check session and redirect if logged in
+  const { user, loading: authLoading } = useSupabaseAuth();
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        navigate("/", { replace: true });
-      }
-    });
-  }, [navigate]);
-
+    if (user) navigate("/trips", { replace: true });
+  }, [user, navigate]);
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    // Real authentication with Supabase
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-    if (error) {
-      // Não exibir mensagem do erro de backend em produção
-      if (
-        error.message?.toLowerCase().includes("invalid login credentials") ||
-        error.message?.toLowerCase().includes("invalid credentials")
-      ) {
-        setError("Credenciais inválidas. Tente novamente.");
-      } else {
-        setError("Falha ao entrar. Tente novamente.");
+    if (loading) return;
+    setLoading(true); setError(null);
+    try {
+      const { error: failure } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      if (failure) {
+        setError(failure.code === "email_not_confirmed"
+          ? "Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada."
+          : "Não foi possível entrar. Confira e-mail e senha e tente novamente.");
+        return;
       }
-      setLoading(false);
-      return;
-    }
-    setLoading(false);
-    navigate("/", { replace: true });
+      setPassword("");
+      navigate("/trips", { replace: true });
+    } catch {
+      setError("Não foi possível conectar. Tente novamente.");
+    } finally { setLoading(false); }
   };
 
   return (
@@ -61,6 +51,8 @@ export default function LoginScreen() {
         <form className="space-y-4" onSubmit={handleLogin}>
           <Input
             type="email"
+            aria-label="E-mail"
+            autoComplete="email"
             placeholder="Seu e-mail"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -69,6 +61,8 @@ export default function LoginScreen() {
           />
           <Input
             type="password"
+            aria-label="Senha"
+            autoComplete="current-password"
             placeholder="Senha"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -78,22 +72,13 @@ export default function LoginScreen() {
           <Button
             className="w-full py-3 bg-[#E76F51] text-white font-semibold text-base shadow-md hover:bg-[#CC5A3D]"
             type="submit"
-            disabled={loading}
+            disabled={loading || authLoading}
           >
             {loading ? "Entrando..." : "Entrar no GoNomad"}
           </Button>
-          {error && <div className="text-red-500 text-sm">{error}</div>}
+          {error && <div role="alert" className="text-red-500 text-sm">{error}</div>}
         </form>
-        <div className="flex justify-end mt-2">
-          <button
-            type="button"
-            onClick={() => { navigate("/auth"); }}
-            className="text-xs text-terra-700 underline"
-            style={{fontFamily: "Inter"}}
-          >
-            Esqueceu sua senha?
-          </button>
-        </div>
+        <Button variant="ghost" onClick={() => navigate("/auth/signup")}>Criar conta</Button>
       </div>
     </div>
   );

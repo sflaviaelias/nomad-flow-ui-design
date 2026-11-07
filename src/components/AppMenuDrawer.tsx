@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 const MENU_ITEMS = [
+  { label: "Minhas viagens", icon: <FileText className="text-[#E76F51]" />, action: "trips" },
   {
     label: "Meu Perfil",
     icon: <User className="text-[#E76F51]" />,
@@ -60,6 +61,9 @@ export default function AppMenuDrawer({ open, onOpenChange }: AppMenuDrawerProps
   function handleMenuItem(action: string) {
     onOpenChange(false);
     switch (action) {
+      case "trips":
+        navigate("/trips");
+        break;
       case "profile":
         navigate("/profile");
         break;
@@ -74,10 +78,10 @@ export default function AppMenuDrawer({ open, onOpenChange }: AppMenuDrawerProps
     }
   }
 
-  function handleLogout() {
-    signOut?.();
+  async function handleLogout() {
+    await signOut();
     onOpenChange(false);
-    navigate("/");
+    navigate("/auth/login");
   }
 
   React.useEffect(() => {

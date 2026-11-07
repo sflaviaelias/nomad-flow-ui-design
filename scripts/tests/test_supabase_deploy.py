@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -14,6 +15,32 @@ spec.loader.exec_module(deploy)
 
 
 class DeploymentTests(unittest.TestCase):
+    def setUp(self):
+        # O deploy de bootstrap continua sendo uma release imutável de 15 SQLs.
+        # Testar essa release em fixture própria, sem ignorar SQLs adicionais.
+        original = deploy.ROOT
+        workspace = tempfile.TemporaryDirectory(prefix="go-nomad-bootstrap-fixture-")
+        self.addCleanup(workspace.cleanup)
+        root = Path(workspace.name)
+        manifest = original / "docs/go-nomad-dev-migrations.sha256"
+        (root / "docs").mkdir()
+        (root / "docs/go-nomad-dev-migrations.sha256").write_bytes(manifest.read_bytes())
+        for line in manifest.read_text().splitlines():
+            name = line.split()[1]
+            target = root / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes((original / name).read_bytes())
+        self.original_root = original
+        replacement = patch.object(deploy, "ROOT", root)
+        replacement.start()
+        self.addCleanup(replacement.stop)
+
+    def test_bootstrap_rejects_unreviewed_additional_migration(self):
+        extra = deploy.ROOT / "supabase/migrations/20990101000000_unreviewed.sql"
+        extra.write_text("select 1;")
+        with self.assertRaises(RuntimeError):
+            deploy.migration_files()
+
     def state(self, **changes):
         return dict(version=170011, database="postgres", user="postgres", read_only="on",
                     public_objects=0, users=0, history_exists=False, **changes)

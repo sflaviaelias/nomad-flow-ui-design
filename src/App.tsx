@@ -14,7 +14,6 @@ import AddExpensePage from "./pages/AddExpensePage";
 import FeedbackPage from "./pages/FeedbackPage";
 import CommunityPage from "./pages/CommunityPage";
 import NotFound from "./pages/NotFound";
-import AuthPage from "./pages/AuthPage";
 import OnboardingFlow from "./features/onboarding/OnboardingFlow";
 import AuthAccessScreen from "./features/auth/AuthAccessScreen";
 import LoginScreen from "./features/auth/LoginScreen";
@@ -37,6 +36,10 @@ import { useEffect } from "react";
 import i18n from "@/i18n/config";
 import { useOnboardingFlow } from "@/hooks/useOnboardingFlow";
 import { supabase } from "@/integrations/supabase/client";
+import { AuthProvider } from "@/contexts/AuthProvider";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import ConfirmEmailPage from "@/features/auth/ConfirmEmailPage";
+import TripDetailsPage from "@/pages/TripDetailsPage";
 
 const queryClient = new QueryClient();
 
@@ -50,16 +53,9 @@ function getInitialLanguage() {
 
 function AppWrapper() {
   const onboarding = useOnboardingFlow();
+  const location = useLocation();
 
-  // Debug logs temporários
-  console.log("[App] Deploy Debug - AppWrapper carregado em:", new Date().toISOString());
-  console.log("[App] Deploy Debug - Onboarding status:", { 
-    checked: onboarding.checked, 
-    show: onboarding.show 
-  });
-
-  if (!onboarding.checked) {
-    console.log("[App] Deploy Debug - Aguardando verificação de onboarding");
+  if (location.pathname === "/" && !onboarding.checked) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FAF3EC] text-terra-700">
         <span className="animate-pulse text-lg">Carregando...</span>
@@ -67,12 +63,9 @@ function AppWrapper() {
     );
   }
 
-  if (onboarding.show) {
-    console.log("[App] Deploy Debug - Mostrando onboarding");
+  if (location.pathname === "/" && onboarding.show) {
     return <OnboardingFlow onFinish={onboarding.finishOnboarding} />;
   }
-
-  console.log("[App] Deploy Debug - Renderizando rotas principais");
 
   return (
     <TooltipProvider>
@@ -82,7 +75,11 @@ function AppWrapper() {
           <Route path="/auth/access" element={<AuthAccessScreen />} />
           <Route path="/auth/signup" element={<SignupScreen />} />
           <Route path="/auth/login" element={<LoginScreen />} />
-          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/auth" element={<Navigate replace to="/auth/login" />} />
+          <Route path="/auth/confirm" element={<ConfirmEmailPage />} />
+          <Route path="/trips" element={<RequireAuth><NextTripsPage /></RequireAuth>} />
+          <Route path="/trip/:tripId" element={<RequireAuth><TripDetailsPage /></RequireAuth>} />
+          <Route path="/active-trip" element={<RequireAuth><ActiveTripDetailsPage /></RequireAuth>} />
 
           {/* Rota principal que permite tanto usuários autenticados quanto convidados */}
           <Route
@@ -222,51 +219,30 @@ function AppWrapper() {
   );
 }
 
-const App = () => {
-  console.log("[App] Deploy Debug - App component iniciado em:", new Date().toISOString());
-
+function UserLanguage() {
+  const { user } = useSupabaseAuth();
   useEffect(() => {
-    console.log("[App] Deploy Debug - useEffect iniciado, verificando usuário e idioma");
-    supabase.auth.getUser().then(async ({ data }) => {
-      const user = data?.user;
-      console.log("[App] Deploy Debug - Usuário obtido:", !!user);
-      let set = false;
-      if (user?.id) {
-        const { data } = await supabase
-          .from("profiles")
-          .select("preferences")
-          .eq("id", user.id)
-          .maybeSingle();
-        let prefs: any = {};
-        if (data?.preferences) {
-          if (typeof data.preferences === "object") prefs = data.preferences;
-          else if (typeof data.preferences === "string") {
-            try { prefs = JSON.parse(data.preferences); } catch { prefs = {}; }
-          }
-        }
-        if (prefs.language) {
-          i18n.changeLanguage(prefs.language);
+    let active = true;
+    void i18n.changeLanguage(getInitialLanguage());
+    if (user) {
+      supabase.from("profiles").select("preferences").eq("id", user.id).maybeSingle().then(({ data }) => {
+        const prefs = data?.preferences;
+        if (active && prefs && typeof prefs === "object" && !Array.isArray(prefs) && typeof prefs.language === "string") {
+          void i18n.changeLanguage(prefs.language);
           localStorage.setItem("language", prefs.language);
-          set = true;
         }
-      }
-      if (!set) {
-        const lang = getInitialLanguage();
-        i18n.changeLanguage(lang);
-      }
-      console.log("[App] Deploy Debug - Idioma configurado");
-    });
-  }, []);
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AppWrapper />
-      </BrowserRouter>
-    </QueryClientProvider>
-  );
-};
-
+      });
+    }
+    return () => { active = false; };
+  }, [user]);
+  return null;
+}
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <Toaster /><Sonner />
+      <BrowserRouter><UserLanguage /><AppWrapper /></BrowserRouter>
+    </AuthProvider>
+  </QueryClientProvider>
+);
 export default App;

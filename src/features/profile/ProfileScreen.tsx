@@ -30,7 +30,6 @@ export default function ProfileScreen() {
       .maybeSingle()
       .then(({ data, error }) => {
         if (data) {
-          console.log("Profile data loaded:", data);
           // Desconstrói as preferências se existirem
           let prefs: any = {};
           if (typeof data.preferences === "object" && data.preferences !== null) {

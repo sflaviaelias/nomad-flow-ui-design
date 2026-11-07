@@ -1,53 +1,7 @@
-import { useEffect, useState, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
-
+import { useContext } from "react";
+import { AuthContext } from "@/contexts/auth-context";
 export function useSupabaseAuth() {
-  const [session, setSession] = useState(null);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Listen to changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-
-      console.log("[useSupabaseAuth] Auth event:", event, session);
-    });
-
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      setLoading(false);
-      console.log("[useSupabaseAuth] Initial getSession:", data.session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const createProfileIfNotExists = useCallback(async (user) => {
-    if (!user) return;
-    await supabase
-      .from("profiles")
-      .upsert(
-        {
-          id: user.id,
-          name: user.user_metadata?.name || user.email?.split("@")[0],
-          email: user.email,
-          avatar_url: user.user_metadata?.avatar_url ?? null,
-          country: null,
-          preferences: {},
-        },
-        { onConflict: "id" }
-      );
-  }, []);
-
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    setSession(null);
-    setUser(null);
-  };
-
-  return { session, user, loading, signOut };
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useSupabaseAuth requer AuthProvider.");
+  return context;
 }

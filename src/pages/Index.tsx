@@ -11,6 +11,8 @@ import HomeTripSummaryCard from "../components/HomeTripSummaryCard";
 import TripDetailsModal from "@/components/TripDetailsModal";
 import { supabase } from "@/integrations/supabase/client";
 import UpcomingTripsSlider from "@/components/UpcomingTripsSlider";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import type { Tables } from "@/integrations/supabase/types";
 import { useActiveTrip } from "@/hooks/useActiveTrip";
 import { useGuestSession } from "@/hooks/useGuestSession";
 import { showGuestBlockedToast } from "@/components/GuestLoginToast";
@@ -28,7 +30,7 @@ const fallbackImage =
 const Index = () => {
   const navigate = useNavigate();
 
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<Tables<"profiles"> | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   // Hook: fetch dynamic active trip
@@ -37,48 +39,17 @@ const Index = () => {
 
   const { isGuestSession, isAuthenticated, isLoading } = useGuestSession();
 
-  // Debug logs
-  console.log("[Index] Deploy Debug - Componente carregado em:", new Date().toISOString());
-  console.log("[Index] Deploy Debug - Status de sessão:", {
-    isGuestSession,
-    isAuthenticated,
-    isLoading,
-    hasActiveTrip,
-    activeTripRaw,
-    tripError
-  });
+  const { user } = useSupabaseAuth();
 
   useEffect(() => {
-    async function fetchProfile() {
-      setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      console.log("[Index] Deploy Debug - fetchProfile, usuário:", !!user?.id);
-      if (!user?.id) {
-        setProfile(null);
-        setLoading(false);
-        return;
-      }
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .maybeSingle();
-      console.log("[Index] Deploy Debug - Profile obtido:", !!data);
-      if (data) {
-        console.log("[Index] Avatar URL no profile:", data.avatar_url);
-      }
-      setProfile(data);
-      setLoading(false);
-    }
-    fetchProfile();
-    const { data: authListener } = supabase.auth.onAuthStateChange(() => {
-      console.log("[Index] Deploy Debug - Auth state mudou, buscando profile novamente");
-      fetchProfile();
-    });
-    return () => {
-      authListener?.subscription?.unsubscribe?.();
-    };
-  }, []);
+    let active = true;
+    if (!user) { setProfile(null); setLoading(false); return; }
+    setLoading(true);
+    Promise.resolve(supabase.from("profiles").select("*").eq("id", user.id).maybeSingle()).then(({ data }) => {
+      if (active) { setProfile(data); setLoading(false); }
+    }).catch(() => { if (active) { setProfile(null); setLoading(false); } });
+    return () => { active = false; };
+  }, [user]);
 
   // Determinar nome do usuário baseado no tipo de sessão
   const userName = isGuestSession ? "Nômade" : (profile?.name || userFallback.name);
@@ -88,15 +59,9 @@ const Index = () => {
         ? profile.avatar_url
         : userFallback.avatarUrl);
 
-  console.log("[Index] Deploy Debug - Nome do usuário:", userName);
-  console.log("[Index] Deploy Debug - Avatar URL final:", avatarUrl);
-  console.log("[Index] Deploy Debug - É sessão guest:", isGuestSession);
-
   // Lógica melhorada para criar activeTrip
   let activeTrip = null;
   if (isAuthenticated && activeTripRaw) {
-    console.log("[Index] Deploy Debug - Criando activeTrip para usuário autenticado");
-    console.log("[Index] Deploy Debug - Dados da viagem:", activeTripRaw);
     
     // Função auxiliar para formatar orçamento
     const formatBudget = (budget: number | null, currency: string = "EUR") => {
@@ -115,36 +80,13 @@ const Index = () => {
       }
     };
 
-    // Função auxiliar para conversão local
-    const formatLocalBudget = (budget: number | null, rate: number = 5.4) => {
-      if (budget === null || budget === undefined) {
-        return "—";
-      }
-      try {
-        const localAmount = budget * rate;
-        return new Intl.NumberFormat("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0,
-        }).format(localAmount);
-      } catch (error) {
-        return "—";
-      }
-    };
-
     activeTrip = {
       destination: activeTripRaw.destination,
       imageUrl: fallbackImage,
       startDate: activeTripRaw.start_date || "",
       endDate: activeTripRaw.end_date || "",
       budget: formatBudget(activeTripRaw.budget, activeTripRaw.currency || "EUR"),
-      localBudget: formatLocalBudget(activeTripRaw.budget),
     };
-    
-    console.log("[Index] Deploy Debug - ActiveTrip formatado:", activeTrip);
-  } else {
-    console.log("[Index] Deploy Debug - Não criando activeTrip - usuário guest ou sem viagem");
   }
 
   return (

@@ -50,6 +50,8 @@ trap cleanup EXIT
 "$supabase_bin" init --workdir "$test_workspace" --yes
 cp -R "$repository_root/supabase/migrations" "$test_workspace/supabase/"
 cp -R "$repository_root/supabase/tests" "$test_workspace/supabase/"
+cp "$repository_root/supabase/migrations/20261107000500_restrict_rls_auto_enable.sql" \
+  "$test_workspace/supabase/tests/rls_auto_enable_migration.inc"
 
 echo 'Inicializando Supabase local descartável; nenhum comando usa --linked ou URL remota.'
 run_logged start "$supabase_bin" start --workdir "$test_workspace" \
@@ -57,7 +59,7 @@ run_logged start "$supabase_bin" start --workdir "$test_workspace" \
     echo 'Falha na inicialização do Supabase local; consulte o log acima.' >&2
     exit 1
   }
-echo 'Recriando banco local e aplicando as 15 migrations em ordem.'
+echo 'Recriando banco local e aplicando as 16 migrations em ordem.'
 run_logged reset "$supabase_bin" db reset --local --workdir "$test_workspace"
 # CLI fixo: cada migration deve aparecer explicitamente no log de aplicação.
 migration_count=0
@@ -68,15 +70,15 @@ for migration in "$test_workspace"/supabase/migrations/*.sql; do
   fi
   migration_count=$((migration_count + 1))
 done
-if [ "$migration_count" -ne 15 ]; then
-  echo "Esperadas 15 migrations; encontradas $migration_count." >&2
+if [ "$migration_count" -ne 16 ]; then
+  echo "Esperadas 16 migrations; encontradas $migration_count." >&2
   exit 1
 fi
-echo 'Executando as três suítes pgTAP.'
+echo 'Executando as quatro suítes pgTAP.'
 run_logged tests "$supabase_bin" test db --workdir "$test_workspace"
-if ! grep -Eq 'Files=3,[[:space:]]+Tests=77([,[:space:]]|$)' "$test_workspace/tests.log" \
+if ! grep -Eq 'Files=4,[[:space:]]+Tests=85([,[:space:]]|$)' "$test_workspace/tests.log" \
   || ! grep -Eq '^Result: PASS[[:space:]]*$' "$test_workspace/tests.log"; then
-  echo 'O runner não confirmou três suítes, 77 asserções e Result: PASS.' >&2
+  echo 'O runner não confirmou quatro suítes, 85 asserções e Result: PASS.' >&2
   exit 1
 fi
-echo 'Validação concluída: 15 migrations, três suítes e 77 asserções aprovadas.'
+echo 'Validação concluída: 16 migrations, quatro suítes e 85 asserções aprovadas.'

@@ -62,7 +62,6 @@ function formatLocalBudget(budget: number | null, rate: number = 5.4): string {
 export function ActiveTripSection({ hasActiveTrip, activeTrip, onShowDetails }: Props) {
   const navigate = useNavigate();
 
-  console.log("[ActiveTripSection] Render - hasActiveTrip:", hasActiveTrip, "activeTrip:", activeTrip);
 
   if (hasActiveTrip && activeTrip) {
     const fallbackImage = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=900&q=80";
@@ -97,7 +96,7 @@ export function ActiveTripSection({ hasActiveTrip, activeTrip, onShowDetails }: 
                   )}
                 </div>
                 <Button 
-                  onClick={onShowDetails || (() => navigate("/active-trip"))}
+                  onClick={onShowDetails || (() => navigate("/trip/active"))}
                   className="w-full mt-4 bg-[#E76F51] hover:bg-[#C9583C] text-white font-medium py-2.5 rounded-lg transition-colors"
                 >
                   Ver detalhes da viagem

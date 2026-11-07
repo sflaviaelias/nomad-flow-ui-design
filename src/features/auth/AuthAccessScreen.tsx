@@ -3,11 +3,13 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Globe, Mail, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import LogoMini from "@/components/LogoMini";
 import { Separator } from "@/components/ui/separator";
 
 export default function AuthAccessScreen() {
   const navigate = useNavigate();
+  const { signOut } = useSupabaseAuth();
 
   // Mantém função existente para o futuro
   const handleSocial = async () => {
@@ -23,23 +25,19 @@ export default function AuthAccessScreen() {
 
   // Explorar como convidado — corrigido para usar React Router
   const handleExploreAsGuest = async () => {
-    console.log("[AuthAccessScreen] Iniciando processo de convidado");
     
     try {
       // Garante sign-out antes de liberar uso como guest
-      await supabase.auth.signOut();
-      console.log("[AuthAccessScreen] Sign-out realizado");
+      await signOut();
       
       // Marca onboarding como feito (não mostra onboarding para guest)
       localStorage.setItem("onboarding_done", "1");
-      console.log("[AuthAccessScreen] Onboarding marcado como feito");
       
       // Navega para Home usando React Router em vez de window.location
-      console.log("[AuthAccessScreen] Navegando para home como convidado");
       navigate("/", { replace: true });
       
-    } catch (error) {
-      console.error("[AuthAccessScreen] Erro ao entrar como convidado:", error);
+    } catch {
+      // O logout compartilhado já remove a sessão local e informa falhas de rede.
     }
   };
 

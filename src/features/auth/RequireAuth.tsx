@@ -4,7 +4,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 export default function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useSupabaseAuth();
+  const { user, loading, error } = useSupabaseAuth();
   const location = useLocation();
 
   if (loading) {
@@ -14,6 +14,7 @@ export default function RequireAuth({ children }: { children: React.ReactNode })
       </div>
     );
   }
+  if (error) return <div role="alert">{error} <button onClick={() => window.location.reload()}>Tentar novamente</button></div>;
   if (!user) {
     return <Navigate to="/auth/access" state={{ from: location }} replace />;
   }

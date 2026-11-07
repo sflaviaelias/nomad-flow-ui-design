@@ -132,6 +132,9 @@ export default function EditProfileScreen() {
     if (Object.values(newErrors).some(Boolean)) return;
     setLoading(true);
     try {
+      const { data: current, error: readError } = await supabase.from("profiles").select("preferences").eq("id", user.id).single();
+      if (readError) throw readError;
+      const savedPreferences = current.preferences && typeof current.preferences === "object" && !Array.isArray(current.preferences) ? current.preferences : {};
       const updates = {
         id: user?.id,
         name,
@@ -140,6 +143,7 @@ export default function EditProfileScreen() {
         country: countryResidence,
         birth_date: birthDate ? birthDate.toISOString().split("T")[0] : null,
         preferences: {
+          ...savedPreferences,
           nationality,
           currency,
           languages,
@@ -149,7 +153,7 @@ export default function EditProfileScreen() {
       };
       const { error } = await supabase
         .from("profiles")
-        .upsert(updates, { onConflict: "id" });
+        .update(updates).eq("id", user.id).select("id").single();
       if (error) {
         if (
           error.message?.toLowerCase().includes("duplic") ||
