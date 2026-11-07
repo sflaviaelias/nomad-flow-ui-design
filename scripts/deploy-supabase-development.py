@@ -30,7 +30,7 @@ def validate_mode(mode, confirmation):
         raise RuntimeError("Project Ref de confirmação incorreto.")
 
 
-def database_url(host, read_only=True):
+def database_url(host, read_only=True, ca_file=CA_FILE):
     if host == f"db.{TARGET_REF}.supabase.co":
         username = "postgres"
     elif re.fullmatch(r"aws-[0-9]+-[a-z0-9-]+\.pooler\.supabase\.com", host):
@@ -38,7 +38,7 @@ def database_url(host, read_only=True):
     else:
         raise RuntimeError("Host inválido: use o host direto deste projeto ou pooler oficial de sessão.")
     options = urlencode({
-        "sslmode": "verify-full", "sslrootcert": CA_FILE,
+        "sslmode": "verify-full", "sslrootcert": ca_file,
         "options": "-c default_transaction_read_only=" + ("on" if read_only else "off"),
     })
     # A senha é enviada somente por PGPASSWORD, nunca no argumento --db-url.
@@ -92,11 +92,12 @@ def main():
     host = os.environ.get("SUPABASE_DEV_DB_HOST", "").strip()
     if not token or not password:
         raise RuntimeError("Configure os dois secrets no Environment go-nomad-dev; valores não serão exibidos.")
-    read_url = database_url(host)
     files = migration_files()
     versions = [path.name[:14] for path in files]
-    if not Path(CA_FILE).is_file():
-        raise RuntimeError("Bundle público de CAs ausente; não desabilitar TLS.")
+    certificate = os.environ.get("SUPABASE_DEV_CA_CERT", "").strip()
+    if not (certificate.startswith("-----BEGIN CERTIFICATE-----")
+            and certificate.endswith("-----END CERTIFICATE-----")):
+        raise RuntimeError("Configure o certificado CA oficial no secret SUPABASE_DEV_CA_CERT.")
 
     def clean(output):
         for secret in (token, password):
@@ -126,13 +127,20 @@ def main():
     validate_project(project)
     print(f"Projeto confirmado: {TARGET_NAME} ({TARGET_REF}); modo {mode}.", flush=True)
 
-    env = dict(os.environ, PGPASSWORD=password, PGSSLMODE="verify-full", PGSSLROOTCERT=CA_FILE,
+    # O certificado CA vem do secret e nunca entra no repositório nem nos logs.
+    ca_directory = tempfile.TemporaryDirectory(prefix="go-nomad-dev-ca-")
+    ca_path = Path(ca_directory.name) / "supabase-ca.crt"
+    ca_path.write_text(certificate + "\n", encoding="utf-8")
+    ca_path.chmod(0o600)
+    read_url = database_url(host, ca_file=str(ca_path))
+    env = dict(os.environ, PGPASSWORD=password, PGSSLMODE="verify-full", PGSSLROOTCERT=str(ca_path),
                PGOPTIONS="-c default_transaction_read_only=on", NO_COLOR="1")
     # O CLI não precisa de token de API nem de vínculo: --db-url seleciona o destino.
     env.pop("SUPABASE_ACCESS_TOKEN", None)
     env.pop("SUPABASE_DB_PASSWORD", None)
     env.pop("SUPABASE_DEV_ACCESS_TOKEN", None)
     env.pop("SUPABASE_DEV_DB_PASSWORD", None)
+    env.pop("SUPABASE_DEV_CA_CERT", None)
 
     def query(sql):
         return json.loads(run("consulta somente leitura", ["psql", "-XAtq", "-v", "ON_ERROR_STOP=1",
@@ -168,7 +176,7 @@ def main():
         if status == "empty":
             print("Confirmação aceita; iniciando aplicação das 15 migrations originais.", flush=True)
             write_env = dict(env, PGOPTIONS="-c default_transaction_read_only=off")
-            run("aplicação", ["supabase", "db", "push", "--db-url", database_url(host, False),
+            run("aplicação", ["supabase", "db", "push", "--db-url", database_url(host, False, ca_file=str(ca_path)),
                 "--workdir", folder, "--yes"], env=write_env)
         if history() != versions:
             raise RuntimeError("Histórico final diferente das 15 versões esperadas; não repetir automaticamente.")
