@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Bootstrap manual de um único projeto; nenhum vínculo ou login-role é criado."""
+"""Deploy manual de desenvolvimento: bootstrap original ou delta 16 explicitamente selecionado."""
+import argparse
 import hashlib
 import importlib.util
 import json
@@ -52,8 +53,15 @@ def validate_project(project):
         raise RuntimeError("Projeto não está ACTIVE_HEALTHY; inspeção interrompida.")
 
 
-def migration_files():
+def migration_files(incremental=False):
     entries = (ROOT / "docs/go-nomad-dev-migrations.sha256").read_text().splitlines()
+    if len(entries) != 15:
+        raise RuntimeError("O manifesto original deve preservar exatamente as 15 migrations.")
+    if incremental:
+        delta = (ROOT / "docs/go-nomad-dev-incremental.sha256").read_text().splitlines()
+        if len(delta) != 1:
+            raise RuntimeError("O manifesto incremental deve conter somente a migration 16.")
+        entries += delta
     files = []
     for entry in entries:
         checksum, name = entry.split()
@@ -63,8 +71,11 @@ def migration_files():
         if hashlib.sha256(path.read_bytes()).hexdigest() != checksum:
             raise RuntimeError("Uma migration não corresponde ao manifesto aprovado.")
         files.append(path)
-    if len(files) != 15 or files != sorted(set(files)) or set(files) != set((ROOT / "supabase/migrations").glob("*.sql")):
-        raise RuntimeError("Esperadas exatamente as 15 migrations originais em ordem.")
+    expected = 16 if incremental else 15
+    if len(files) != expected or files != sorted(set(files)) or set(files) != set((ROOT / "supabase/migrations").glob("*.sql")):
+        raise RuntimeError(f"Esperadas exatamente {expected} migrations aprovadas em ordem.")
+    if incremental and files[-1].name != "20261107000500_restrict_rls_auto_enable.sql":
+        raise RuntimeError("Somente a migration 16 autorizada pode ser adicionada.")
     return files
 
 
@@ -82,7 +93,19 @@ def validate_state(state, history, versions):
     return "empty"
 
 
-def main():
+def validate_incremental_state(state, history, versions):
+    # Reutilizar as verificações de identidade SQL, mas nunca exigir banco vazio.
+    validate_state(state, versions, versions)
+    if not state.get("history_exists"):
+        raise RuntimeError("Histórico remoto ausente; incremental requer as 15 versões originais.")
+    if history == versions:
+        return "complete"
+    if history == versions[:-1]:
+        return "pending"
+    raise RuntimeError("Histórico divergente das 15 versões originais ou das 16 aprovadas; operação bloqueada.")
+
+
+def main(incremental=False):
     if os.environ.get("GITHUB_ACTIONS") != "true":
         raise RuntimeError("Este roteiro só deve ser executado pelo workflow manual autorizado.")
     mode = os.environ.get("DEPLOY_MODE", "")
@@ -92,7 +115,7 @@ def main():
     host = os.environ.get("SUPABASE_DEV_DB_HOST", "").strip()
     if not token or not password:
         raise RuntimeError("Configure os dois secrets no Environment go-nomad-dev; valores não serão exibidos.")
-    files = migration_files()
+    files = migration_files(incremental=incremental)
     versions = [path.name[:14] for path in files]
     certificate = os.environ.get("SUPABASE_DEV_CA_CERT", "").strip()
     if not (certificate.startswith("-----BEGIN CERTIFICATE-----")
@@ -159,7 +182,10 @@ def main():
         return query("select coalesce(json_agg(version order by version), '[]'::json) from supabase_migrations.schema_migrations")
 
     before = history() if state["history_exists"] else []
-    status = validate_state(state, before, versions)
+    validator = validate_incremental_state if incremental else validate_state
+    status = validator(state, before, versions)
+    pending = files[-1:] if incremental and status == "pending" else (files if status == "empty" else [])
+    print("Migrations pendentes: " + (", ".join(p.name for p in pending) if pending else "nenhuma"), flush=True)
     print("Histórico remoto: " + (", ".join(before) if before else "vazio/ausente"), flush=True)
     with tempfile.TemporaryDirectory(prefix="go-nomad-dev-deploy-") as folder:
         workdir = Path(folder)
@@ -173,20 +199,25 @@ def main():
         if mode == "dry-run":
             print("Dry-run concluído em conexão somente leitura; nenhuma migration aplicada.")
             return
-        if status == "empty":
-            print("Confirmação aceita; iniciando aplicação das 15 migrations originais.", flush=True)
+        if status in ("empty", "pending"):
+            # Revalidar imediatamente antes da escrita; não aceitar mudanças desde o preview.
+            if incremental and history() != before:
+                raise RuntimeError("Histórico mudou durante o preview; aplicação bloqueada.")
+            print(f"Confirmação aceita; aplicando {len(pending)} migration(s) pendente(s).", flush=True)
             write_env = dict(env, PGOPTIONS="-c default_transaction_read_only=off")
             run("aplicação", ["supabase", "db", "push", "--db-url", database_url(host, False, ca_file=str(ca_path)),
                 "--workdir", folder, "--yes"], env=write_env)
         if history() != versions:
-            raise RuntimeError("Histórico final diferente das 15 versões esperadas; não repetir automaticamente.")
+            raise RuntimeError("Histórico final diferente das versões aprovadas; não repetir automaticamente.")
         run("histórico final CLI", ["supabase", "migration", "list", "--db-url", read_url, "--workdir", folder], env=env)
-        print("Histórico final verificado: 15 versões originais; nenhuma alteração de frontend.")
+        print(f"Histórico final verificado: {len(versions)} versões aprovadas; nenhuma alteração de frontend.")
 
 
 if __name__ == "__main__":
     try:
-        main()
+        parser = argparse.ArgumentParser(description=__doc__)
+        parser.add_argument("--incremental", action="store_true", help="Somente a migration 16, após verificar as 15 originais")
+        main(incremental=parser.parse_args().incremental)
     except Exception as error:
         # Exceções não previstas não imprimem payloads/tracebacks com credenciais.
         message = str(error) if isinstance(error, RuntimeError) else "Falha inesperada; execução interrompida sem expor detalhes sensíveis."
