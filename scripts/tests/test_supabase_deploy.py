@@ -95,6 +95,10 @@ class DeploymentTests(unittest.TestCase):
         self.assertNotIn("token-ficticio", text)
         self.assertNotIn("senha-ficticia", text)
         self.assertNotIn("BEGIN CERTIFICATE", text)
+        for command, _ in calls:
+            if command[0] == "psql":
+                self.assertTrue(command[-1].startswith("BEGIN READ ONLY; "))
+                self.assertTrue(command[-1].endswith("; COMMIT;"))
         return calls, error
 
     def test_dry_run_never_invokes_write_or_link(self):
