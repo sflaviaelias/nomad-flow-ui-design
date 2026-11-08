@@ -16,6 +16,23 @@ spec.loader.exec_module(deploy)
 
 class IncrementalTests(unittest.TestCase):
     def setUp(self):
+        original = deploy.ROOT
+        workspace = tempfile.TemporaryDirectory(prefix="go-nomad-incremental-fixture-")
+        self.addCleanup(workspace.cleanup)
+        root = Path(workspace.name)
+        for name in ("go-nomad-dev-migrations.sha256", "go-nomad-dev-incremental.sha256"):
+            manifest = original / "docs" / name
+            target = root / "docs" / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(manifest.read_bytes())
+            for line in manifest.read_text().splitlines():
+                path = line.split()[1]
+                target = root / path
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes((original / path).read_bytes())
+        replacement = patch.object(deploy, "ROOT", root)
+        replacement.start()
+        self.addCleanup(replacement.stop)
         self.files = deploy.migration_files(incremental=True)
         self.versions = [p.name[:14] for p in self.files]
         self.state = dict(version=170011, database="postgres", user="postgres", read_only="on", history_exists=True,
