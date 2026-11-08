@@ -8,10 +8,11 @@ interface PageHeaderProps {
   title: string;
   showBack?: boolean;
   backTo?: string;
+  backLabel?: string;
   rightAction?: React.ReactNode;
 }
 
-const PageHeader: React.FC<PageHeaderProps> = ({ title, showBack = false, backTo, rightAction }) => {
+const PageHeader: React.FC<PageHeaderProps> = ({ title, showBack = false, backTo, backLabel = "Voltar", rightAction }) => {
   const navigate = useNavigate();
   const { getPrevious } = useNavigationHistory();
 
@@ -33,14 +34,15 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, showBack = false, backTo
     <header className="w-full flex items-center justify-between px-4 pt-4 pb-2 bg-[#FAF3EC] shadow-soft rounded-b-lg select-none">
       {showBack ? (
         <button
-          className="flex items-center justify-center rounded-full hover:bg-[#E76F5115] transition"
+          type="button"
+          className="flex items-center justify-center rounded-full hover:bg-[#E76F5115] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta-dark"
           onClick={handleBack}
-          aria-label="Voltar"
+          aria-label={backLabel}
           style={{
             width: 44, height: 44, minWidth: 44, minHeight: 44
           }}
         >
-          <ArrowLeft size={24} className="text-[#E76F51]" />
+          <ArrowLeft aria-hidden="true" size={24} className="text-[#E76F51]" />
         </button>
       ) : (
         <div style={{ width: 44, height: 44 }} />

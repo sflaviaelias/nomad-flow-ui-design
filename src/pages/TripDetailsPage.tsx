@@ -1,5 +1,5 @@
-import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, CalendarDays, Clock3, MapPin, NotebookPen, Wallet } from "lucide-react";
+import { useParams } from "react-router-dom";
+import { CalendarDays, Clock3, MapPin, NotebookPen, Wallet } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import TripCover from "@/components/TripCover";
 import { useTrip } from "@/hooks/useTrips";
@@ -11,9 +11,8 @@ export default function TripDetailsPage() {
   const data = trip.data;
   const status = data && tripStatus(data.start_date, data.end_date);
   return <div className="min-h-screen bg-background pb-12 text-accent">
-    <PageHeader title="Detalhes da viagem" showBack backTo="/trips" />
+    <PageHeader title="Detalhes da viagem" showBack backTo="/trips" backLabel="Voltar para Minhas viagens" />
     <main className="mx-auto max-w-6xl px-5 py-6 sm:px-8 sm:py-8">
-      <Link to="/trips" className="mb-6 inline-flex min-h-11 items-center gap-2 rounded text-sm font-medium text-terracotta-dark hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-terracotta-dark"><ArrowLeft aria-hidden="true" className="h-4 w-4" />Minhas viagens</Link>
       {trip.isLoading ? <div role="status"><p className="mb-4">Carregando viagem...</p><div aria-hidden="true" className="h-80 animate-pulse rounded-3xl bg-terracotta-light motion-reduce:animate-none" /></div>
         : trip.isError ? <div role="alert" className="rounded-2xl border border-terracotta/20 bg-white p-6"><p>{trip.error.message}</p><Button className="mt-4 bg-terracotta-dark text-white hover:bg-accent" onClick={() => void trip.refetch()}>Tentar novamente</Button></div>
         : !data ? <section className="rounded-3xl bg-cream p-10 text-center"><MapPin aria-hidden="true" className="mx-auto mb-4 h-10 w-10 text-terracotta-dark" /><p>Viagem não encontrada ou indisponível para esta conta.</p></section>
