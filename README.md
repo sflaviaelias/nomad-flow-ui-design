@@ -1,6 +1,6 @@
 # Go Nomad
 
-**A context-aware travel companion for remote workers, and a hands-on product engineering learning project.**
+**An early-stage, mobile-first travel companion concept for remote workers, developed as a hands-on product engineering learning project.**
 
 [Live app](https://nomad-flow-ui-design.vercel.app) · [Issues and roadmap](https://github.com/sflaviaelias/nomad-flow-ui-design/issues) · [Sprint 1](https://github.com/sflaviaelias/nomad-flow-ui-design/issues/13)
 
@@ -8,9 +8,9 @@
 
 **Product purpose.** Go Nomad is designed for people who want to travel without putting their work on hold. Planning a trip while working remotely requires more than destinations, dates and budgets: travelers need to understand where they can actually work, whether accommodation is suitable for calls, how reliable the internet is, and how to fit exploration around their work schedule.
 
-**Learning purpose.** Go Nomad is also an independent learning project to explore the full product development process, from discovery and UX to engineering, data modeling, tests and deployment. It is not presented as a production-ready commercial service.
+**Project history and learning purpose.** Go Nomad began around 2025 as an early prototype, was paused, and was resumed in 2026 with a more structured development approach: version control, a prioritized GitHub backlog, incremental changes, automated tests, pull requests and hands-on QA. It is also an independent learning project exploring product discovery, UX, engineering, data modeling and deployment. It is **not a publicly launched or production-ready service**.
 
-> **PT-BR:** O Go Nomad é pensado para quem quer viajar sem deixar de trabalhar. A proposta é apoiar decisões práticas da rotina remota dentro do contexto de cada viagem: onde ficar, onde trabalhar, como avaliar internet e ambiente e como aproveitar o destino nos horários livres. Ao mesmo tempo, é um projeto independente de estudo e desenvolvimento de produto.
+> **PT-BR:** O Go Nomad é pensado para quem quer viajar sem deixar de trabalhar. A proposta é apoiar decisões práticas da rotina remota dentro do contexto de cada viagem: onde ficar, onde trabalhar, como avaliar internet e ambiente e como aproveitar o destino nos horários livres. O projeto começou por volta de 2025 como um protótipo, ficou pausado e foi retomado em 2026 com uma estrutura mais organizada de desenvolvimento, testes, PRs e gestão do backlog. Continua sendo um projeto de estudo, ainda não lançado publicamente como produto.
 
 ## Product goal / Objetivo do produto
 
@@ -28,7 +28,13 @@ Unlike a general travel itinerary app, Go Nomad aims to connect travel planning 
 
 **PT-BR:** A proposta não é ser apenas um aplicativo para registrar viagens ou montar roteiros turísticos. É ajudar pessoas que trabalham remotamente a conciliar trabalho e viagem, com ferramentas e informações contextualizadas para o destino e a rotina de cada viagem. Isso pode servir tanto a nômades digitais quanto a quem faz uma viagem temporária sem tirar férias.
 
-## What works today / O que funciona hoje
+## Target experience and platform / Experiência e plataforma pretendidas
+
+**The long-term goal is a mobile application**, designed for the on-the-go needs of remote workers. The current prototype is a **responsive web app**, accessible on mobile browsers, and is **not yet a native iOS or Android application**. Any future mobile implementation and distribution will depend on validation and technical decisions.
+
+**PT-BR:** A intenção é que o Go Nomad evolua para um **aplicativo mobile**, pensado para uso durante as viagens. Hoje, porém, a implementação é uma **aplicação web responsiva**, acessível pelo navegador do celular, e não um aplicativo nativo para iOS ou Android.
+
+## What works in the current prototype / O que funciona no protótipo atual
 
 - Account creation, sign-in and authenticated sessions using Supabase Auth.
 - Creating, listing and viewing trips, with destination, dates and optional budget in BRL.
@@ -107,9 +113,9 @@ Supabase-backed flows require a correctly configured development environment. Do
 
 ## Project status / Estado do projeto
 
-**Active learning project, iteratively developed.** Features, screenshots and implementation details may change as the product evolves.
+**Early-stage learning prototype, resumed in 2026 after a pause. Not publicly launched as a finished product.** Features, screenshots and implementation details may change as the product evolves.
 
-**Projeto de estudo ativo, desenvolvido de forma incremental.** O README é revisado quando uma funcionalidade importante ou sprint é concluída.
+**Protótipo em desenvolvimento, retomado em 2026 após uma pausa, ainda não lançado como produto final.** O README é revisado quando uma funcionalidade importante ou sprint é concluída.
 
 ## Author / Autoria
 
