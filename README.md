@@ -1,22 +1,32 @@
 # Go Nomad
 
-**A travel planning app and a hands-on product engineering learning project.**
+**A context-aware travel companion for remote workers, and a hands-on product engineering learning project.**
 
 [Live app](https://nomad-flow-ui-design.vercel.app) · [Issues and roadmap](https://github.com/sflaviaelias/nomad-flow-ui-design/issues) · [Sprint 1](https://github.com/sflaviaelias/nomad-flow-ui-design/issues/13)
 
 ## Why this project exists
 
-Go Nomad is an independent learning project created to explore the full journey of building a digital product, from product discovery and UX decisions to implementation, testing, data modeling and deployment.
+**Product purpose.** Go Nomad is designed for people who want to travel without putting their work on hold. Planning a trip while working remotely requires more than destinations, dates and budgets: travelers need to understand where they can actually work, whether accommodation is suitable for calls, how reliable the internet is, and how to fit exploration around their work schedule.
 
-The goal is to put product management and software engineering concepts into practice by evolving a real travel planning app in small, testable increments. The project is **not presented as a production-ready commercial service**.
+**Learning purpose.** Go Nomad is also an independent learning project to explore the full product development process, from discovery and UX to engineering, data modeling, tests and deployment. It is not presented as a production-ready commercial service.
 
-> **PT-BR:** O Go Nomad é um projeto independente de estudo e desenvolvimento prático. Seu objetivo é explorar o ciclo completo de construção de um produto digital, unindo gestão de produto, UX, programação, testes, banco de dados e publicação. É um laboratório de aprendizado com um aplicativo real de planejamento de viagens.
+> **PT-BR:** O Go Nomad é pensado para quem quer viajar sem deixar de trabalhar. A proposta é apoiar decisões práticas da rotina remota dentro do contexto de cada viagem: onde ficar, onde trabalhar, como avaliar internet e ambiente e como aproveitar o destino nos horários livres. Ao mesmo tempo, é um projeto independente de estudo e desenvolvimento de produto.
 
 ## Product goal / Objetivo do produto
 
-Help travelers organize upcoming trips and relevant information in one place, starting with reliable core journeys before expanding into advanced planning features.
+**Help remote workers plan trips around the realities of their work, not the other way around.**
 
-Ajudar viajantes a organizar viagens futuras e informações importantes em um só lugar, priorizando primeiro os fluxos essenciais e sua confiabilidade.
+Unlike a general travel itinerary app, Go Nomad aims to connect travel planning with the needs of someone working from another city or country. A user's destination, travel dates, work routine and available time should guide what information and recommendations are relevant.
+
+**Illustrative use cases, part of the product vision (not yet implemented):**
+
+- **Remote-work-friendly accommodation:** understand whether an Airbnb or other stay has a desk, a quiet environment, suitable space for video calls and reliable connectivity.
+- **Work-friendly cafés and places:** identify whether remote work is permitted, whether there is a time limit or minimum consumption, access to outlets, noise level and Wi-Fi quality.
+- **Connectivity confidence:** assess whether the connection is sufficient for video calls and day-to-day work, with transparent sources rather than unsupported claims.
+- **Travel around work:** suggest activities and experiences for evenings, weekends and free hours when the person works Monday through Friday.
+- **Trip-specific context:** prioritize information relevant to the actual destination and dates rather than offer a generic directory of places.
+
+**PT-BR:** A proposta não é ser apenas um aplicativo para registrar viagens ou montar roteiros turísticos. É ajudar pessoas que trabalham remotamente a conciliar trabalho e viagem, com ferramentas e informações contextualizadas para o destino e a rotina de cada viagem. Isso pode servir tanto a nômades digitais quanto a quem faz uma viagem temporária sem tirar férias.
 
 ## What works today / O que funciona hoje
 
@@ -36,7 +46,8 @@ Ajudar viajantes a organizar viagens futuras e informações importantes em um s
 Development is tracked in [GitHub Issues](https://github.com/sflaviaelias/nomad-flow-ui-design/issues), which is the single source of truth for the backlog.
 
 - **Sprint 1:** Improve trip management, including navigation, editing and deletion. Navigation fix [#12](https://github.com/sflaviaelias/nomad-flow-ui-design/issues/12) was merged and validated on iPhone; editing [#10](https://github.com/sflaviaelias/nomad-flow-ui-design/issues/10) and deletion [#11](https://github.com/sflaviaelias/nomad-flow-ui-design/issues/11) remain open.
-- **Later:** Improve destination validation/autocomplete, photo coverage, profile usability, localization and budgeting.
+- **Later, foundational improvements:** Improve destination validation/autocomplete, photo coverage, profile usability, localization and budgeting.
+- **Long-term product vision (not implemented):** Work-friendly accommodation and café information, connectivity and workspace suitability, constraints such as minimum consumption or time limits, and context-aware suggestions for free time around a remote-work schedule. Data sources, verification and feasibility are still to be defined.
 
 These are planned improvements, not claims about current functionality.
 
