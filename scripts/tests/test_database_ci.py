@@ -32,7 +32,7 @@ case "$stage" in
            if [ "${MOCK_SKIP_MIGRATION:-0}" = 1 ] && [ "$skipped" = 0 ]; then skipped=1; continue; fi
            echo "Applying migration $(basename "$file")..."
          done ;;
-  db) echo "Files=4, Tests=${MOCK_ASSERTIONS:-85}, 1 wallclock secs"
+  db) echo "Files=5, Tests=${MOCK_ASSERTIONS:-95}, 1 wallclock secs"
       echo 'Result: PASS' ;;
   stop) : ;;
   *) echo "Comando simulado desconhecido: $stage" >&2; exit 99 ;;
@@ -87,7 +87,7 @@ class LocalRunnerTests(unittest.TestCase):
     def test_success_requires_full_run_and_cleans_workspace(self):
         outcome = self.run_script()
         self.assertEqual(outcome.returncode, 0, outcome.stdout + outcome.stderr)
-        self.assertIn("85 asserções aprovadas", outcome.stdout)
+        self.assertIn("95 asserções aprovadas", outcome.stdout)
         self.assertNotIn("segredo-local-simulado", outcome.stdout)
         self.assertNotIn("senha-simulada", outcome.stdout)
         self.assertFalse(Path(self.state.read_text().strip()).exists())
@@ -98,7 +98,7 @@ class LocalRunnerTests(unittest.TestCase):
         outcome = self.run_script(MOCK_FAIL="db")
         self.assertEqual(outcome.returncode, 17)
         self.assertIn("stop --workdir", self.calls.read_text())
-        self.assertNotIn("85 asserções aprovadas", outcome.stdout)
+        self.assertNotIn("95 asserções aprovadas", outcome.stdout)
 
     def test_zero_assertions_cannot_pass(self):
         outcome = self.run_script(MOCK_ASSERTIONS="0")

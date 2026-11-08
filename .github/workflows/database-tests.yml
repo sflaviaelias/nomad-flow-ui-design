@@ -95,7 +95,7 @@ jobs:
           DATABASE_OUTCOME: ${{ steps.database.outcome }}
         run: |
           if [ "$DATABASE_OUTCOME" = success ]; then
-            echo '16 migrations aplicadas; quatro suítes e 85 asserções pgTAP aprovadas.' >> "$GITHUB_STEP_SUMMARY"
+            echo '17 migrations aplicadas; cinco suítes e 95 asserções pgTAP aprovadas.' >> "$GITHUB_STEP_SUMMARY"
           else
             echo 'Validação não concluída com sucesso. Consulte o primeiro erro nos logs; não considerar os testes aprovados.' >> "$GITHUB_STEP_SUMMARY"
           fi

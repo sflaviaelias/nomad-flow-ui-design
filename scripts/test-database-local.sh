@@ -59,7 +59,7 @@ run_logged start "$supabase_bin" start --workdir "$test_workspace" \
     echo 'Falha na inicialização do Supabase local; consulte o log acima.' >&2
     exit 1
   }
-echo 'Recriando banco local e aplicando as 16 migrations em ordem.'
+echo 'Recriando banco local e aplicando as 17 migrations em ordem.'
 run_logged reset "$supabase_bin" db reset --local --workdir "$test_workspace"
 # CLI fixo: cada migration deve aparecer explicitamente no log de aplicação.
 migration_count=0
@@ -70,15 +70,15 @@ for migration in "$test_workspace"/supabase/migrations/*.sql; do
   fi
   migration_count=$((migration_count + 1))
 done
-if [ "$migration_count" -ne 16 ]; then
-  echo "Esperadas 16 migrations; encontradas $migration_count." >&2
+if [ "$migration_count" -ne 17 ]; then
+  echo "Esperadas 17 migrations; encontradas $migration_count." >&2
   exit 1
 fi
-echo 'Executando as quatro suítes pgTAP.'
+echo 'Executando as cinco suítes pgTAP.'
 run_logged tests "$supabase_bin" test db --workdir "$test_workspace"
-if ! grep -Eq 'Files=4,[[:space:]]+Tests=85([,[:space:]]|$)' "$test_workspace/tests.log" \
+if ! grep -Eq 'Files=5,[[:space:]]+Tests=95([,[:space:]]|$)' "$test_workspace/tests.log" \
   || ! grep -Eq '^Result: PASS[[:space:]]*$' "$test_workspace/tests.log"; then
-  echo 'O runner não confirmou quatro suítes, 85 asserções e Result: PASS.' >&2
+  echo 'O runner não confirmou cinco suítes, 95 asserções e Result: PASS.' >&2
   exit 1
 fi
-echo 'Validação concluída: 16 migrations, quatro suítes e 85 asserções aprovadas.'
+echo 'Validação concluída: 17 migrations, cinco suítes e 95 asserções aprovadas.'
