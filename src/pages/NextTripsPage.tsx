@@ -5,6 +5,7 @@ import PageHeader from "@/components/PageHeader";
 import TripCover from "@/components/TripCover";
 import { useTrips } from "@/hooks/useTrips";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { clearTripDraft } from "@/lib/trip-form-draft";
 import { Button } from "@/components/ui/button";
 import { tripBudget, tripDate, tripDuration, tripStatus } from "@/lib/trip-presentation";
 export default function NextTripsPage() {
@@ -14,7 +15,10 @@ export default function NextTripsPage() {
     if (!user || !trips.data) return;
     const key = `go-nomad:pending-trip:${user.id}`;
     const pending = sessionStorage.getItem(key);
-    if (pending && trips.data.some((trip) => trip.id === pending)) sessionStorage.removeItem(key);
+    if (pending && trips.data.some((trip) => trip.id === pending)) {
+      sessionStorage.removeItem(key);
+      clearTripDraft(user.id);
+    }
   }, [user, trips.data]);
   return <div className="min-h-screen bg-background pb-12 text-accent">
     <PageHeader title="Minhas viagens" showBack backTo="/" rightAction={

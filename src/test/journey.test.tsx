@@ -62,7 +62,7 @@ describe("Jornada React com Supabase simulado", () => {
     expect(window.location.pathname).toBe(`/trip/${id}`);
     expect(fake.upsert).not.toHaveBeenCalled();
     expect(fake.client.functions.invoke).not.toHaveBeenCalled();
-    await user.click(screen.getByRole("link", { name: "Minhas viagens" }));
+    await user.click(screen.getByRole("button", { name: "Voltar para Minhas viagens" }));
     await user.click(screen.getByRole("button", { name: "Sair da conta" }));
     await screen.findByRole("heading", { name: "Bem-vindo" });
     expect(screen.queryByText("Porto")).toBeNull();

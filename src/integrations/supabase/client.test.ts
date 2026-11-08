@@ -8,6 +8,8 @@ it("logout remove tokens e tentativas privadas, preservando preferências não p
   localStorage.setItem("theme", "dark");
   sessionStorage.setItem("go-nomad:pending-trip:user-1", "id-ficticio");
   sessionStorage.setItem("go-nomad:pending-trip:user-2", "outro-id-ficticio");
+  sessionStorage.setItem("go-nomad:trip-draft:user-1", "rascunho-privado");
+  sessionStorage.setItem("go-nomad:trip-draft:user-2", "outro-rascunho");
   clearLocalAuth();
   expect(localStorage.getItem(AUTH_STORAGE_KEY)).toBeNull();
   expect(localStorage.getItem(`${AUTH_STORAGE_KEY}-code-verifier`)).toBeNull();

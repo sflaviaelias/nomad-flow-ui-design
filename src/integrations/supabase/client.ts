@@ -1,4 +1,5 @@
 // Configuração compartilhada pelo cliente e pelos endereços das Edge Functions.
+import { TRIP_DRAFT_PREFIX } from "@/lib/trip-form-draft";
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
@@ -21,7 +22,7 @@ export function clearLocalAuth() {
   localStorage.removeItem("language");
   for (let i = sessionStorage.length - 1; i >= 0; i--) {
     const key = sessionStorage.key(i);
-    if (key?.startsWith("go-nomad:pending-trip:")) sessionStorage.removeItem(key);
+    if (key?.startsWith("go-nomad:pending-trip:") || key?.startsWith(TRIP_DRAFT_PREFIX)) sessionStorage.removeItem(key);
   }
 }
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
