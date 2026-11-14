@@ -67,6 +67,16 @@ export async function updateTrip(userId: string, id: string, draft: TripDraft) {
   } catch { /* A retry updates the same row even if the response was lost. */ }
   throw new Error("Não foi possível salvar as alterações. Seus campos foram preservados; tente novamente.");
 }
+export async function deleteTrip(userId: string, id: string) {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user || user.id !== userId) throw new Error("Sua sessão expirou. Entre novamente.");
+  try {
+    const { data, error } = await supabase.from("trips").delete()
+      .eq("id", id).eq("user_id", userId).select("id").maybeSingle();
+    if (!error && data?.id === id) return;
+  } catch { /* Do not report success for an unconfirmed server response. */ }
+  throw new Error("Não foi possível confirmar a exclusão. Atualize a página ou tente novamente.");
+}
 export function localDateKey(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }

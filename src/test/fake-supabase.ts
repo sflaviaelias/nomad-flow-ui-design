@@ -11,6 +11,8 @@ export function createFakeSupabase() {
   let loseResponse = false;
   let rejectInsert = false;
   let rejectUpdate = false;
+  let rejectDelete = false;
+  let lostDeleteResponse = false;
   let logoutFailure = false;
   let missingProfile = false;
   let gate: Promise<void> | null = null;
@@ -22,6 +24,7 @@ export function createFakeSupabase() {
   }
   const insert = vi.fn();
   const update = vi.fn();
+  const remove = vi.fn();
   const upsert = vi.fn(() => { throw new Error("O frontend não deve criar perfis."); });
   const client = {
     auth: {
@@ -54,6 +57,7 @@ export function createFakeSupabase() {
     from: vi.fn((table: string) => {
       const filters: [string, unknown][] = [];
       let payload: Trip | null = null;
+      let deleting = false;
       let changes: Partial<Trip> | null = null;
       queries.push({ table, filters });
       async function execute(single = false) {
@@ -75,6 +79,15 @@ export function createFakeSupabase() {
           rows.filter((r) => r.user_id === session?.user.id && filters.every(([key, value]) => r[key] === value))
             .forEach((r) => Object.assign(r, changes));
         }
+        if (deleting) {
+          remove(filters);
+          if (gate) await gate;
+          if (rejectDelete) return { data: null, error: new Error("offline") };
+          const deleted = rows.filter((r) => r.user_id === session?.user.id && filters.every(([key, value]) => r[key] === value));
+          deleted.forEach((row) => rows.splice(rows.indexOf(row), 1));
+          if (lostDeleteResponse) { lostDeleteResponse = false; throw new Error("response lost"); }
+          return { data: single ? deleted[0] ?? null : deleted, error: null };
+        }
         const selected = rows.filter((r) => filters.every(([key, value]) => r[key] === value));
         return { data: single ? (selected[0] ?? null) : selected, error: null };
       }
@@ -85,6 +98,7 @@ export function createFakeSupabase() {
         abortSignal: () => builder,
         insert: (value: Trip) => { payload = value; return builder; },
         update: (value: Partial<Trip>) => { changes = value; return builder; },
+        delete: () => { deleting = true; return builder; },
         upsert,
         single: () => execute(true),
         maybeSingle: () => execute(true),
@@ -94,11 +108,13 @@ export function createFakeSupabase() {
     }),
   };
   return {
-    client, rows, queries, insert, update, upsert,
+    client, rows, queries, insert, update, remove, upsert,
     clear: vi.fn(() => { session = null; sessionStorage.clear(); localStorage.clear(); }),
     register(email = "ana@example.test", id = "user-1") { accounts.set(email, { id, password: "Senha!123", confirmed: true }); login(email); },
     confirm(email: string, activate = false) { accounts.get(email).confirmed = true; if (activate) login(email); },
     loseNextResponse() { loseResponse = true; },
+    failDelete(value = true) { rejectDelete = value; },
+    loseDeleteResponse() { lostDeleteResponse = true; },
     failUpdate(value = true) { rejectUpdate = value; },
     failInsert(value = true) { rejectInsert = value; },
     failLogout() { logoutFailure = true; },
@@ -107,7 +123,7 @@ export function createFakeSupabase() {
     switchUser() { accounts.set("bia@example.test", { id: "user-2", password: "Senha!123", confirmed: true }); login("bia@example.test"); },
     reset() {
       session = null; listener = null; rows.length = 0; queries.length = 0; accounts.clear();
-      loseResponse = false; rejectUpdate = false; rejectInsert = false; logoutFailure = false; missingProfile = false; gate = null;
+      rejectDelete = false; lostDeleteResponse = false; loseResponse = false; rejectUpdate = false; rejectInsert = false; logoutFailure = false; missingProfile = false; gate = null;
       vi.clearAllMocks();
     },
   };

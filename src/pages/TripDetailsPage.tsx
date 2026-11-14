@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DeleteTripButton from "@/components/DeleteTripButton";
 import TripForm from "@/components/TripForm";
 import { useParams } from "react-router-dom";
 import { CalendarDays, Clock3, MapPin, NotebookPen, Wallet } from "lucide-react";
@@ -25,6 +26,7 @@ export default function TripDetailsPage() {
         </section> : <article>
           {saved && <p role="status" className="mb-4">Viagem atualizada com sucesso.</p>}
           <Button className="mb-4" onClick={() => { setSaved(false); setEditing(true); }}>Editar viagem</Button>
+          <DeleteTripButton key={data.id} trip={data} />
           <div className="overflow-hidden rounded-3xl border border-terracotta/10 shadow-soft"><TripCover tripId={data.id} destination={data.destination} hero /></div>
           <div className="grid items-start gap-6 pt-7 lg:grid-cols-[1fr_20rem] lg:gap-10">
             <div className="min-w-0 space-y-7">
