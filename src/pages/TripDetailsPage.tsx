@@ -1,3 +1,5 @@
+import { useState } from "react";
+import TripForm from "@/components/TripForm";
 import { useParams } from "react-router-dom";
 import { CalendarDays, Clock3, MapPin, NotebookPen, Wallet } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
@@ -6,6 +8,8 @@ import { useTrip } from "@/hooks/useTrips";
 import { Button } from "@/components/ui/button";
 import { tripBudget, tripDate, tripDuration, tripStatus } from "@/lib/trip-presentation";
 export default function TripDetailsPage() {
+  const [editing, setEditing] = useState(false);
+  const [saved, setSaved] = useState(false);
   const { tripId } = useParams();
   const trip = useTrip(tripId);
   const data = trip.data;
@@ -16,7 +20,11 @@ export default function TripDetailsPage() {
       {trip.isLoading ? <div role="status"><p className="mb-4">Carregando viagem...</p><div aria-hidden="true" className="h-80 animate-pulse rounded-3xl bg-terracotta-light motion-reduce:animate-none" /></div>
         : trip.isError ? <div role="alert" className="rounded-2xl border border-terracotta/20 bg-white p-6"><p>{trip.error.message}</p><Button className="mt-4 bg-terracotta-dark text-white hover:bg-accent" onClick={() => void trip.refetch()}>Tentar novamente</Button></div>
         : !data ? <section className="rounded-3xl bg-cream p-10 text-center"><MapPin aria-hidden="true" className="mx-auto mb-4 h-10 w-10 text-terracotta-dark" /><p>Viagem não encontrada ou indisponível para esta conta.</p></section>
-        : <article>
+        : editing ? <section className="mx-auto max-w-xl"><h2 className="text-2xl font-semibold">Editar viagem</h2>
+          <TripForm key={data.id} trip={data} onCancel={() => setEditing(false)} onSaved={() => { setEditing(false); setSaved(true); }} />
+        </section> : <article>
+          {saved && <p role="status" className="mb-4">Viagem atualizada com sucesso.</p>}
+          <Button className="mb-4" onClick={() => { setSaved(false); setEditing(true); }}>Editar viagem</Button>
           <div className="overflow-hidden rounded-3xl border border-terracotta/10 shadow-soft"><TripCover tripId={data.id} destination={data.destination} hero /></div>
           <div className="grid items-start gap-6 pt-7 lg:grid-cols-[1fr_20rem] lg:gap-10">
             <div className="min-w-0 space-y-7">

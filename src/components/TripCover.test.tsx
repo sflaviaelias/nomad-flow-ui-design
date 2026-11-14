@@ -55,6 +55,17 @@ describe("Capa de viagem", () => {
     await screen.findByText("Foto do destino indisponível");
     expect(screen.queryByRole("img")).toBeNull();
   });
+  it("destination edit drops the previous photo immediately and reprocesses the cover", async () => {
+    mocks.invoke.mockResolvedValueOnce({ data: { status: "ready", photo }, error: null })
+      .mockResolvedValue({ data: null, error: new Error("offline") });
+    const cache = new QueryClient();
+    const view = render(ui(cache));
+    fireEvent.load(await screen.findByRole("img"));
+    view.rerender(ui(cache, "Portugal"));
+    expect(screen.queryByRole("img")).toBeNull();
+    await screen.findByText("Foto do destino indisponível");
+    expect(mocks.invoke).toHaveBeenCalledTimes(2);
+  });
   it("chaves de cache distinguem contas privadas", async () => {
     mocks.invoke.mockResolvedValueOnce({ data: { status: "ready", photo }, error: null }).mockResolvedValue({ data: null, error: new Error("404") });
     const client = new QueryClient();

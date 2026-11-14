@@ -9,7 +9,7 @@ export const tripDraftSchema = z.object({
   destination: z.string().trim().min(1, "Informe o destino."),
   start_date: calendarDate, end_date: calendarDate,
   budget: z.number().finite().nonnegative("O orçamento não pode ser negativo.").nullable(),
-  currency: z.literal("BRL"),
+  currency: z.enum(["BRL", "EUR", "USD"], { message: "Moeda não suportada." }),
 }).refine((value) => value.end_date >= value.start_date, {
   message: "O término deve ser igual ou posterior ao início.", path: ["end_date"],
 });
@@ -51,6 +51,21 @@ export async function createTrip(userId: string, draft: TripDraft, id: string) {
   const recovered = await getTrip(userId, id);
   if (recovered) return reconcile(recovered);
   throw new Error("Não foi possível salvar. Seus campos foram preservados; tente novamente.");
+}
+export async function updateTrip(userId: string, id: string, draft: TripDraft) {
+  const input = tripDraftSchema.parse(draft) as TripDraft;
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || user?.id !== userId) throw new Error("Sua sessão expirou. Entre novamente.");
+  const previous = await getTrip(userId, id);
+  if (!previous) throw new Error("Viagem não encontrada ou indisponível para esta conta.");
+  if (previous.currency !== input.currency) throw new Error("Mantenha a moeda original desta viagem.");
+  try {
+    // Only editable fields are sent; identity, notes, checklist and history stay intact.
+    const { data, error } = await supabase.from("trips").update(input)
+      .eq("id", id).eq("user_id", userId).select("*").maybeSingle();
+    if (!error && data) return data;
+  } catch { /* A retry updates the same row even if the response was lost. */ }
+  throw new Error("Não foi possível salvar as alterações. Seus campos foram preservados; tente novamente.");
 }
 export function localDateKey(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
