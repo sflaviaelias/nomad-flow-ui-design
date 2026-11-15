@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import ConciergePage from "./pages/ConciergePage";
 import ActiveTripDetailsPage from "./pages/ActiveTripDetailsPage";
@@ -53,19 +53,6 @@ function getInitialLanguage() {
 
 function AppWrapper() {
   const onboarding = useOnboardingFlow();
-  const location = useLocation();
-
-  if (location.pathname === "/" && !onboarding.checked) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FAF3EC] text-terra-700">
-        <span className="animate-pulse text-lg">Carregando...</span>
-      </div>
-    );
-  }
-
-  if (location.pathname === "/" && onboarding.show) {
-    return <OnboardingFlow onFinish={onboarding.finishOnboarding} />;
-  }
 
   return (
     <TooltipProvider>
@@ -81,15 +68,8 @@ function AppWrapper() {
           <Route path="/trip/:tripId" element={<RequireAuth><TripDetailsPage /></RequireAuth>} />
           <Route path="/active-trip" element={<RequireAuth><ActiveTripDetailsPage /></RequireAuth>} />
 
-          {/* Rota principal que permite tanto usuários autenticados quanto convidados */}
-          <Route
-            path="/"
-            element={
-              <GuestOrAuthRoute>
-                <Index />
-              </GuestOrAuthRoute>
-            }
-          />
+          {/* Home is the public introduction; private routes retain RequireAuth. */}
+          <Route path="/" element={<Index />} />
           
           {/* Nova rota para prompt de nova viagem */}
           <Route path="/new-trip" element={<NewTripAuthPrompt />} />
