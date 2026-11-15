@@ -1,85 +1,53 @@
-
-import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import LogoMini from "@/components/LogoMini";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import EntryLayout from "@/features/entry/EntryLayout";
+import { EntryAlternatives, EntryButton, EntryError } from "@/features/entry/EntryControls";
+import { homeFocus } from "@/features/home/HomeAction";
+import { safeAuthReturn } from "./return-path";
 
 export default function LoginScreen() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { state } = useLocation();
+  const returnTo = safeAuthReturn(state);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const { user, loading: authLoading } = useSupabaseAuth();
-  useEffect(() => {
-    if (user) navigate("/trips", { replace: true });
-  }, [user, navigate]);
-  const handleLogin = async (e: React.FormEvent) => {
+  const locked = useRef(false);
+  const active = useRef(true);
+  useEffect(() => { active.current = true; return () => { active.current = false; }; }, []);
+  const { user, loading: authLoading, error: sessionError } = useSupabaseAuth();
+  useEffect(() => { if (user) navigate(returnTo, { replace: true }); }, [user, navigate, returnTo]);
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    if (loading) return;
-    setLoading(true); setError(null);
+    if (locked.current || authLoading) return;
+    locked.current = true; setLoading(true); setError(null);
     try {
       const { error: failure } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      if (!active.current) return;
       if (failure) {
-        setError(failure.code === "email_not_confirmed"
-          ? "Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada."
-          : "Não foi possível entrar. Confira e-mail e senha e tente novamente.");
+        setError(failure.code === "email_not_confirmed" ? "Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada." : "Não foi possível entrar. Confira e-mail e senha e tente novamente.");
         return;
       }
-      setPassword("");
-      navigate("/trips", { replace: true });
-    } catch {
-      setError("Não foi possível conectar. Tente novamente.");
-    } finally { setLoading(false); }
-  };
-
-  return (
-    <div className="h-screen flex flex-col justify-center items-center bg-[#FAF3EC] px-4">
-      <div className="w-full max-w-md">
-        {/* Logo centralizada acima dos campos */}
-        <div className="flex justify-center mb-8">
-          <LogoMini size="medium" showText={true} />
-        </div>
-        
-        <h2 className="font-bold text-2xl mb-6 text-terra-800 text-center" style={{fontFamily: "Inter"}}>
-          Entrar no GoNomad
-        </h2>
-        <form className="space-y-4" onSubmit={handleLogin}>
-          <Input
-            type="email"
-            aria-label="E-mail"
-            autoComplete="email"
-            placeholder="Seu e-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="bg-white"
-          />
-          <Input
-            type="password"
-            aria-label="Senha"
-            autoComplete="current-password"
-            placeholder="Senha"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="bg-white"
-          />
-          <Button
-            className="w-full py-3 bg-[#E76F51] text-white font-semibold text-base shadow-md hover:bg-[#CC5A3D]"
-            type="submit"
-            disabled={loading || authLoading}
-          >
-            {loading ? "Entrando..." : "Entrar no GoNomad"}
-          </Button>
-          {error && <div role="alert" className="text-red-500 text-sm">{error}</div>}
-        </form>
-        <Button variant="ghost" onClick={() => navigate("/auth/signup")}>Criar conta</Button>
-      </div>
-    </div>
-  );
+      setPassword(""); navigate(returnTo, { replace: true });
+    } catch { if (active.current) setError("Não foi possível conectar. Tente novamente."); }
+    finally { locked.current = false; if (active.current) setLoading(false); }
+  }
+  return <EntryLayout title="Entrar no GoNomad" description="Seus destinos e seus planos, do jeito que você deixou. Entre para continuar sua jornada.">
+    <h2 className="mb-6 text-xl font-semibold">Que bom ter você de volta.</h2>
+    <form onSubmit={handleLogin} aria-busy={loading || authLoading} aria-describedby={error || sessionError ? "login-error" : undefined} className="entry-fields space-y-5">
+      <fieldset disabled={loading || authLoading} className="space-y-5">
+        <label className="block" htmlFor="login-email">E-mail<input id="login-email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="mt-2" placeholder="voce@exemplo.com" /></label>
+        <div><label className="block" htmlFor="login-password">Senha</label><div className="relative mt-2"><input id="login-password" type={showPassword ? "text" : "password"} autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} className="entry-password" /><button type="button" aria-pressed={showPassword} aria-label={showPassword ? "Esconder senha" : "Mostrar senha"} onClick={() => setShowPassword(!showPassword)} className={`absolute right-1 top-0.5 flex h-11 w-11 items-center justify-center rounded-lg ${homeFocus}`}>{showPassword ? <EyeOff aria-hidden="true" className="h-5 w-5" /> : <Eye aria-hidden="true" className="h-5 w-5" />}</button></div></div>
+        <EntryButton type="submit" className="w-full">{loading ? "Entrando..." : "Entrar no GoNomad"}</EntryButton>
+      </fieldset>
+      {authLoading && <p role="status" className="text-sm">Verificando sua sessão...</p>}
+      <EntryError id="login-error" message={error || sessionError} />
+    </form>
+    <EntryAlternatives signup />
+  </EntryLayout>;
 }

@@ -14,7 +14,7 @@ function trip(id: string, start: string, end: string, budget: number | null = 50
   return { id, user_id: "account-a", destination: id, start_date: start, end_date: end, budget, currency: "BRL", notes: null, checklist: null, itinerary: null, created_at: "", updated_at: "", is_smart_trip: false };
 }
 function state(data: Trip[] = []) { return { data, isLoading: false, isError: false, isFetching: false, refetch: mocks.retry }; }
-function ui() { return <MemoryRouter><Routes><Route path="/" element={<Home />} /><Route path="/trip/:id" element={<h1>Trip detail destination</h1>} /><Route path="/trip/new" element={<h1>Create destination</h1>} /><Route path="/trips" element={<h1>Trips destination</h1>} /><Route path="/auth/signup" element={<h1>Signup destination</h1>} /><Route path="/auth/login" element={<h1>Login destination</h1>} /><Route path="/profile" element={<h1>Profile destination</h1>} /><Route path="/settings" element={<h1>Settings destination</h1>} /></Routes></MemoryRouter>; }
+function ui() { return <MemoryRouter><Routes><Route path="/" element={<Home />} /><Route path="/trip/:id" element={<h1>Trip detail destination</h1>} /><Route path="/trip/new" element={<h1>Create destination</h1>} /><Route path="/trips" element={<h1>Trips destination</h1>} /><Route path="/demo" element={<h1>Demo destination</h1>} /><Route path="/auth/signup" element={<h1>Signup destination</h1>} /><Route path="/auth/login" element={<h1>Login destination</h1>} /><Route path="/profile" element={<h1>Profile destination</h1>} /><Route path="/settings" element={<h1>Settings destination</h1>} /></Routes></MemoryRouter>; }
 beforeEach(() => { vi.clearAllMocks(); mocks.auth.mockReturnValue({ user: { id: "account-a" }, loading: false, signOut: mocks.signOut }); mocks.trips.mockReturnValue(state()); });
 
 describe("Home", () => {
@@ -29,8 +29,8 @@ describe("Home", () => {
     expect(screen.getByText(/Conceitos em estudo, ainda não disponíveis/)).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Notificações" })).toBeNull();
     expect(screen.queryByText(/Resumo Inteligente/)).toBeNull();
-    await userEvent.click(screen.getByRole("link", { name: "Começar minha jornada" }));
-    expect(screen.getByRole("heading", { name: "Signup destination" })).toBeTruthy();
+    await userEvent.click(screen.getByRole("link", { name: "Explorar como convidado" }));
+    expect(screen.getByRole("heading", { name: "Demo destination" })).toBeTruthy();
   });
   it("features an inclusive active trip before any upcoming trip and opens its details", async () => {
     mocks.trips.mockReturnValue(state([trip("Upcoming", "2099-01-01", "2099-01-15"), trip("Current", today, today)]));

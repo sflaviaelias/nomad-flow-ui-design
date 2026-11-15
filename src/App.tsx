@@ -40,6 +40,7 @@ import { AuthProvider } from "@/contexts/AuthProvider";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import ConfirmEmailPage from "@/features/auth/ConfirmEmailPage";
 import TripDetailsPage from "@/pages/TripDetailsPage";
+import DemoTripPage from "@/features/entry/DemoTripPage";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,7 @@ function AppWrapper() {
     <TooltipProvider>
       <NavigationHistoryProvider>
         <Routes>
+          <Route path="/demo" element={<DemoTripPage />} />
           <Route path="/onboarding" element={<OnboardingFlow onFinish={onboarding.finishOnboarding} />} />
           <Route path="/auth/access" element={<AuthAccessScreen />} />
           <Route path="/auth/signup" element={<SignupScreen />} />

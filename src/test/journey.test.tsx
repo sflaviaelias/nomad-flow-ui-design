@@ -33,7 +33,7 @@ describe("Jornada React com Supabase simulado", () => {
     await user.click(screen.getByRole("button", { name: "Criar Conta" }));
     await screen.findByRole("heading", { name: "Confira seu e-mail" });
     expect(fake.client.auth.signUp.mock.calls[0][0]).toMatchObject({ options: { emailRedirectTo: `${window.location.origin}/auth/confirm` } });
-    await user.click(screen.getByRole("button", { name: "Já confirmei: entrar" }));
+    await user.click(screen.getByRole("link", { name: "Já confirmei: entrar" }));
     async function enter() {
       await user.type(screen.getByLabelText("E-mail"), "ana@example.test");
       await user.type(screen.getByLabelText("Senha"), "Senha!123");
@@ -66,7 +66,7 @@ describe("Jornada React com Supabase simulado", () => {
     await user.click(screen.getByRole("button", { name: "Sair da conta" }));
     await screen.findByRole("heading", { name: "Bem-vindo" });
     expect(screen.queryByText("Porto")).toBeNull();
-    await user.click(screen.getByRole("button", { name: /Já tem conta/ }));
+    await user.click(screen.getByRole("link", { name: /Já tem conta/ }));
     await enter();
     await user.click(await screen.findByRole("link", { name: "Porto" }));
     await screen.findByRole("heading", { name: "Porto" });
