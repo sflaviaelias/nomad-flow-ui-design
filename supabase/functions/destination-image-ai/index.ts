@@ -70,7 +70,7 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({ error: "Não foi possível gerar imagem" }), { status: 500, headers: corsHeaders });
   } catch (error) {
-    console.error("Erro na chamada Groq: ", error);
+    console.error("[destination-image-ai] request_failed");
     return new Response(JSON.stringify({ error: "Erro interno ao gerar imagem", details: String(error) }), { status: 500, headers: corsHeaders });
   }
 });
