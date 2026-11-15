@@ -46,7 +46,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ image_url: null }), { headers: corsHeaders });
     }
   } catch (error) {
-    console.error("Erro ao buscar imagem Unsplash:", error);
+    console.error("[destination-image-unsplash] request_failed");
     return new Response(JSON.stringify({ error: "Erro ao buscar imagem Unsplash", details: String(error) }), { status: 500, headers: corsHeaders });
   }
 });
