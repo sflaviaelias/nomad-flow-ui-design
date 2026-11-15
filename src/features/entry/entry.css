@@ -1,0 +1,21 @@
+/* Entry-only controls follow Home's existing palette; shared forms remain under #21. */
+.entry-shell { overflow-wrap: anywhere; }
+.entry-fields input:not([type="checkbox"]), .entry-fields select {
+  box-sizing: border-box; display: block; width: 100%; min-width: 0; min-height: 48px;
+  border: 1px solid #9b806e; border-radius: 12px; padding: 10px 12px;
+  background: #fff; color: #6d4530; font-size: 16px;
+}
+.entry-fields input:focus-visible, .entry-fields select:focus-visible {
+  outline: 2px solid #c2513b; outline-offset: 3px;
+}
+.entry-fields label { font-size: 14px; font-weight: 500; }
+.entry-fields .entry-password { padding-right: 52px !important; }
+.entry-tags label { flex: 1 1 180px; min-height: 48px; border-color: #9b806e; color: #6d4530; }
+.entry-tags label.bg-terra-600 { background: #c2513b; color: #fff; border-color: #c2513b; }
+.entry-tags button { border-color: currentColor; }
+.entry-tags button:focus-visible { outline: 2px solid #244956; outline-offset: 3px; }
+
+.entry-tags > div { display: grid; grid-template-columns: minmax(0, 1fr); }
+.entry-tags label { min-width: 0; }
+@media (min-width: 640px) { .entry-tags > div { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.entry-fields input::placeholder { color: #826652; opacity: 1; }

@@ -19,8 +19,8 @@ export default function Index() {
   const featured = active ?? upcoming;
   const ready = !!user && !authLoading && !trips.isLoading && !trips.isError;
   const featuredId = ready ? featured?.id : undefined;
-  const primaryTo = !user ? "/auth/signup" : featuredId ? `/trip/${featuredId}` : ready ? "/trip/new" : "/trips";
-  const primaryLabel = !user ? "Começar minha jornada" : featuredId ? "Continuar planejamento" : ready ? "Planejar uma viagem" : "Minhas viagens";
+  const primaryTo = !user ? "/demo" : featuredId ? `/trip/${featuredId}` : ready ? "/trip/new" : "/trips";
+  const primaryLabel = !user ? "Explorar como convidado" : featuredId ? "Continuar planejamento" : ready ? "Planejar uma viagem" : "Minhas viagens";
   return <div lang="pt-BR" className="home-shell min-h-screen bg-background text-accent">
     <a href="#home-content" className="sr-only z-50 rounded-lg bg-white p-4 focus:not-sr-only focus:absolute focus:left-4 focus:top-4">Pular para o conteúdo</a>
     <HomeHeader />
