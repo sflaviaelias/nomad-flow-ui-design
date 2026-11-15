@@ -1,0 +1,8 @@
+/* Scoped presentation only: the shared TripCover's loading, matching and attribution stay intact. */
+.home-trip-cover > div { display: flex; height: 100%; flex-direction: column; }
+.home-trip-cover > div > div:first-child { flex: 1; min-height: 13rem; height: auto; }
+.home-shell { overflow-wrap: anywhere; }
+.home-horizon { background: linear-gradient(165deg, #fcf7f4 35%, #f3e5d9 100%); }
+@media (prefers-reduced-motion: reduce) {
+  .home-shell * { scroll-behavior: auto; }
+}
